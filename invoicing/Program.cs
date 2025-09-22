@@ -49,6 +49,7 @@ namespace invoicing
             services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
             services.AddScoped<ICustomerRepository, CustomerRepository>();
             services.AddScoped<ISupplierRepository, SupplierRepository>();
+            services.AddScoped<IProductRepository, ProductRepository>();
 
             // 在這裡註冊其他的 Service
             services.AddScoped<IFormUIService, FormUIService>();
@@ -61,6 +62,8 @@ namespace invoicing
             services.AddTransient<CustomerForm>();
             services.AddTransient<SupplierManageForm>();
             services.AddTransient<SupplierForm>();
+            services.AddTransient<ProductManageForm>();
+            services.AddTransient<ProductForm>();
 
             //事件註冊
             services.AddSingleton<EventBus>();

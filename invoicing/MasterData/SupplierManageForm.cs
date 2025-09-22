@@ -68,6 +68,10 @@ namespace invoicing.MasterData
                 txtSupplierTel.Text = supplier.Phone1;
                 txtSupplierFax.Text = supplier.FaxNumber;
             }
+            else
+            {
+                MessageBox.Show("請輸入正確的廠商名稱", "錯誤");
+            }
         }
 
 
@@ -98,29 +102,7 @@ namespace invoicing.MasterData
         private async void btnSupplierSearch_Click(object sender, EventArgs e)
         {
             string supplierName = Interaction.InputBox("請輸入廠商名稱", "標題", "輸入框預設內容", -1, -1);
-            var supplier = await _supplierRepository.Get(x => x.CompanyFullName == supplierName)
-                                                    .Select(
-                                                        y => new
-                                                        {
-                                                            y.CompanyCode,
-                                                            y.CompanyFullName,
-                                                            y.DeliveryAddress,
-                                                            y.Phone1,
-                                                            y.FaxNumber
-                                                        })
-                                                    .FirstOrDefaultAsync();
-            if (supplier == null)
-            {
-                MessageBox.Show("請輸入正確的客戶名稱", "錯誤");
-            }
-            else
-            {
-                lblSupplierIdValue.Text = supplier.CompanyCode;
-                txtSupplierName.Text = supplier.CompanyFullName;
-                txtSupplierAddress.Text = supplier.DeliveryAddress;
-                txtSupplierTel.Text = supplier.Phone1;
-                txtSupplierFax.Text = supplier.FaxNumber;
-            }
+            await SearchAsync(supplierName);
         }
 
         private async void btnSupplierDelete_Click(object sender, EventArgs e)

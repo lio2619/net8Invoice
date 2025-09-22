@@ -96,14 +96,16 @@
             // ProductMangeMenu
             // 
             ProductMangeMenu.Name = "ProductMangeMenu";
-            ProductMangeMenu.Size = new Size(152, 26);
+            ProductMangeMenu.Size = new Size(224, 26);
             ProductMangeMenu.Text = "貨品資料";
+            ProductMangeMenu.Click += ProductMangeMenu_Click;
             // 
             // ProductMenu
             // 
             ProductMenu.Name = "ProductMenu";
-            ProductMenu.Size = new Size(152, 26);
+            ProductMenu.Size = new Size(224, 26);
             ProductMenu.Text = "查詢貨品";
+            ProductMenu.Click += ProductMenu_Click;
             // 
             // 廠商資料ToolStripMenuItem
             // 
@@ -115,14 +117,14 @@
             // SupplierMangeMenu
             // 
             SupplierMangeMenu.Name = "SupplierMangeMenu";
-            SupplierMangeMenu.Size = new Size(224, 26);
+            SupplierMangeMenu.Size = new Size(152, 26);
             SupplierMangeMenu.Text = "個別資料";
             SupplierMangeMenu.Click += SupplierMangeMenu_Click;
             // 
             // SupplierMenu
             // 
             SupplierMenu.Name = "SupplierMenu";
-            SupplierMenu.Size = new Size(224, 26);
+            SupplierMenu.Size = new Size(152, 26);
             SupplierMenu.Text = "全部資料";
             SupplierMenu.Click += SupplierMenu_Click;
             // 

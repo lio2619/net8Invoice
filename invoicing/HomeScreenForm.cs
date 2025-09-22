@@ -30,6 +30,16 @@ namespace invoicing
             OpenForm<SupplierForm>();
         }
 
+        private void ProductMangeMenu_Click(object sender, EventArgs e)
+        {
+            OpenForm<ProductManageForm>();
+        }
+
+        private void ProductMenu_Click(object sender, EventArgs e)
+        {
+            OpenForm<ProductForm>();
+        }
+
         /// <summary>
         /// 判斷該視窗是否已經顯示在畫面上了，若沒有就呼叫該視窗，若有就不用管該請求
         /// </summary>

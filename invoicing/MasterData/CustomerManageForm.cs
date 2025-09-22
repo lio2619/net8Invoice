@@ -68,6 +68,10 @@ namespace invoicing.MasterData
                 txtCustomerTel.Text = customer.Phone1;
                 txtCustomerFax.Text = customer.FaxNumber;
             }
+            else
+            {
+                MessageBox.Show("請輸入正確的客戶名稱", "錯誤");
+            }
         }
 
         private async void btnCustomerCreate_Click(object sender, EventArgs e)
@@ -97,29 +101,7 @@ namespace invoicing.MasterData
         private async void btnCustomerSearch_Click(object sender, EventArgs e)
         {
             string customerName = Interaction.InputBox("請輸入客戶名稱", "標題", "輸入框預設內容", -1, -1);
-            var customer = await _customerRepository.Get(x => x.CompanyFullName == customerName)
-                                                    .Select(
-                                                        y => new
-                                                        {
-                                                            y.CompanyCode,
-                                                            y.CompanyFullName,
-                                                            y.DeliveryAddress,
-                                                            y.Phone1,
-                                                            y.FaxNumber
-                                                        })
-                                                    .FirstOrDefaultAsync();
-            if (customer == null)
-            {
-                MessageBox.Show("請輸入正確的客戶名稱", "錯誤");
-            }
-            else
-            {
-                lblCustomerIdValue.Text = customer.CompanyCode;
-                txtCustomerName.Text = customer.CompanyFullName;
-                txtCustomerAddress.Text = customer.DeliveryAddress;
-                txtCustomerTel.Text = customer.Phone1;
-                txtCustomerFax.Text = customer.FaxNumber;
-            }
+            await SearchAsync(customerName);
         }
 
         private async void btnCustomerDelete_Click(object sender, EventArgs e)
