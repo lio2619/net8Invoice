@@ -5,6 +5,7 @@ using invoicing.Repository;
 using invoicing.Repository.Interface;
 using invoicing.Service;
 using invoicing.Service.Interface;
+using invoicing.Transactions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -53,6 +54,7 @@ namespace invoicing
 
             // 在這裡註冊其他的 Service
             services.AddScoped<IFormUIService, FormUIService>();
+            services.AddScoped<ITransactionsService, TransactionsService>();
             services.AddScoped<IPrintService, PrintService>();
 
             // 註冊你的表單
@@ -64,6 +66,12 @@ namespace invoicing
             services.AddTransient<SupplierForm>();
             services.AddTransient<ProductManageForm>();
             services.AddTransient<ProductForm>();
+            services.AddTransient<PurchaseOrderForm>();
+            services.AddTransient<PurchaseReceiptForm>();
+            services.AddTransient<PurchaseReturnForm>();
+            services.AddTransient<SalesDeliveryForm>();
+            services.AddTransient<SalesOrderForm>();
+            services.AddTransient<SalesReturnForm>();
 
             //事件註冊
             services.AddSingleton<EventBus>();

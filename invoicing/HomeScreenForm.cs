@@ -1,4 +1,5 @@
 ﻿using invoicing.MasterData;
+using invoicing.Transactions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace invoicing
@@ -38,6 +39,36 @@ namespace invoicing
         private void ProductMenu_Click(object sender, EventArgs e)
         {
             OpenForm<ProductForm>();
+        }
+
+        private void SalesDeliveryMenu_Click(object sender, EventArgs e)
+        {
+            OpenForm<SalesDeliveryForm>();
+        }
+
+        private void PurchaseReceiptMenu_Click(object sender, EventArgs e)
+        {
+            OpenForm<PurchaseReceiptForm>();
+        }
+
+        private void PurchaseOrderMenu_Click(object sender, EventArgs e)
+        {
+            OpenForm<PurchaseOrderForm>();
+        }
+
+        private void SalesOrderMenu_Click(object sender, EventArgs e)
+        {
+            OpenForm<SalesOrderForm>();
+        }
+
+        private void SalesReturnMenu_Click(object sender, EventArgs e)
+        {
+            OpenForm<SalesReturnForm>();
+        }
+
+        private void PurchaseReturnMenu_Click(object sender, EventArgs e)
+        {
+            OpenForm<PurchaseReturnForm>();
         }
 
         /// <summary>

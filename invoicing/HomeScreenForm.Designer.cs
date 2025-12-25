@@ -96,14 +96,14 @@
             // ProductMangeMenu
             // 
             ProductMangeMenu.Name = "ProductMangeMenu";
-            ProductMangeMenu.Size = new Size(224, 26);
+            ProductMangeMenu.Size = new Size(152, 26);
             ProductMangeMenu.Text = "貨品資料";
             ProductMangeMenu.Click += ProductMangeMenu_Click;
             // 
             // ProductMenu
             // 
             ProductMenu.Name = "ProductMenu";
-            ProductMenu.Size = new Size(224, 26);
+            ProductMenu.Size = new Size(152, 26);
             ProductMenu.Text = "查詢貨品";
             ProductMenu.Click += ProductMenu_Click;
             // 
@@ -133,36 +133,42 @@
             SalesDeliveryMenu.Name = "SalesDeliveryMenu";
             SalesDeliveryMenu.Size = new Size(68, 24);
             SalesDeliveryMenu.Text = "出貨單";
+            SalesDeliveryMenu.Click += SalesDeliveryMenu_Click;
             // 
             // PurchaseReceiptMenu
             // 
             PurchaseReceiptMenu.Name = "PurchaseReceiptMenu";
             PurchaseReceiptMenu.Size = new Size(68, 24);
             PurchaseReceiptMenu.Text = "進貨單";
+            PurchaseReceiptMenu.Click += PurchaseReceiptMenu_Click;
             // 
             // PurchaseOrderMenu
             // 
             PurchaseOrderMenu.Name = "PurchaseOrderMenu";
             PurchaseOrderMenu.Size = new Size(68, 24);
             PurchaseOrderMenu.Text = "採購單";
+            PurchaseOrderMenu.Click += PurchaseOrderMenu_Click;
             // 
             // SalesOrderMenu
             // 
             SalesOrderMenu.Name = "SalesOrderMenu";
             SalesOrderMenu.Size = new Size(68, 24);
             SalesOrderMenu.Text = "訂貨單";
+            SalesOrderMenu.Click += SalesOrderMenu_Click;
             // 
             // SalesReturnMenu
             // 
             SalesReturnMenu.Name = "SalesReturnMenu";
             SalesReturnMenu.Size = new Size(98, 24);
             SalesReturnMenu.Text = "出貨退回單";
+            SalesReturnMenu.Click += SalesReturnMenu_Click;
             // 
             // PurchaseReturnMenu
             // 
             PurchaseReturnMenu.Name = "PurchaseReturnMenu";
             PurchaseReturnMenu.Size = new Size(98, 24);
             PurchaseReturnMenu.Text = "進貨退出單";
+            PurchaseReturnMenu.Click += PurchaseReturnMenu_Click;
             // 
             // TotalPurchasesMenu
             // 
