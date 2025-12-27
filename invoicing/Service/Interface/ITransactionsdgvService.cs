@@ -5,7 +5,7 @@ namespace invoicing.Service.Interface
     /// <summary>
     /// 提供交易表單 DataGridView 相關的共用服務介面
     /// </summary>
-    public interface ITransactionsService
+    public interface ITransactionsdgvService
     {
         #region DataGridView 使用功能
         /// <summary>

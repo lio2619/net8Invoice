@@ -1,6 +1,7 @@
 using invoicing.DB.DBContext;
 using invoicing.Event;
 using invoicing.MasterData;
+using invoicing.ReadForm;
 using invoicing.Repository;
 using invoicing.Repository.Interface;
 using invoicing.Service;
@@ -54,7 +55,8 @@ namespace invoicing
 
             // 在這裡註冊其他的 Service
             services.AddScoped<IFormUIService, FormUIService>();
-            services.AddScoped<ITransactionsService, TransactionsService>();
+            services.AddScoped<ITransactionsdgvService, TransactionsdgvService>();
+            services.AddScoped<ITransactionsbtnService, TransactionsbtnService>();
             services.AddScoped<IPrintService, PrintService>();
 
             // 註冊你的表單
@@ -72,6 +74,7 @@ namespace invoicing
             services.AddTransient<SalesDeliveryForm>();
             services.AddTransient<SalesOrderForm>();
             services.AddTransient<SalesReturnForm>();
+            services.AddTransient<ReadInvoicesForm>();
 
             //事件註冊
             services.AddSingleton<EventBus>();

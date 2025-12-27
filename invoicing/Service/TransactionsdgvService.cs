@@ -8,7 +8,7 @@ namespace invoicing.Service
     /// <summary>
     /// 交易表單 DataGridView 共用服務實作
     /// </summary>
-    public class TransactionsService : ITransactionsService
+    public class TransactionsdgvService : ITransactionsdgvService
     {
         private readonly IProductRepository _productRepository;
 
@@ -46,7 +46,7 @@ namespace invoicing.Service
         /// 建構函式，注入產品資料庫儲存庫
         /// </summary>
         /// <param name="productRepository">產品資料庫儲存庫</param>
-        public TransactionsService(IProductRepository productRepository)
+        public TransactionsdgvService(IProductRepository productRepository)
         {
             _productRepository = productRepository;
         }
@@ -348,10 +348,10 @@ namespace invoicing.Service
             if (_suggestionListBox.SelectedIndex < 0 || _suggestionListBox.SelectedIndex >= _currentSuggestions.Count) return;
 
             var selected = _currentSuggestions[_suggestionListBox.SelectedIndex];
-            
+
             // 記錄已選擇的產品編號，防止 TextChanged 事件再次觸發查詢
             _lastSelectedProductCode = selected.ProductCode;
-            
+
             _currentTextBox.Text = selected.ProductCode;
             _currentTextBox.SelectionStart = _currentTextBox.Text.Length;
 
