@@ -8,13 +8,15 @@ namespace invoicing.Models.Entity
     /// 總單子_客戶
     /// </summary>
     [Table("CustomerOrder")]
-    [Index(nameof(OrderNumber), IsUnique = true)]
     public class CustomerOrder : BaseEntity
     {
         [Comment("單子編號")]
-        [Required]
         [MaxLength(50)]
         public string OrderNumber { get; set; }
+
+        [Comment("新單子編號")]
+        [MaxLength(50)]
+        public string? NewOrderNumber { get; set; }
 
         [Comment("備註")]
         [MaxLength(255)]

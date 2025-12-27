@@ -19,14 +19,12 @@ namespace invoicing.Repository
 
         public virtual async Task AddAsync(T entity)
         {
-            entity.CreatedAt = DateTime.UtcNow;
             await _dbSet.AddAsync(entity);
             await _context.SaveChangesAsync();
         }
 
         public virtual async Task UpdateAsync(T entity)
         {
-            entity.LastModified = DateTime.UtcNow;
             _dbSet.Update(entity);
             await _context.SaveChangesAsync();
         }
