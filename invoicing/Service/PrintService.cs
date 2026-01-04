@@ -1,240 +1,332 @@
-﻿using invoicing.Service.Interface;
+﻿using invoicing.Models.DTO;
+using invoicing.Service.Interface;
+using PdfiumViewer;
+using QuestPDF.Fluent;
+using QuestPDF.Helpers;
+using QuestPDF.Infrastructure;
 using System.Configuration;
-using System.Drawing.Printing;
 
 namespace invoicing.Service
 {
     public class PrintService : IPrintService
     {
-        private readonly int[] _width = [20, 135, 520, 575, 625, 680, 750];
-        private readonly string[] _vendorDocs = ["進貨退出單", "進貨單"];
-        private readonly string _defaultCustomerName = ConfigurationManager.AppSettings["DefaultCustomerName"];
-        private readonly string _defaultCustomerTel = ConfigurationManager.AppSettings["DefaultCustomerTel"];
-        private readonly string _defaultCustomerFax = ConfigurationManager.AppSettings["DefaultCustomerFax"];
+        private readonly string _defaultCustomerName = ConfigurationManager.AppSettings["DefaultCustomerName"] ?? "";
+        private readonly string _defaultCustomerTel = ConfigurationManager.AppSettings["DefaultCustomerTel"] ?? "";
+        private readonly string _defaultCustomerFax = ConfigurationManager.AppSettings["DefaultCustomerFax"] ?? "";
+
+        // 每頁最大筆數
+        private const int MaxRowsPerPage = 40;
+        // 小於等於此筆數時，表尾位置調整至頁面中間
+        private const int SmallPageThreshold = 16;
+
+        static PrintService()
+        {
+            // 設定 QuestPDF 社群授權
+            QuestPDF.Settings.License = LicenseType.Community;
+        }
+
+        #region QuestPDF + PdfiumViewer 列印功能
 
         /// <summary>
-        /// 列印表頭 (依據單據類型：客戶/廠商/採購單)
+        /// 使用 QuestPDF 產生發票 PDF
         /// </summary>
-        /// <param name="e">列印事件參數 (提供繪製功能)</param>
-        /// <param name="bili">單據名稱 (例如：進貨單、出貨單)</param>
-        /// <param name="client">客戶或廠商名稱</param>
-        /// <param name="date">單據日期</param>
-        /// <param name="singleNumber">單據編號</param>
-        /// <param name="tex">電話號碼</param>
-        /// <param name="fax">傳真號碼</param>
-        /// <param name="address">送貨地址</param>
-        /// <param name="page">目前頁碼</param>
-        /// <param name="totalPage">總頁數</param>
-        public void PrintHeader(PrintPageEventArgs e, string bili, string client, string date,
-                                string singleNumber, string tex, string fax, string address,
-                                int page, int totalPage)
+        public byte[] GenerateInvoicePdf(PrintInvoiceRequest request)
         {
-            if (_vendorDocs.Contains(bili)) // 給廠商
+            // 計算總資料筆數
+            int totalItems = request.OrderType == "採購單"
+                ? (request.PurchaseOrderDetails?.Count ?? 0)
+                : (request.Details?.Count ?? 0);
+
+            // 計算總頁數
+            int totalPages = totalItems <= 0 ? 1 : (int)Math.Ceiling((double)totalItems / MaxRowsPerPage);
+
+            var document = Document.Create(container =>
             {
-                DrawHeaderBase(e, bili, client, date, singleNumber, tex, fax, address, page, totalPage, "廠商名稱");
-                DrawTableHeader(e, bili == "採購單" ? "採購單" : "廠商");
-            }
-            else if (bili == "採購單")
-            {
-                DrawHeaderBase(e, bili, client, date, singleNumber, tex, fax, address, page, totalPage, "廠商名稱");
-                DrawTableHeader(e, "採購單");
-            }
-            else // 給客戶
-            {
-                DrawHeaderBase(e, bili, client, date, singleNumber, tex, fax, address, page, totalPage, "客戶名稱");
-                DrawTableHeader(e, "客戶");
-            }
+                int itemIndex = 0;
+
+                for (int pageNum = 1; pageNum <= totalPages; pageNum++)
+                {
+                    int currentPage = pageNum;
+                    int startIndex = itemIndex;
+                    int itemsOnThisPage = Math.Min(MaxRowsPerPage, totalItems - startIndex);
+                    bool isLastPage = (currentPage == totalPages);
+
+                    // 判斷最後一頁是否需要特殊處理（≤16筆時表尾在中間）
+                    bool useMiddleFooter = isLastPage && itemsOnThisPage <= SmallPageThreshold && itemsOnThisPage > 0;
+
+                    container.Page(page =>
+                    {
+                        page.Size(PageSizes.A4);
+                        page.Margin(20);
+                        page.DefaultTextStyle(x => x.FontFamily("Microsoft JhengHei").FontSize(8));
+
+                        page.Header().Element(c => ComposeHeaderWithPageNumber(c, request, currentPage, totalPages));
+                        page.Content().Element(c => ComposeContentPaged(c, request, startIndex, itemsOnThisPage, useMiddleFooter));
+
+                        // 只在最後一頁顯示表尾
+                        if (isLastPage)
+                        {
+                            if (useMiddleFooter)
+                            {
+                                // ≤16筆：表尾已包含在 Content 中（中間位置）
+                                page.Footer().Element(c => { });
+                            }
+                            else
+                            {
+                                page.Footer().Element(c => ComposeFooter(c, request));
+                            }
+                        }
+                    });
+
+                    itemIndex += itemsOnThisPage;
+                }
+            });
+
+            return document.GeneratePdf();
         }
 
         /// <summary>
-        /// 列印表格內的內容 (逐列印出數值)
+        /// 使用 PdfiumViewer 顯示 PDF 預覽視窗並提供列印功能
         /// </summary>
-        /// <param name="e">列印事件參數 (提供繪製功能)</param>
-        /// <param name="value">要列印的文字內容</param>
-        /// <param name="high">列印的垂直位置 (Y 座標)</param>
-        /// <param name="j">目前欄位索引 (決定水平位置)</param>
-        /// <param name="row">目前列索引</param>
-        public void PrintInside(PrintPageEventArgs e, string value, int high, int j, int row)
+        public void ShowPrintPreviewAndPrint(byte[] pdfBytes, int copies = 1)
         {
-            if (row % 5 == 0 && row != 0 && row % 40 != 0)
-            {
-                using var blackPen = new Pen(Color.Black);
-                e.Graphics.DrawLine(blackPen, new PointF(20, high), new PointF(790, high));
-            }
+            using var stream = new MemoryStream(pdfBytes);
+            using var pdfDocument = PdfDocument.Load(stream);
 
-            using var font = new Font("Arial", 10);
-            using var stringFormat = new StringFormat { Alignment = StringAlignment.Far };
+            // 建立預覽表單
+            var previewForm = new Form
+            {
+                Text = "列印預覽",
+                Width = 900,
+                Height = 700,
+                StartPosition = FormStartPosition.CenterScreen
+            };
 
-            if (j > 1)
+            // PDF 檢視器
+            var pdfViewer = new PdfViewer
             {
-                e.Graphics.DrawString(value, font, Brushes.Black, new PointF(_width[j], high), stringFormat);
-            }
-            else
+                Dock = DockStyle.Fill,
+                Document = pdfDocument
+            };
+
+            // 列印按鈕
+            var printButton = new Button
             {
-                e.Graphics.DrawString(value, font, Brushes.Black, new PointF(_width[j], high));
-            }
+                Text = "列印",
+                Dock = DockStyle.Bottom,
+                Height = 40
+            };
+
+            printButton.Click += (sender, e) =>
+            {
+                using var printDoc = pdfDocument.CreatePrintDocument();
+                printDoc.PrinterSettings.Copies = (short)copies;
+
+                var printDialog = new PrintDialog
+                {
+                    Document = printDoc,
+                    UseEXDialog = true
+                };
+
+                if (printDialog.ShowDialog() == DialogResult.OK)
+                {
+                    printDoc.Print();
+                }
+            };
+
+            previewForm.Controls.Add(pdfViewer);
+            previewForm.Controls.Add(printButton);
+            previewForm.ShowDialog();
         }
 
         /// <summary>
-        /// 列印表尾 (總計與備註)
+        /// 繪製表頭（含頁次）
         /// </summary>
-        /// <param name="e">列印事件參數 (提供繪製功能)</param>
-        /// <param name="value">總計數值</param>
-        /// <param name="direction">備註文字</param>
-        /// <param name="row">目前列索引</param>
-        /// <param name="isLastPage">是否為最後一頁</param>
-        public void PrintLast(PrintPageEventArgs e, string value, string direction, int row, bool isLastPage)
+        private void ComposeHeaderWithPageNumber(IContainer container, PrintInvoiceRequest request, int currentPage, int totalPages)
         {
-            using var normalFont = new Font("Arial", 12);
-            using var blackPen = new Pen(Color.Black);
+            var clientLabel = request.IsSupplier ? "廠商名稱" : "客戶名稱";
 
-            if (isLastPage)
+            container.Column(column =>
             {
-                e.Graphics.DrawLine(blackPen, new PointF(20, 1010), new PointF(790, 1010));
-                e.Graphics.DrawString($"備註：{direction}", normalFont, Brushes.Black, new PointF(20, 1020));
-                e.Graphics.DrawString($"總計：{value}", normalFont, Brushes.Black, new PointF(640, 1020));
-            }
-            else if (row % 40 < 16 && row % 40 != 0)
-            {
-                e.Graphics.DrawLine(blackPen, new PointF(20, 500), new PointF(790, 500));
-                e.Graphics.DrawString($"備註：{direction}", normalFont, Brushes.Black, new PointF(20, 510));
-                e.Graphics.DrawString($"總計：{value}", normalFont, Brushes.Black, new PointF(640, 510));
-            }
-            else
-            {
-                e.Graphics.DrawLine(blackPen, new PointF(20, 1010), new PointF(790, 1010));
-                e.Graphics.DrawString($"備註：{direction}", normalFont, Brushes.Black, new PointF(20, 1020));
-                e.Graphics.DrawString($"總計：{value}", normalFont, Brushes.Black, new PointF(640, 1020));
-            }
+                column.Spacing(5);
+
+                // 第一行：公司名稱 + 單據類型
+                column.Item().Row(row =>
+                {
+                    row.RelativeItem().Text(_defaultCustomerName).FontSize(18).Bold();
+                    row.ConstantItem(150).AlignRight().Text(request.OrderType).FontSize(18).Bold();
+                });
+
+                // 第二行：電話、傳真、頁次
+                column.Item().Row(row =>
+                {
+                    row.RelativeItem().Text($"Tel：{_defaultCustomerTel}");
+                    row.RelativeItem().Text($"Fax：{_defaultCustomerFax}");
+                    row.ConstantItem(120).AlignRight().Text($"頁次：{currentPage}/{totalPages}");
+                });
+
+                // 第三行：客戶/廠商名稱、日期
+                column.Item().Row(row =>
+                {
+                    row.RelativeItem().Text($"{clientLabel}：{request.CustomerName}");
+                    row.ConstantItem(200).AlignRight().Text($"貨單日期：{request.Date}");
+                });
+
+                // 第四行：電話、傳真、編號
+                column.Item().Row(row =>
+                {
+                    row.RelativeItem().Text($"連絡電話：{request.Phone}");
+                    row.RelativeItem().Text($"傳真號碼：{request.Fax}");
+                    row.ConstantItem(200).AlignRight().Text($"貨單編號：{request.OrderNumber}");
+                });
+
+                // 第五行：送貨地址
+                column.Item().Text($"送貨地址：{request.Address}");
+
+                // 分隔線
+                column.Item().PaddingVertical(5).LineHorizontal(1);
+            });
         }
 
         /// <summary>
-        /// 列印「應收帳款簡要表」表頭
+        /// 繪製分頁內容表格
         /// </summary>
-        /// <param name="e">列印事件參數</param>
-        /// <param name="startDate">帳款區間起始日</param>
-        /// <param name="endDate">帳款區間結束日</param>
-        /// <param name="company">客戶名稱</param>
-        public void CollectMoneyHeader(PrintPageEventArgs e, string startDate, string endDate, string company)
+        private void ComposeContentPaged(IContainer container, PrintInvoiceRequest request, int startIndex, int itemCount, bool includeFooterInMiddle)
         {
-            using var titleFont = new Font("Arial", 20);
-            using var subTitleFont = new Font("Arial", 16);
-            using var normalFont = new Font("Arial", 12);
-            using var blackPen = new Pen(Color.Black);
+            var isPurchaseOrder = request.OrderType == "採購單";
+            int columnCount = isPurchaseOrder ? 5 : 7;
 
-            e.Graphics.DrawString(_defaultCustomerName, titleFont, Brushes.Black, new PointF(320, 20));
-            e.Graphics.DrawString("應收帳款簡要表", subTitleFont, Brushes.Black, new PointF(325, 60));
-            e.Graphics.DrawString($"帳款區間：{startDate} ~ {endDate}", normalFont, Brushes.Black, new PointF(20, 80));
-            e.Graphics.DrawString($"客戶名稱：{company}", normalFont, Brushes.Black, new PointF(20, 110));
+            container.Column(column =>
+            {
+                // 表格部分
+                column.Item().Table(table =>
+                {
+                    // 定義欄位
+                    if (isPurchaseOrder)
+                    {
+                        table.ColumnsDefinition(columns =>
+                        {
+                            columns.RelativeColumn(1.5f); // 編號
+                            columns.RelativeColumn(4f);   // 品名
+                            columns.RelativeColumn(1f);   // 數量
+                            columns.RelativeColumn(1f);   // 單位
+                            columns.RelativeColumn(2f);   // 備註
+                        });
+                    }
+                    else
+                    {
+                        table.ColumnsDefinition(columns =>
+                        {
+                            columns.RelativeColumn(1.5f); // 編號
+                            columns.RelativeColumn(3f);   // 品名
+                            columns.RelativeColumn(1f);   // 數量
+                            columns.RelativeColumn(1f);   // 單位
+                            columns.RelativeColumn(1f);   // 單價
+                            columns.RelativeColumn(1f);   // 金額
+                            columns.RelativeColumn(1.5f); // 備註
+                        });
+                    }
 
-            e.Graphics.DrawString("單別", normalFont, Brushes.Black, new PointF(70, 140));
-            e.Graphics.DrawString("交易日期", normalFont, Brushes.Black, new PointF(140, 140));
-            e.Graphics.DrawString("交易單號", normalFont, Brushes.Black, new PointF(260, 140));
-            e.Graphics.DrawString("合計金額", normalFont, Brushes.Black, new PointF(550, 140));
-            e.Graphics.DrawString("總計金額", normalFont, Brushes.Black, new PointF(650, 140));
+                    // 表頭
+                    table.Header(header =>
+                    {
+                        header.Cell().BorderBottom(1).Padding(5).Text("編號").Bold();
+                        header.Cell().BorderBottom(1).Padding(5).Text("品名").Bold();
+                        header.Cell().BorderBottom(1).Padding(5).AlignRight().Text("數量").Bold();
+                        header.Cell().BorderBottom(1).Padding(5).Text("單位").Bold();
 
-            e.Graphics.DrawLine(blackPen, new PointF(20, 160), new PointF(790, 160));
+                        if (isPurchaseOrder)
+                        {
+                            header.Cell().BorderBottom(1).Padding(5).Text("備註").Bold();
+                        }
+                        else
+                        {
+                            header.Cell().BorderBottom(1).Padding(5).AlignRight().Text("單價").Bold();
+                            header.Cell().BorderBottom(1).Padding(5).AlignRight().Text("金額").Bold();
+                            header.Cell().BorderBottom(1).Padding(5).Text("備註").Bold();
+                        }
+                    });
+
+                    // 資料列（分頁）
+                    int rowCounter = 0;
+                    if (isPurchaseOrder && request.PurchaseOrderDetails != null)
+                    {
+                        for (int i = startIndex; i < startIndex + itemCount && i < request.PurchaseOrderDetails.Count; i++)
+                        {
+                            var detail = request.PurchaseOrderDetails[i];
+                            bool needSeparator = (rowCounter > 0) && (rowCounter % 5 == 0);
+
+                            // 每 5 筆加一條分隔線
+                            table.Cell().BorderTop(needSeparator ? 0.5f : 0).Padding(3).Text(detail.ProductCode ?? "").ClampLines(1);
+                            table.Cell().BorderTop(needSeparator ? 0.5f : 0).Padding(3).Text(detail.ProductName ?? "").ClampLines(1);
+                            table.Cell().BorderTop(needSeparator ? 0.5f : 0).Padding(3).AlignRight().Text(detail.Quantity ?? "").ClampLines(1);
+                            table.Cell().BorderTop(needSeparator ? 0.5f : 0).Padding(3).Text(detail.Unit ?? "").ClampLines(1);
+                            table.Cell().BorderTop(needSeparator ? 0.5f : 0).Padding(3).Text(detail.Remark ?? "").ClampLines(1);
+
+                            rowCounter++;
+                        }
+                    }
+                    else if (request.Details != null)
+                    {
+                        for (int i = startIndex; i < startIndex + itemCount && i < request.Details.Count; i++)
+                        {
+                            var detail = request.Details[i];
+                            bool needSeparator = (rowCounter > 0) && (rowCounter % 5 == 0);
+
+                            // 每 5 筆加一條分隔線
+                            table.Cell().BorderTop(needSeparator ? 0.5f : 0).Padding(3).Text(detail.ProductCode ?? "").ClampLines(1);
+                            table.Cell().BorderTop(needSeparator ? 0.5f : 0).Padding(3).Text(detail.ProductName ?? "").ClampLines(1);
+                            table.Cell().BorderTop(needSeparator ? 0.5f : 0).Padding(3).AlignRight().Text(detail.Quantity ?? "").ClampLines(1);
+                            table.Cell().BorderTop(needSeparator ? 0.5f : 0).Padding(3).Text(detail.Unit ?? "").ClampLines(1);
+                            table.Cell().BorderTop(needSeparator ? 0.5f : 0).Padding(3).AlignRight().Text(detail.UnitPrice ?? "").ClampLines(1);
+                            table.Cell().BorderTop(needSeparator ? 0.5f : 0).Padding(3).AlignRight().Text(detail.Amount ?? "").ClampLines(1);
+                            table.Cell().BorderTop(needSeparator ? 0.5f : 0).Padding(3).Text(detail.Remark ?? "").ClampLines(1);
+
+                            rowCounter++;
+                        }
+                    }
+                });
+
+                // 如果需要在中間顯示表尾（≤SmallPageThreshold筆時）
+                if (includeFooterInMiddle)
+                {
+                    // 加入一些垂直間距，讓表尾顯示在表格下方（中間位置）
+                    column.Item().PaddingTop(20).Column(footerColumn =>
+                    {
+                        footerColumn.Item().LineHorizontal(1);
+                        footerColumn.Item().PaddingTop(5).Row(row =>
+                        {
+                            row.RelativeItem().Text($"備註：{request.Remark}");
+                            if (!string.IsNullOrEmpty(request.TotalAmount) && request.TotalAmount != "0")
+                            {
+                                row.ConstantItem(150).AlignRight().Text($"總計：{request.TotalAmount}").Bold();
+                            }
+                        });
+                    });
+                }
+            });
         }
 
         /// <summary>
-        /// 列印「應收帳款簡要表」內部的資料列
+        /// 繪製表尾（固定在頁面底部）
         /// </summary>
-        /// <param name="e">列印事件參數</param>
-        /// <param name="value">要列印的文字內容</param>
-        /// <param name="high">列印的垂直位置 (Y 座標)</param>
-        /// <param name="j">目前欄位索引</param>
-        public void CollectMoneyInside(PrintPageEventArgs e, string value, int high, int j)
+        private void ComposeFooter(IContainer container, PrintInvoiceRequest request)
         {
-            using var font = new Font("Arial", 12);
-            using var stringFormat = new StringFormat { Alignment = StringAlignment.Far };
+            container.Column(column =>
+            {
+                column.Item().PaddingTop(10).LineHorizontal(1);
 
-            int[] mWidth = { 120, 220, 365, 620, 720 };
-            e.Graphics.DrawString(value, font, Brushes.Black, new PointF(mWidth[j], high), stringFormat);
+                column.Item().Row(row =>
+                {
+                    row.RelativeItem().Text($"備註：{request.Remark}");
+                    if (!string.IsNullOrEmpty(request.TotalAmount) && request.TotalAmount != "0")
+                    {
+                        row.ConstantItem(150).AlignRight().Text($"總計：{request.TotalAmount}").Bold();
+                    }
+                });
+            });
         }
 
-        /// <summary>
-        /// 列印「應收帳款簡要表」的表尾 (畫橫線)
-        /// </summary>
-        /// <param name="e">列印事件參數</param>
-        /// <param name="row">目前列索引</param>
-        public void CollectMoneyLast(PrintPageEventArgs e, int row)
-        {
-            using var blackPen = new Pen(Color.Black);
-
-            if (row % 41 < 16)
-            {
-                e.Graphics.DrawLine(blackPen, new PointF(20, 500), new PointF(790, 500));
-            }
-            else
-            {
-                e.Graphics.DrawLine(blackPen, new PointF(20, 1010), new PointF(790, 1010));
-            }
-        }
-
-        /// <summary>
-        /// 畫表頭的基本資訊 (單據名稱、頁次、公司資訊等)
-        /// </summary>
-        /// <param name="e">列印事件參數</param>
-        /// <param name="bili">單據名稱</param>
-        /// <param name="client">客戶/廠商名稱</param>
-        /// <param name="date">單據日期</param>
-        /// <param name="singleNumber">單據編號</param>
-        /// <param name="tex">電話號碼</param>
-        /// <param name="fax">傳真號碼</param>
-        /// <param name="address">送貨地址</param>
-        /// <param name="page">目前頁碼</param>
-        /// <param name="totalPage">總頁數</param>
-        /// <param name="clientLabel">顯示標籤 (客戶名稱/廠商名稱)</param>
-        private void DrawHeaderBase(PrintPageEventArgs e, string bili, string client, string date,
-                                    string singleNumber, string tex, string fax, string address,
-                                    int page, int totalPage, string clientLabel)
-        {
-            using var titleFont = new Font("Arial", 22);
-            using var normalFont = new Font("Arial", 12);
-
-            e.Graphics.DrawString(_defaultCustomerName, titleFont, Brushes.Black, new PointF(20, 20));
-            e.Graphics.DrawString(bili, titleFont, Brushes.Black, new PointF(560, 20));
-            e.Graphics.DrawString($"Tel：{_defaultCustomerTel}", normalFont, Brushes.Black, new PointF(20, 60));
-            e.Graphics.DrawString($"Fax：{_defaultCustomerFax}", normalFont, Brushes.Black, new PointF(250, 60));
-            e.Graphics.DrawString($"頁次：{page + 1}/{totalPage + 1}", normalFont, Brushes.Black, new PointF(560, 60));
-            e.Graphics.DrawString($"{clientLabel}：{client}", normalFont, Brushes.Black, new PointF(20, 90));
-            e.Graphics.DrawString($"貨單日期：{date}", normalFont, Brushes.Black, new PointF(560, 90));
-            e.Graphics.DrawString($"連絡電話：{tex}", normalFont, Brushes.Black, new PointF(20, 120));
-            e.Graphics.DrawString($"傳真號碼：{fax}", normalFont, Brushes.Black, new PointF(250, 120));
-            e.Graphics.DrawString($"貨單編號：{singleNumber}", normalFont, Brushes.Black, new PointF(560, 120));
-            e.Graphics.DrawString($"送貨地址：{address}", normalFont, Brushes.Black, new PointF(20, 150));
-        }
-
-        /// <summary>
-        /// 畫表格的欄位標題 (品名、數量、單位...等)
-        /// </summary>
-        /// <param name="e">列印事件參數</param>
-        /// <param name="type">單據類型 (決定顯示的欄位)</param>
-        private void DrawTableHeader(PrintPageEventArgs e, string type)
-        {
-            using var normalFont = new Font("Arial", 12);
-            using var blackPen = new Pen(Color.Black);
-
-            var lineY = 170;
-            e.Graphics.DrawLine(blackPen, new PointF(20, lineY), new PointF(790, lineY));
-
-            e.Graphics.DrawString("編號", normalFont, Brushes.Black, new PointF(20, lineY));
-            e.Graphics.DrawString("品名", normalFont, Brushes.Black, new PointF(140, lineY));
-            e.Graphics.DrawString("數量", normalFont, Brushes.Black, new PointF(490, lineY));
-            e.Graphics.DrawString("單位", normalFont, Brushes.Black, new PointF(540, lineY));
-
-            if (type == "採購單")
-            {
-                e.Graphics.DrawString("備註", normalFont, Brushes.Black, new PointF(640, lineY));
-            }
-            else
-            {
-                e.Graphics.DrawString("單價", normalFont, Brushes.Black, new PointF(590, lineY));
-                e.Graphics.DrawString("金額", normalFont, Brushes.Black, new PointF(640, lineY));
-                e.Graphics.DrawString("建議售價", normalFont, Brushes.Black, new PointF(700, lineY));
-            }
-
-            e.Graphics.DrawLine(blackPen, new PointF(20, 190), new PointF(790, 190));
-        }
+        #endregion
     }
 }
