@@ -22,10 +22,12 @@ namespace invoicing.Models.Entity
         [MaxLength(50)]
         public string? UnitPrice { get; set; }
 
-        [Required]
-        [Comment("單子編號")]
+        [Comment("單子編號（舊資料關聯用）")]
         [MaxLength(50)]
-        public string OrderNumber { get; set; }
+        public string? OrderNumber { get; set; }
+
+        [Comment("CustomerOrder Id（新資料關聯用）")]
+        public int? CustomerOrderId { get; set; }
 
         [Comment("基本單位")]
         [MaxLength(10)]

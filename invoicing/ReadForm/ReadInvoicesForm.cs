@@ -97,7 +97,7 @@ namespace invoicing.ReadForm
 
                 // 基本查詢條件：未刪除且在時間範圍內
                 var query = _customerOrderRepository.Get(x =>
-                    (x.IsDeleted == false) &&
+                    (x.Deleted == "0") &&
                     x.Date != null &&
                     x.Date.CompareTo(startDate) >= 0 &&
                     x.Date.CompareTo(endDate) <= 0);
@@ -110,11 +110,13 @@ namespace invoicing.ReadForm
 
                 // 轉換為 DTO
                 _invoicingData = query
-                    .OrderByDescending(x => x.OrderNumber)
+                    .OrderByDescending(x => x.NewOrderNumber)
                     .ThenByDescending(x => x.Date)
                     .Select(y => new InvoicingDTO
                     {
+                        Id = y.Id,
                         OrderNumber = y.OrderNumber,
+                        NewOrderNumber = y.NewOrderNumber,
                         Date = y.Date,
                         Customer = y.Customer,
                         OrderName = y.OrderName,
@@ -197,10 +199,28 @@ namespace invoicing.ReadForm
                     return;
                 }
 
-                // 查詢選中訂單的明細資料
-                var selectedDetails = _orderDetailRepository
-                    .Get(x => selectedOrderNumbers.Contains(x.OrderNumber))
-                    .Select(d => new InvoicingDetailDTO
+                // 查詢選中訂單的明細資料（區分新舊資料）
+                var selectedDetails = new List<InvoicingDetailDTO>();
+
+                foreach (var invoice in selectedInvoices)
+                {
+                    List<OrderDetail> details;
+                    if (!string.IsNullOrEmpty(invoice.NewOrderNumber))
+                    {
+                        // 新資料：用 CustomerOrderId 查詢
+                        details = _orderDetailRepository
+                            .Get(x => x.CustomerOrderId == invoice.Id)
+                            .ToList();
+                    }
+                    else
+                    {
+                        // 舊資料：用 OrderNumber 查詢
+                        details = _orderDetailRepository
+                            .Get(x => x.OrderNumber == invoice.OrderNumber)
+                            .ToList();
+                    }
+
+                    selectedDetails.AddRange(details.Select(d => new InvoicingDetailDTO
                     {
                         ProductCode = d.ProductCode,
                         ProductName = d.ProductName,
@@ -209,7 +229,8 @@ namespace invoicing.ReadForm
                         UnitPrice = d.UnitPrice,
                         Amount = d.Amount,
                         Remark = d.Remark
-                    }).ToList();
+                    }));
+                }
 
                 // 發布事件
                 _eventBus.Publish(new InvoiceSelectedEvent(

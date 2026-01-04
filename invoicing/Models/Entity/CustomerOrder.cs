@@ -12,7 +12,7 @@ namespace invoicing.Models.Entity
     {
         [Comment("單子編號")]
         [MaxLength(50)]
-        public string OrderNumber { get; set; }
+        public string? OrderNumber { get; set; }
 
         [Comment("新單子編號")]
         [MaxLength(50)]

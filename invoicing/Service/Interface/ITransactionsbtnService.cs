@@ -1,4 +1,6 @@
-﻿namespace invoicing.Service.Interface
+﻿using invoicing.Models.DTO;
+
+namespace invoicing.Service.Interface
 {
     /// <summary>
     /// 交易表單按鈕服務介面
@@ -12,5 +14,33 @@
         /// <param name="callerFormType">呼叫來源的表單類型名稱</param>
         /// <param name="callerOrderName">用於篩選的單子名稱（可為空）</param>
         void OpenReadInvoicesForm(string callerFormType, string callerOrderName = "");
+
+        /// <summary>
+        /// 儲存交易單子（新增或更新）
+        /// </summary>
+        /// <param name="request">儲存請求參數</param>
+        /// <returns>儲存結果</returns>
+        Task<SaveResult> SaveTransactionAsync(SaveTransactionRequest request);
+
+        /// <summary>
+        /// 刷新表單確認對話框
+        /// </summary>
+        /// <returns>刷新結果（是否確認刷新）</returns>
+        RefreshResult ConfirmRefresh();
+
+        /// <summary>
+        /// 刪除交易單子
+        /// </summary>
+        /// <param name="orderNumber">單子編號</param>
+        /// <param name="isNewOrderNumber">是否為新編號系統（NewOrderNumber）</param>
+        /// <returns>刪除結果</returns>
+        Task<DeleteResult> DeleteTransactionAsync(string orderNumber, bool isNewOrderNumber);
+
+        /// <summary>
+        /// 建立 Excel 檔案
+        /// </summary>
+        /// <param name="request">建立 Excel 請求參數</param>
+        /// <returns>非同步任務</returns>
+        Task CreateExcelAsync(CreateExcelRequest request);
     }
 }

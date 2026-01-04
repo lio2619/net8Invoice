@@ -22,7 +22,6 @@ namespace invoicing.DB.DBContext
                       .HasFilter("\"OrderNumber\" IS NOT NULL");
 
                 entity.HasIndex(e => e.NewOrderNumber)
-                      .IsUnique()
                       .HasFilter("\"NewOrderNumber\" IS NOT NULL");
 
                 // 2. 設定 PostgreSQL Check Constraint (互斥邏輯)

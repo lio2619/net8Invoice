@@ -2,7 +2,9 @@
 
 using invoicing.Event;
 using invoicing.Models.DTO;
+using invoicing.Repository.Interface;
 using invoicing.Service.Interface;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel;
 
 namespace invoicing.Transactions
@@ -15,8 +17,8 @@ namespace invoicing.Transactions
         private readonly IFormUIService _formUIService;
         private readonly ITransactionsdgvService _transactionsdgvService;
         private readonly ITransactionsbtnService _transactionsbtnService;
+        private readonly ICustomerRepository _customerRepository;
         private readonly EventBus _eventBus;
-        private readonly IServiceProvider _serviceProvider;
 
         /// <summary>
         /// 使用 BindingList 作為資料來源，支援 DataGridView 自動增行功能。
@@ -28,6 +30,26 @@ namespace invoicing.Transactions
         /// </summary>
         private readonly CancellationTokenSource _cancellationTokenSource = new();
 
+        /// <summary>
+        /// 標記是否已儲存過（用於判斷新增或更新模式）
+        /// </summary>
+        private bool _isSaved = false;
+
+        /// <summary>
+        /// 當前使用的單子編號（舊資料用 OrderNumber，新資料用 NewOrderNumber）
+        /// </summary>
+        private string _currentOrderNumber = string.Empty;
+
+        /// <summary>
+        /// 標記是否使用新編號系統（NewOrderNumber）
+        /// </summary>
+        private bool _isUsingNewOrderNumber = false;
+
+        /// <summary>
+        /// 單子類型名稱
+        /// </summary>
+        private const string OrderType = "出貨退出單";
+
         public SalesReturnForm()
         {
             InitializeComponent();
@@ -37,19 +59,20 @@ namespace invoicing.Transactions
             IFormUIService formUIService,
             ITransactionsdgvService transactionsdgvService,
             ITransactionsbtnService transactionsbtnService,
-            EventBus eventBus,
-            IServiceProvider serviceProvider)
+            ICustomerRepository customerRepository,
+            EventBus eventBus)
         {
             InitializeComponent();
             _formUIService = formUIService;
             _transactionsdgvService = transactionsdgvService;
             _transactionsbtnService = transactionsbtnService;
+            _customerRepository = customerRepository;
             _eventBus = eventBus;
-            _serviceProvider = serviceProvider;
 
             InitializeFormControls();
             RegisterEventHandlers();
             SubscribeToEvents();
+            _ = LoadCustomersAsync();
         }
 
         /// <summary>
@@ -91,6 +114,10 @@ namespace invoicing.Transactions
 
             // 按鈕事件
             btnLoad.Click += BtnLoad_Click;
+            btnSave.Click += BtnSave_Click;
+            btnRefresh.Click += BtnRefresh_Click;
+            btnDelete.Click += BtnDelete_Click;
+            btnCreateExcel.Click += BtnCreateExcel_Click;
 
             // 表單關閉事件
             FormClosing += (sender, e) =>
@@ -118,6 +145,33 @@ namespace invoicing.Transactions
         }
 
         /// <summary>
+        /// 載入客戶資料到下拉選單
+        /// </summary>
+        private async Task LoadCustomersAsync()
+        {
+            try
+            {
+                var customers = await _customerRepository.Get()
+                    .Where(x => !x.IsDeleted)
+                    .OrderBy(x => x.CompanyFullName)
+                    .Select(x => x.CompanyFullName)
+                    .ToListAsync();
+
+                cboCustomer.Items.Clear();
+                foreach (var customer in customers)
+                {
+                    cboCustomer.Items.Add(customer);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"載入客戶資料失敗：{ex.Message}", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        #region 按鈕事件處理
+
+        /// <summary>
         /// 讀檔按鈕點擊事件
         /// </summary>
         private void BtnLoad_Click(object? sender, EventArgs e)
@@ -125,13 +179,165 @@ namespace invoicing.Transactions
             try
             {
                 // 使用 Service 開啟 ReadInvoicesForm
-                _transactionsbtnService.OpenReadInvoicesForm(nameof(SalesReturnForm), "出貨退出單");  // 銷貨退回單的單子名稱
+                _transactionsbtnService.OpenReadInvoicesForm(nameof(SalesReturnForm), OrderType);
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"開啟讀檔視窗失敗：{ex.Message}", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        /// <summary>
+        /// 儲存按鈕點擊事件
+        /// </summary>
+        private async void BtnSave_Click(object? sender, EventArgs e)
+        {
+            try
+            {
+                var request = new SaveTransactionRequest
+                {
+                    OrderType = OrderType,
+                    CustomerName = cboCustomer.Text,
+                    Date = dtpDate.Value.ToString("yyyyMMdd"),
+                    Remark = txtRemark.Text,
+                    TotalAmount = lblAmount.Text,
+                    // 舊資料使用 OrderNumber，新資料使用 NewOrderNumber
+                    OrderNumber = _isSaved && !_isUsingNewOrderNumber ? _currentOrderNumber : null,
+                    NewOrderNumber = _isSaved && _isUsingNewOrderNumber ? _currentOrderNumber : null,
+                    IsUpdate = _isSaved,
+                    Details = _invoicingData.ToList()
+                };
+
+                var result = await _transactionsbtnService.SaveTransactionAsync(request);
+
+                if (result.Success)
+                {
+                    _isSaved = true;
+                    // 新資料使用 NewOrderNumber
+                    if (!string.IsNullOrEmpty(result.NewOrderNumber))
+                    {
+                        _currentOrderNumber = result.NewOrderNumber;
+                        _isUsingNewOrderNumber = true;
+                        lblNumber.Text = result.NewOrderNumber;
+                    }
+                    else if (!string.IsNullOrEmpty(result.OrderNumber))
+                    {
+                        _currentOrderNumber = result.OrderNumber;
+                        lblNumber.Text = result.OrderNumber;
+                    }
+                }
+
+                MessageBox.Show(result.Message, result.Success ? "成功" : "錯誤",
+                    MessageBoxButtons.OK, result.Success ? MessageBoxIcon.Information : MessageBoxIcon.Error);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"儲存失敗：{ex.Message}", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// 刷新按鈕點擊事件
+        /// </summary>
+        private void BtnRefresh_Click(object? sender, EventArgs e)
+        {
+            try
+            {
+                var result = _transactionsbtnService.ConfirmRefresh();
+                if (result.Confirmed)
+                {
+                    _isSaved = false;
+                    _currentOrderNumber = string.Empty;
+                    _isUsingNewOrderNumber = false;
+                    cboCustomer.Text = "";
+                    txtRemark.Text = "";
+                    lblNumber.Text = "0";
+                    lblAmount.Text = "0";
+                    dtpDate.Value = DateTime.Now;
+                    _invoicingData.Clear();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"刷新失敗：{ex.Message}", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// 刪單按鈕點擊事件
+        /// </summary>
+        private async void BtnDelete_Click(object? sender, EventArgs e)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(_currentOrderNumber))
+                {
+                    MessageBox.Show("沒有可刪除的單子", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                // 依據資料類型傳入不同的編號
+                var result = await _transactionsbtnService.DeleteTransactionAsync(
+                    _currentOrderNumber,
+                    _isUsingNewOrderNumber);
+
+                if (result.Success)
+                {
+                    _isSaved = false;
+                    _currentOrderNumber = string.Empty;
+                    _isUsingNewOrderNumber = false;
+                    cboCustomer.Text = "";
+                    txtRemark.Text = "";
+                    lblNumber.Text = "0";
+                    lblAmount.Text = "0";
+                    _invoicingData.Clear();
+                }
+
+                MessageBox.Show(result.Message, result.Success ? "成功" : "錯誤",
+                    MessageBoxButtons.OK, result.Success ? MessageBoxIcon.Information : MessageBoxIcon.Error);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"刪除失敗：{ex.Message}", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// 創建 Excel 按鈕點擊事件
+        /// </summary>
+        private async void BtnCreateExcel_Click(object? sender, EventArgs e)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(cboCustomer.Text))
+                {
+                    MessageBox.Show("請選擇客戶", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                var request = new CreateExcelRequest
+                {
+                    OrderType = OrderType,
+                    CustomerName = cboCustomer.Text,
+                    Date = dtpDate.Value,
+                    Remark = txtRemark.Text,
+                    TotalAmount = lblAmount.Text,
+                    Details = _invoicingData.ToList(),
+                    // 依據資料類型傳入不同的編號
+                    OrderNumber = !_isUsingNewOrderNumber ? _currentOrderNumber : null,
+                    NewOrderNumber = _isUsingNewOrderNumber ? _currentOrderNumber : null,
+                    IsUsingNewOrderNumber = _isUsingNewOrderNumber
+                };
+
+                await _transactionsbtnService.CreateExcelAsync(request);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"建立 Excel 失敗：{ex.Message}", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        #endregion
 
         /// <summary>
         /// 處理單子選擇事件
@@ -206,8 +412,22 @@ namespace invoicing.Transactions
                     txtRemark.Text = firstInvoice.Remark;
                 }
 
-                // 設定單子編號
-                lblNumber.Text = firstInvoice.OrderNumber;
+                // 設定單子編號（判斷使用新/舊編號系統）
+                if (!string.IsNullOrEmpty(firstInvoice.NewOrderNumber))
+                {
+                    // 新資料：使用 NewOrderNumber
+                    _currentOrderNumber = firstInvoice.NewOrderNumber;
+                    _isUsingNewOrderNumber = true;
+                    lblNumber.Text = firstInvoice.NewOrderNumber;
+                }
+                else
+                {
+                    // 舊資料：使用 OrderNumber
+                    _currentOrderNumber = firstInvoice.OrderNumber;
+                    _isUsingNewOrderNumber = false;
+                    lblNumber.Text = firstInvoice.OrderNumber;
+                }
+                _isSaved = true;
             }
 
             // 更新總金額
@@ -257,3 +477,4 @@ namespace invoicing.Transactions
         }
     }
 }
+
