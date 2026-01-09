@@ -109,18 +109,48 @@ namespace invoicing.Service
                 Document = pdfDocument
             };
 
+            // 控制面板 (包含列印按鈕與份數選擇)
+            var controlPanel = new Panel
+            {
+                Dock = DockStyle.Bottom,
+                Height = 60,
+                Padding = new Padding(10)
+            };
+
+            // 份數標籤
+            var copiesLabel = new Label
+            {
+                Text = "列印份數:",
+                AutoSize = true,
+                Location = new Point(20, 18),
+                Font = new Font("Microsoft JhengHei UI", 12F)
+            };
+
+            // 份數輸入框
+            var copiesInput = new NumericUpDown
+            {
+                Minimum = 1,
+                Maximum = 100,
+                Value = copies,
+                Location = new Point(120, 15),
+                Width = 80,
+                Font = new Font("Microsoft JhengHei UI", 12F)
+            };
+
             // 列印按鈕
             var printButton = new Button
             {
                 Text = "列印",
-                Dock = DockStyle.Bottom,
-                Height = 40
+                Location = new Point(220, 10),
+                Width = 100,
+                Height = 35,
+                Font = new Font("Microsoft JhengHei UI", 12F)
             };
 
             printButton.Click += (sender, e) =>
             {
                 using var printDoc = pdfDocument.CreatePrintDocument();
-                printDoc.PrinterSettings.Copies = (short)copies;
+                printDoc.PrinterSettings.Copies = (short)copiesInput.Value;
 
                 var printDialog = new PrintDialog
                 {
@@ -130,12 +160,17 @@ namespace invoicing.Service
 
                 if (printDialog.ShowDialog() == DialogResult.OK)
                 {
+                    printDoc.PrinterSettings.Copies = (short)copiesInput.Value; // 確保列印對話框確認後再次設定份數
                     printDoc.Print();
                 }
             };
 
+            controlPanel.Controls.Add(copiesLabel);
+            controlPanel.Controls.Add(copiesInput);
+            controlPanel.Controls.Add(printButton);
+
             previewForm.Controls.Add(pdfViewer);
-            previewForm.Controls.Add(printButton);
+            previewForm.Controls.Add(controlPanel);
             previewForm.ShowDialog();
         }
 
