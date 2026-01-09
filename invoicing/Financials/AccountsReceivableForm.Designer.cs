@@ -57,8 +57,8 @@
             searchPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 21.2830963F));
             searchPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 12.5254583F));
             searchPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 22.09776F));
-            searchPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 12.3217926F));
-            searchPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 19.7556F));
+            searchPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 8.452139F));
+            searchPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 23.6252537F));
             searchPanel.Controls.Add(lblCustomer, 4, 0);
             searchPanel.Controls.Add(lblStartText, 0, 0);
             searchPanel.Controls.Add(lblEndText, 2, 0);
@@ -78,7 +78,7 @@
             lblCustomer.Anchor = AnchorStyles.Right;
             lblCustomer.AutoSize = true;
             lblCustomer.Font = new Font("Microsoft JhengHei UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            lblCustomer.Location = new Point(712, 25);
+            lblCustomer.Location = new Point(674, 25);
             lblCustomer.Name = "lblCustomer";
             lblCustomer.Size = new Size(72, 25);
             lblCustomer.TabIndex = 4;
@@ -131,9 +131,9 @@
             cboCustomer.Anchor = AnchorStyles.Left;
             cboCustomer.Font = new Font("Microsoft JhengHei UI", 12F);
             cboCustomer.FormattingEnabled = true;
-            cboCustomer.Location = new Point(790, 21);
+            cboCustomer.Location = new Point(752, 21);
             cboCustomer.Name = "cboCustomer";
-            cboCustomer.Size = new Size(189, 33);
+            cboCustomer.Size = new Size(227, 33);
             cboCustomer.TabIndex = 5;
             // 
             // buttonPanel

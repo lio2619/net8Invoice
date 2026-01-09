@@ -59,6 +59,7 @@ namespace invoicing
             services.AddScoped<ITransactionsdgvService, TransactionsdgvService>();
             services.AddScoped<ITransactionsbtnService, TransactionsbtnService>();
             services.AddScoped<IPrintService, PrintService>();
+            services.AddScoped<IFinancialService, FinancialService>();
 
             // 註冊你的表單
             services.AddTransient<HomeScreenForm>();
