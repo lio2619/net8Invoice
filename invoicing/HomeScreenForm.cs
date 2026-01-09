@@ -1,5 +1,6 @@
 ﻿using invoicing.Financials;
 using invoicing.MasterData;
+using invoicing.PlugIn;
 using invoicing.Transactions;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -85,6 +86,26 @@ namespace invoicing
         private void AccountsReceivableMenu_Click(object sender, EventArgs e)
         {
             OpenForm<AccountsReceivableForm>();
+        }
+
+        private void TangYiMenu_Click(object sender, EventArgs e)
+        {
+            OpenForm<TangYiForm>();
+        }
+
+        private void JinDaMenu_Click(object sender, EventArgs e)
+        {
+            OpenForm<JinDaForm>();
+        }
+
+        private void JinDaNewMenu_Click(object sender, EventArgs e)
+        {
+            OpenForm<JinDaNewForm>();
+        }
+
+        private void GuanmaoMenu_Click(object sender, EventArgs e)
+        {
+            OpenForm<GuanmaoForm>();
         }
 
         /// <summary>

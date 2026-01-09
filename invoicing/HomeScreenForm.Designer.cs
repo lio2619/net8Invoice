@@ -48,10 +48,10 @@
             TotalSalesMenu = new ToolStripMenuItem();
             AccountsReceivableMenu = new ToolStripMenuItem();
             外掛ToolStripMenuItem = new ToolStripMenuItem();
-            唐益ToolStripMenuItem = new ToolStripMenuItem();
-            金大ToolStripMenuItem = new ToolStripMenuItem();
-            金大新ToolStripMenuItem = new ToolStripMenuItem();
-            關貿ToolStripMenuItem = new ToolStripMenuItem();
+            TangYiMenu = new ToolStripMenuItem();
+            JinDaMenu = new ToolStripMenuItem();
+            JinDaNewMenu = new ToolStripMenuItem();
+            GuanmaoMenu = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             SuspendLayout();
             // 
@@ -193,34 +193,38 @@
             // 
             // 外掛ToolStripMenuItem
             // 
-            外掛ToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { 唐益ToolStripMenuItem, 金大ToolStripMenuItem, 金大新ToolStripMenuItem, 關貿ToolStripMenuItem });
+            外掛ToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { TangYiMenu, JinDaMenu, JinDaNewMenu, GuanmaoMenu });
             外掛ToolStripMenuItem.Name = "外掛ToolStripMenuItem";
             外掛ToolStripMenuItem.Size = new Size(53, 24);
             外掛ToolStripMenuItem.Text = "外掛";
             // 
-            // 唐益ToolStripMenuItem
+            // TangYiMenu
             // 
-            唐益ToolStripMenuItem.Name = "唐益ToolStripMenuItem";
-            唐益ToolStripMenuItem.Size = new Size(147, 26);
-            唐益ToolStripMenuItem.Text = "唐詣";
+            TangYiMenu.Name = "TangYiMenu";
+            TangYiMenu.Size = new Size(224, 26);
+            TangYiMenu.Text = "唐詣";
+            TangYiMenu.Click += TangYiMenu_Click;
             // 
-            // 金大ToolStripMenuItem
+            // JinDaMenu
             // 
-            金大ToolStripMenuItem.Name = "金大ToolStripMenuItem";
-            金大ToolStripMenuItem.Size = new Size(147, 26);
-            金大ToolStripMenuItem.Text = "金大";
+            JinDaMenu.Name = "JinDaMenu";
+            JinDaMenu.Size = new Size(224, 26);
+            JinDaMenu.Text = "金大";
+            JinDaMenu.Click += JinDaMenu_Click;
             // 
-            // 金大新ToolStripMenuItem
+            // JinDaNewMenu
             // 
-            金大新ToolStripMenuItem.Name = "金大新ToolStripMenuItem";
-            金大新ToolStripMenuItem.Size = new Size(147, 26);
-            金大新ToolStripMenuItem.Text = "金大(新)";
+            JinDaNewMenu.Name = "JinDaNewMenu";
+            JinDaNewMenu.Size = new Size(224, 26);
+            JinDaNewMenu.Text = "金大(新)";
+            JinDaNewMenu.Click += JinDaNewMenu_Click;
             // 
-            // 關貿ToolStripMenuItem
+            // GuanmaoMenu
             // 
-            關貿ToolStripMenuItem.Name = "關貿ToolStripMenuItem";
-            關貿ToolStripMenuItem.Size = new Size(147, 26);
-            關貿ToolStripMenuItem.Text = "關貿";
+            GuanmaoMenu.Name = "GuanmaoMenu";
+            GuanmaoMenu.Size = new Size(224, 26);
+            GuanmaoMenu.Text = "關貿";
+            GuanmaoMenu.Click += GuanmaoMenu_Click;
             // 
             // HomeScreenForm
             // 
@@ -261,9 +265,9 @@
         private ToolStripMenuItem TotalSalesMenu;
         private ToolStripMenuItem AccountsReceivableMenu;
         private ToolStripMenuItem 外掛ToolStripMenuItem;
-        private ToolStripMenuItem 唐益ToolStripMenuItem;
-        private ToolStripMenuItem 金大ToolStripMenuItem;
-        private ToolStripMenuItem 金大新ToolStripMenuItem;
-        private ToolStripMenuItem 關貿ToolStripMenuItem;
+        private ToolStripMenuItem TangYiMenu;
+        private ToolStripMenuItem JinDaMenu;
+        private ToolStripMenuItem JinDaNewMenu;
+        private ToolStripMenuItem GuanmaoMenu;
     }
 }

@@ -2,6 +2,7 @@ using invoicing.DB.DBContext;
 using invoicing.Event;
 using invoicing.Financials;
 using invoicing.MasterData;
+using invoicing.PlugIn;
 using invoicing.ReadForm;
 using invoicing.Repository;
 using invoicing.Repository.Interface;
@@ -80,6 +81,10 @@ namespace invoicing
             services.AddTransient<TotalPurchasesForm>();
             services.AddTransient<TotalSalesForm>();
             services.AddTransient<AccountsReceivableForm>();
+            services.AddTransient<TangYiForm>();
+            services.AddTransient<JinDaForm>();
+            services.AddTransient<JinDaNewForm>();
+            services.AddTransient<GuanmaoForm>();
 
             //事件註冊
             services.AddSingleton<EventBus>();
