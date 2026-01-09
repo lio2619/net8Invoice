@@ -175,18 +175,21 @@
             TotalPurchasesMenu.Name = "TotalPurchasesMenu";
             TotalPurchasesMenu.Size = new Size(83, 24);
             TotalPurchasesMenu.Text = "總進貨額";
+            TotalPurchasesMenu.Click += TotalPurchasesMenu_Click;
             // 
             // TotalSalesMenu
             // 
             TotalSalesMenu.Name = "TotalSalesMenu";
             TotalSalesMenu.Size = new Size(83, 24);
             TotalSalesMenu.Text = "總銷貨額";
+            TotalSalesMenu.Click += TotalSalesMenu_Click;
             // 
             // AccountsReceivableMenu
             // 
             AccountsReceivableMenu.Name = "AccountsReceivableMenu";
             AccountsReceivableMenu.Size = new Size(83, 24);
             AccountsReceivableMenu.Text = "應收帳款";
+            AccountsReceivableMenu.Click += AccountsReceivableMenu_Click;
             // 
             // 外掛ToolStripMenuItem
             // 
