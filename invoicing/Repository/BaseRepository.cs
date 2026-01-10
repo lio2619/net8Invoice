@@ -34,8 +34,7 @@ namespace invoicing.Repository
             var entity = await GetById(id).FirstOrDefaultAsync();
             if (entity != null)
             {
-                entity.IsDeleted = true;
-                _dbSet.Update(entity);
+                _dbSet.Remove(entity);
                 await _context.SaveChangesAsync();
             }
         }
