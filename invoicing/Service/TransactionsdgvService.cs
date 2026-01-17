@@ -43,6 +43,16 @@ namespace invoicing.Service
         private string? _lastSelectedProductCode = null;
 
         /// <summary>
+        /// 產品編號 TextChanged 事件處理器（保留為成員變數以正確移除事件）
+        /// </summary>
+        private EventHandler? _productCodeTextChangedHandler;
+
+        /// <summary>
+        /// 用於事件處理的 CancellationToken
+        /// </summary>
+        private CancellationToken _autoCompleteCancellationToken;
+
+        /// <summary>
         /// 建構函式，注入產品資料庫儲存庫
         /// </summary>
         /// <param name="productRepository">產品資料庫儲存庫</param>
@@ -196,6 +206,16 @@ namespace invoicing.Service
         {
             ArgumentNullException.ThrowIfNull(dgv);
 
+            // 儲存 CancellationToken 並建立事件處理器（保留為成員變數以正確移除事件）
+            _autoCompleteCancellationToken = cancellationToken;
+            _productCodeTextChangedHandler = async (sender, e) =>
+            {
+                if (sender is TextBox textBox)
+                {
+                    await HandleProductCodeTextChangedAsync(textBox, _autoCompleteCancellationToken);
+                }
+            };
+
             // 建立自訂下拉選單
             _suggestionListBox = new ListBox
             {
@@ -230,9 +250,12 @@ namespace invoicing.Service
                     // 禁用內建自動完成（我們使用自訂下拉選單）
                     textBox.AutoCompleteMode = AutoCompleteMode.None;
 
-                    // 移除現有的事件處理器以避免重複註冊
-                    textBox.TextChanged -= CreateProductCodeTextChangedHandler(cancellationToken);
-                    textBox.TextChanged += CreateProductCodeTextChangedHandler(cancellationToken);
+                    // 使用成員變數的事件處理器，確保可以正確移除
+                    if (_productCodeTextChangedHandler != null)
+                    {
+                        textBox.TextChanged -= _productCodeTextChangedHandler;
+                        textBox.TextChanged += _productCodeTextChangedHandler;
+                    }
 
                     textBox.LostFocus -= TextBox_LostFocus;
                     textBox.LostFocus += TextBox_LostFocus;
@@ -369,19 +392,6 @@ namespace invoicing.Service
             }
         }
 
-        /// <summary>
-        /// 建立產品編號 TextChanged 事件處理器
-        /// </summary>
-        private EventHandler CreateProductCodeTextChangedHandler(CancellationToken cancellationToken)
-        {
-            return async (sender, e) =>
-            {
-                if (sender is TextBox textBox)
-                {
-                    await HandleProductCodeTextChangedAsync(textBox, cancellationToken);
-                }
-            };
-        }
 
         /// <summary>
         /// 處理產品編號欄位的 TextChanged 事件，包含防抖動機制

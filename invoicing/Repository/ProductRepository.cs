@@ -27,7 +27,7 @@ namespace invoicing.Repository
                 .Where(p => !p.IsDeleted)
                 .Where(p => p.ProductCode.StartsWith(prefix))
                 .Select(p => p.ProductCode)
-                .Take(10)
+                .Take(20)
                 .ToListAsync();
         }
 
@@ -45,7 +45,7 @@ namespace invoicing.Repository
                 .Where(p => !p.IsDeleted)
                 .Where(p => p.ProductCode.StartsWith(prefix))
                 .Select(p => new { p.ProductCode, p.ProductName })
-                .Take(10)
+                .Take(20)
                 .ToListAsync();
 
             return results.Select(r => (r.ProductCode, r.ProductName ?? "")).ToList();

@@ -20,6 +20,13 @@ namespace invoicing.Service.Interface
         /// <param name="copies">列印份數</param>
         void ShowPrintPreviewAndPrint(byte[] pdfBytes, int copies = 1);
 
+        /// <summary>
+        /// 產生應收帳款簡要表 PDF
+        /// </summary>
+        /// <param name="request">應收帳款列印請求資料</param>
+        /// <returns>PDF 檔案的 byte 陣列</returns>
+        byte[] GenerateAccountsReceivablePdf(AccountsReceivablePrintRequest request);
+
         #endregion
     }
 }

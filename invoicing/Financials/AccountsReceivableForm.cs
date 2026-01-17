@@ -177,32 +177,44 @@ namespace invoicing.Financials
                 // 計算本期總計（本期合計 + 營業稅）
                 decimal totalWithTax = _currentTotal + tax;
 
-                // 建立列印請求
-                var details = _currentDetails.Select(d => new InvoicingDetailDTO
+                // 建立應收帳款列印請求
+                var details = _currentDetails.Select(d =>
                 {
-                    ProductCode = d.OrderName,
-                    ProductName = d.Date,
-                    Quantity = d.OrderUid,
-                    UnitPrice = d.OrderName == NegativeOrderType
-                        ? $"- {d.TotalAmount:N0}"
-                        : d.TotalAmount.ToString("N0"),
-                    Amount = d.OrderName == NegativeOrderType
-                        ? $"- {d.TotalAmount:N0}"
-                        : d.TotalAmount.ToString("N0")
+                    // 取單子編號的後4位數字
+                    int orderNo = 0;
+                    if (int.TryParse(d.OrderUid, out int fullOrderNo))
+                    {
+                        orderNo = fullOrderNo % 10000;
+                    }
+                    // 組合成 日期 + 4位編號 格式
+                    string transactionNumber = d.Date + orderNo.ToString("D4");
+
+                    return new AccountsReceivablePrintDetail
+                    {
+                        OrderType = d.OrderName,
+                        TransactionDate = d.Date,
+                        TransactionNumber = transactionNumber,
+                        TotalAmount = d.TotalAmount,
+                        // 出貨退出單統計金額為負數
+                        StatisticalAmount = d.OrderName == NegativeOrderType
+                            ? -d.TotalAmount
+                            : d.TotalAmount
+                    };
                 }).ToList();
 
-                var request = new PrintInvoiceRequest
+                var request = new AccountsReceivablePrintRequest
                 {
-                    OrderType = "應收帳款",
                     CustomerName = cboCustomer.Text,
-                    Date = $"{dtpStart.Value:yyyyMMdd} - {dtpEnd.Value:yyyyMMdd}",
-                    TotalAmount = totalWithTax.ToString("N0"),
-                    Remark = $"本期合計：{_currentTotal:N0}  營業稅：{tax:N0}  本期總計：{totalWithTax:N0}",
+                    StartDate = dtpStart.Value.ToString("yyyyMMdd"),
+                    EndDate = dtpEnd.Value.ToString("yyyyMMdd"),
+                    SubTotal = _currentTotal,
+                    Tax = tax,
+                    Total = totalWithTax,
                     Details = details
                 };
 
-                // 產生 PDF 並列印
-                byte[] pdfBytes = _printService.GenerateInvoicePdf(request);
+                // 產生應收帳款簡要表 PDF 並列印
+                byte[] pdfBytes = _printService.GenerateAccountsReceivablePdf(request);
                 _printService.ShowPrintPreviewAndPrint(pdfBytes);
             }
             catch (Exception ex)

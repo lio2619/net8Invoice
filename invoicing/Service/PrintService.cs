@@ -417,5 +417,115 @@ namespace invoicing.Service
         }
 
         #endregion
+
+        #region 應收帳款簡要表列印功能
+
+        /// <summary>
+        /// 產生應收帳款簡要表 PDF
+        /// </summary>
+        public byte[] GenerateAccountsReceivablePdf(AccountsReceivablePrintRequest request)
+        {
+            var document = Document.Create(container =>
+            {
+                container.Page(page =>
+                {
+                    page.Size(PageSizes.A4);
+                    page.Margin(30);
+                    page.DefaultTextStyle(x => x.FontFamily("Microsoft JhengHei").FontSize(10));
+
+                    page.Content().Column(column =>
+                    {
+                        column.Spacing(5);
+
+                        // 標題：公司名稱
+                        column.Item().AlignCenter().Text(_defaultCustomerName).FontSize(18).Bold();
+
+                        // 副標題：應收帳款簡要表
+                        column.Item().AlignCenter().Text("應收帳款簡要表").FontSize(14);
+
+                        column.Item().PaddingTop(2);
+
+                        // 帳款區間
+                        column.Item().Text($"帳款區間：{request.StartDate} ~ {request.EndDate}");
+
+                        // 客戶名稱
+                        column.Item().Text($"客戶名稱：{request.CustomerName}");
+
+                        column.Item().PaddingTop(2);
+
+                        // 表格
+                        column.Item().Table(table =>
+                        {
+                            // 定義欄位寬度
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn(1.2f);  // 單別
+                                columns.RelativeColumn(1.5f);  // 交易日期
+                                columns.RelativeColumn(2f);    // 交易單號
+                                columns.RelativeColumn(1.5f);  // 合計金額
+                                columns.RelativeColumn(1.5f);  // 統計金額
+                            });
+
+                            // 表頭
+                            table.Header(header =>
+                            {
+                                header.Cell().BorderBottom(1).Padding(0).Text("單別").Bold();
+                                header.Cell().BorderBottom(1).Padding(0).Text("交易日期").Bold();
+                                header.Cell().BorderBottom(1).Padding(0).Text("交易單號").Bold();
+                                header.Cell().BorderBottom(1).Padding(0).AlignRight().Text("合計金額").Bold();
+                                header.Cell().BorderBottom(1).Padding(0).AlignRight().Text("統計金額").Bold();
+                            });
+
+                            // 資料列
+                            foreach (var detail in request.Details)
+                            {
+                                table.Cell().Padding(1).Text(detail.OrderType);
+                                table.Cell().Padding(1).Text(detail.TransactionDate);
+                                table.Cell().Padding(1).Text(detail.TransactionNumber);
+                                table.Cell().Padding(1).AlignRight().Text(detail.TotalAmount.ToString("#,##0.###"));
+                                
+                                // 統計金額：出貨退出單顯示負數
+                                string statAmount = detail.StatisticalAmount < 0
+                                    ? $"- {Math.Abs(detail.StatisticalAmount):#,##0.###}"
+                                    : detail.StatisticalAmount.ToString("#,##0.###");
+                                table.Cell().Padding(2).AlignRight().Text(statAmount);
+                            }
+                        });
+
+                        // 分隔線
+                        column.Item().PaddingTop(1).LineHorizontal(1);
+
+                        // 頁尾統計 - 靠右對齊，各自獨立一行
+                        column.Item().PaddingTop(1).AlignRight().Table(table =>
+                        {
+                            // 定義兩欄：一欄放標籤，一欄放數字
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.ConstantColumn(100); // 標籤欄寬度 (可依文字長度調整)
+                                columns.ConstantColumn(100); // 數字欄寬度
+                            });
+
+                            // --- 第一列：本期合計 ---
+                            // 標籤靠右對齊
+                            table.Cell().AlignRight().Text("本期合計：");
+                            // 數字靠右對齊
+                            table.Cell().AlignRight().Text(request.SubTotal.ToString("#,##0.###"));
+
+                            // --- 第二列：營業稅 ---
+                            table.Cell().AlignRight().Text("營業稅：");
+                            table.Cell().AlignRight().Text(request.Tax.ToString("#,##0.###"));
+
+                            // --- 第三列：本期總計 ---
+                            table.Cell().AlignRight().Text("本期總計：");
+                            table.Cell().AlignRight().Text(request.Total.ToString("#,##0.###"));
+                        });
+                    });
+                });
+            });
+
+            return document.GeneratePdf();
+        }
+
+        #endregion
     }
 }
