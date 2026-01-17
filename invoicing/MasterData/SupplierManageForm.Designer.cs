@@ -70,6 +70,7 @@
             mainPanel.Controls.Add(lblSupplierIdValue, 1, 0);
             mainPanel.Dock = DockStyle.Fill;
             mainPanel.Location = new Point(0, 0);
+            mainPanel.Margin = new Padding(2, 2, 2, 2);
             mainPanel.Name = "mainPanel";
             mainPanel.RowCount = 5;
             mainPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
@@ -77,17 +78,18 @@
             mainPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
             mainPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
             mainPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
-            mainPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            mainPanel.Size = new Size(1182, 483);
+            mainPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 16F));
+            mainPanel.Size = new Size(919, 381);
             mainPanel.TabIndex = 2;
             // 
             // btnFormClear
             // 
             btnFormClear.Anchor = AnchorStyles.Left;
             btnFormClear.Font = new Font("Microsoft JhengHei UI", 14F);
-            btnFormClear.Location = new Point(1007, 406);
+            btnFormClear.Location = new Point(782, 321);
+            btnFormClear.Margin = new Padding(2, 2, 2, 2);
             btnFormClear.Name = "btnFormClear";
-            btnFormClear.Size = new Size(172, 55);
+            btnFormClear.Size = new Size(134, 43);
             btnFormClear.TabIndex = 14;
             btnFormClear.Text = "清空";
             btnFormClear.UseVisualStyleBackColor = true;
@@ -97,9 +99,10 @@
             // 
             btnSupplierDelete.Anchor = AnchorStyles.Left;
             btnSupplierDelete.Font = new Font("Microsoft JhengHei UI", 14F);
-            btnSupplierDelete.Location = new Point(1007, 308);
+            btnSupplierDelete.Location = new Point(782, 244);
+            btnSupplierDelete.Margin = new Padding(2, 2, 2, 2);
             btnSupplierDelete.Name = "btnSupplierDelete";
-            btnSupplierDelete.Size = new Size(172, 55);
+            btnSupplierDelete.Size = new Size(134, 43);
             btnSupplierDelete.TabIndex = 13;
             btnSupplierDelete.Text = "刪除";
             btnSupplierDelete.UseVisualStyleBackColor = true;
@@ -109,9 +112,10 @@
             // 
             btnSupplierSearch.Anchor = AnchorStyles.Left;
             btnSupplierSearch.Font = new Font("Microsoft JhengHei UI", 14F);
-            btnSupplierSearch.Location = new Point(1007, 212);
+            btnSupplierSearch.Location = new Point(782, 168);
+            btnSupplierSearch.Margin = new Padding(2, 2, 2, 2);
             btnSupplierSearch.Name = "btnSupplierSearch";
-            btnSupplierSearch.Size = new Size(172, 55);
+            btnSupplierSearch.Size = new Size(134, 43);
             btnSupplierSearch.TabIndex = 12;
             btnSupplierSearch.Text = "查詢";
             btnSupplierSearch.UseVisualStyleBackColor = true;
@@ -121,9 +125,10 @@
             // 
             btnSupplierModify.Anchor = AnchorStyles.Left;
             btnSupplierModify.Font = new Font("Microsoft JhengHei UI", 14F);
-            btnSupplierModify.Location = new Point(1007, 116);
+            btnSupplierModify.Location = new Point(782, 92);
+            btnSupplierModify.Margin = new Padding(2, 2, 2, 2);
             btnSupplierModify.Name = "btnSupplierModify";
-            btnSupplierModify.Size = new Size(172, 55);
+            btnSupplierModify.Size = new Size(134, 43);
             btnSupplierModify.TabIndex = 11;
             btnSupplierModify.Text = "修改";
             btnSupplierModify.UseVisualStyleBackColor = true;
@@ -134,9 +139,10 @@
             lblSupplierId.Anchor = AnchorStyles.Right;
             lblSupplierId.AutoSize = true;
             lblSupplierId.Font = new Font("Microsoft JhengHei UI", 14F);
-            lblSupplierId.Location = new Point(41, 33);
+            lblSupplierId.Location = new Point(30, 26);
+            lblSupplierId.Margin = new Padding(2, 0, 2, 0);
             lblSupplierId.Name = "lblSupplierId";
-            lblSupplierId.Size = new Size(133, 30);
+            lblSupplierId.Size = new Size(105, 24);
             lblSupplierId.TabIndex = 0;
             lblSupplierId.Text = "廠商編號：";
             // 
@@ -145,9 +151,10 @@
             lblSupplierName.Anchor = AnchorStyles.Right;
             lblSupplierName.AutoSize = true;
             lblSupplierName.Font = new Font("Microsoft JhengHei UI", 14F);
-            lblSupplierName.Location = new Point(41, 129);
+            lblSupplierName.Location = new Point(30, 102);
+            lblSupplierName.Margin = new Padding(2, 0, 2, 0);
             lblSupplierName.Name = "lblSupplierName";
-            lblSupplierName.Size = new Size(133, 30);
+            lblSupplierName.Size = new Size(105, 24);
             lblSupplierName.TabIndex = 1;
             lblSupplierName.Text = "廠商名稱：";
             // 
@@ -156,9 +163,10 @@
             lblSupplierAddress.Anchor = AnchorStyles.Right;
             lblSupplierAddress.AutoSize = true;
             lblSupplierAddress.Font = new Font("Microsoft JhengHei UI", 14F);
-            lblSupplierAddress.Location = new Point(41, 225);
+            lblSupplierAddress.Location = new Point(30, 178);
+            lblSupplierAddress.Margin = new Padding(2, 0, 2, 0);
             lblSupplierAddress.Name = "lblSupplierAddress";
-            lblSupplierAddress.Size = new Size(133, 30);
+            lblSupplierAddress.Size = new Size(105, 24);
             lblSupplierAddress.TabIndex = 2;
             lblSupplierAddress.Text = "廠商地址：";
             // 
@@ -167,9 +175,10 @@
             lblSupplierTel.Anchor = AnchorStyles.Right;
             lblSupplierTel.AutoSize = true;
             lblSupplierTel.Font = new Font("Microsoft JhengHei UI", 14F);
-            lblSupplierTel.Location = new Point(41, 321);
+            lblSupplierTel.Location = new Point(30, 254);
+            lblSupplierTel.Margin = new Padding(2, 0, 2, 0);
             lblSupplierTel.Name = "lblSupplierTel";
-            lblSupplierTel.Size = new Size(133, 30);
+            lblSupplierTel.Size = new Size(105, 24);
             lblSupplierTel.TabIndex = 3;
             lblSupplierTel.Text = "聯絡號碼：";
             // 
@@ -178,9 +187,10 @@
             lblSupplierFax.Anchor = AnchorStyles.Right;
             lblSupplierFax.AutoSize = true;
             lblSupplierFax.Font = new Font("Microsoft JhengHei UI", 14F);
-            lblSupplierFax.Location = new Point(41, 418);
+            lblSupplierFax.Location = new Point(30, 330);
+            lblSupplierFax.Margin = new Padding(2, 0, 2, 0);
             lblSupplierFax.Name = "lblSupplierFax";
-            lblSupplierFax.Size = new Size(133, 30);
+            lblSupplierFax.Size = new Size(105, 24);
             lblSupplierFax.TabIndex = 4;
             lblSupplierFax.Text = "傳真號碼：";
             // 
@@ -190,9 +200,10 @@
             txtSupplierName.BackColor = SystemColors.Control;
             txtSupplierName.BorderStyle = BorderStyle.None;
             txtSupplierName.Font = new Font("Microsoft JhengHei UI", 14F);
-            txtSupplierName.Location = new Point(180, 129);
+            txtSupplierName.Location = new Point(139, 102);
+            txtSupplierName.Margin = new Padding(2, 2, 2, 2);
             txtSupplierName.Name = "txtSupplierName";
-            txtSupplierName.Size = new Size(787, 30);
+            txtSupplierName.Size = new Size(612, 24);
             txtSupplierName.TabIndex = 6;
             // 
             // txtSupplierAddress
@@ -201,9 +212,10 @@
             txtSupplierAddress.BackColor = SystemColors.Control;
             txtSupplierAddress.BorderStyle = BorderStyle.None;
             txtSupplierAddress.Font = new Font("Microsoft JhengHei UI", 14F);
-            txtSupplierAddress.Location = new Point(180, 225);
+            txtSupplierAddress.Location = new Point(139, 178);
+            txtSupplierAddress.Margin = new Padding(2, 2, 2, 2);
             txtSupplierAddress.Name = "txtSupplierAddress";
-            txtSupplierAddress.Size = new Size(787, 30);
+            txtSupplierAddress.Size = new Size(612, 24);
             txtSupplierAddress.TabIndex = 7;
             // 
             // txtSupplierTel
@@ -212,9 +224,10 @@
             txtSupplierTel.BackColor = SystemColors.Control;
             txtSupplierTel.BorderStyle = BorderStyle.None;
             txtSupplierTel.Font = new Font("Microsoft JhengHei UI", 14F);
-            txtSupplierTel.Location = new Point(180, 321);
+            txtSupplierTel.Location = new Point(139, 254);
+            txtSupplierTel.Margin = new Padding(2, 2, 2, 2);
             txtSupplierTel.Name = "txtSupplierTel";
-            txtSupplierTel.Size = new Size(787, 30);
+            txtSupplierTel.Size = new Size(612, 24);
             txtSupplierTel.TabIndex = 8;
             // 
             // txtSupplierFax
@@ -223,18 +236,20 @@
             txtSupplierFax.BackColor = SystemColors.Control;
             txtSupplierFax.BorderStyle = BorderStyle.None;
             txtSupplierFax.Font = new Font("Microsoft JhengHei UI", 14F);
-            txtSupplierFax.Location = new Point(180, 418);
+            txtSupplierFax.Location = new Point(139, 330);
+            txtSupplierFax.Margin = new Padding(2, 2, 2, 2);
             txtSupplierFax.Name = "txtSupplierFax";
-            txtSupplierFax.Size = new Size(787, 30);
+            txtSupplierFax.Size = new Size(612, 24);
             txtSupplierFax.TabIndex = 9;
             // 
             // btnSupplierCreate
             // 
             btnSupplierCreate.Anchor = AnchorStyles.Left;
             btnSupplierCreate.Font = new Font("Microsoft JhengHei UI", 14F);
-            btnSupplierCreate.Location = new Point(1007, 20);
+            btnSupplierCreate.Location = new Point(782, 16);
+            btnSupplierCreate.Margin = new Padding(2, 2, 2, 2);
             btnSupplierCreate.Name = "btnSupplierCreate";
-            btnSupplierCreate.Size = new Size(172, 55);
+            btnSupplierCreate.Size = new Size(134, 43);
             btnSupplierCreate.TabIndex = 10;
             btnSupplierCreate.Text = "新增";
             btnSupplierCreate.UseVisualStyleBackColor = true;
@@ -245,18 +260,21 @@
             lblSupplierIdValue.Anchor = AnchorStyles.Left;
             lblSupplierIdValue.AutoSize = true;
             lblSupplierIdValue.Font = new Font("Microsoft JhengHei UI", 14F);
-            lblSupplierIdValue.Location = new Point(180, 33);
+            lblSupplierIdValue.Location = new Point(139, 26);
+            lblSupplierIdValue.Margin = new Padding(2, 0, 2, 0);
             lblSupplierIdValue.Name = "lblSupplierIdValue";
-            lblSupplierIdValue.Size = new Size(0, 30);
+            lblSupplierIdValue.Size = new Size(0, 24);
             lblSupplierIdValue.TabIndex = 15;
             // 
             // SupplierManageForm
             // 
-            AutoScaleDimensions = new SizeF(9F, 19F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1182, 483);
+            ClientSize = new Size(919, 381);
             Controls.Add(mainPanel);
+            Margin = new Padding(2, 2, 2, 2);
             Name = "SupplierManageForm";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "廠商資料管理";
             mainPanel.ResumeLayout(false);
             mainPanel.PerformLayout();

@@ -67,7 +67,8 @@
             buttonPanel.Controls.Add(btnProductModify, 0, 1);
             buttonPanel.Controls.Add(btnProductCreate, 0, 0);
             buttonPanel.Dock = DockStyle.Right;
-            buttonPanel.Location = new Point(832, 0);
+            buttonPanel.Location = new Point(648, 0);
+            buttonPanel.Margin = new Padding(2, 2, 2, 2);
             buttonPanel.Name = "buttonPanel";
             buttonPanel.RowCount = 5;
             buttonPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
@@ -75,16 +76,17 @@
             buttonPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
             buttonPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
             buttonPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
-            buttonPanel.Size = new Size(250, 653);
+            buttonPanel.Size = new Size(194, 516);
             buttonPanel.TabIndex = 0;
             // 
             // btnFormClear
             // 
             btnFormClear.Anchor = AnchorStyles.Left;
             btnFormClear.Font = new Font("Microsoft JhengHei UI", 14F);
-            btnFormClear.Location = new Point(3, 554);
+            btnFormClear.Location = new Point(2, 438);
+            btnFormClear.Margin = new Padding(2, 2, 2, 2);
             btnFormClear.Name = "btnFormClear";
-            btnFormClear.Size = new Size(244, 64);
+            btnFormClear.Size = new Size(190, 51);
             btnFormClear.TabIndex = 4;
             btnFormClear.Text = "清空";
             btnFormClear.UseVisualStyleBackColor = true;
@@ -94,9 +96,10 @@
             // 
             btnProductDelete.Anchor = AnchorStyles.Left;
             btnProductDelete.Font = new Font("Microsoft JhengHei UI", 14F);
-            btnProductDelete.Location = new Point(3, 423);
+            btnProductDelete.Location = new Point(2, 335);
+            btnProductDelete.Margin = new Padding(2, 2, 2, 2);
             btnProductDelete.Name = "btnProductDelete";
-            btnProductDelete.Size = new Size(244, 64);
+            btnProductDelete.Size = new Size(190, 51);
             btnProductDelete.TabIndex = 3;
             btnProductDelete.Text = "刪除";
             btnProductDelete.UseVisualStyleBackColor = true;
@@ -106,9 +109,10 @@
             // 
             btnProductSearch.Anchor = AnchorStyles.Left;
             btnProductSearch.Font = new Font("Microsoft JhengHei UI", 14F);
-            btnProductSearch.Location = new Point(3, 293);
+            btnProductSearch.Location = new Point(2, 232);
+            btnProductSearch.Margin = new Padding(2, 2, 2, 2);
             btnProductSearch.Name = "btnProductSearch";
-            btnProductSearch.Size = new Size(244, 64);
+            btnProductSearch.Size = new Size(190, 51);
             btnProductSearch.TabIndex = 2;
             btnProductSearch.Text = "搜尋";
             btnProductSearch.UseVisualStyleBackColor = true;
@@ -118,9 +122,10 @@
             // 
             btnProductModify.Anchor = AnchorStyles.Left;
             btnProductModify.Font = new Font("Microsoft JhengHei UI", 14F);
-            btnProductModify.Location = new Point(3, 163);
+            btnProductModify.Location = new Point(2, 129);
+            btnProductModify.Margin = new Padding(2, 2, 2, 2);
             btnProductModify.Name = "btnProductModify";
-            btnProductModify.Size = new Size(244, 64);
+            btnProductModify.Size = new Size(190, 51);
             btnProductModify.TabIndex = 1;
             btnProductModify.Text = "修改";
             btnProductModify.UseVisualStyleBackColor = true;
@@ -130,9 +135,10 @@
             // 
             btnProductCreate.Anchor = AnchorStyles.Left;
             btnProductCreate.Font = new Font("Microsoft JhengHei UI", 14F);
-            btnProductCreate.Location = new Point(3, 33);
+            btnProductCreate.Location = new Point(2, 26);
+            btnProductCreate.Margin = new Padding(2, 2, 2, 2);
             btnProductCreate.Name = "btnProductCreate";
-            btnProductCreate.Size = new Size(244, 64);
+            btnProductCreate.Size = new Size(190, 51);
             btnProductCreate.TabIndex = 0;
             btnProductCreate.Text = "新增";
             btnProductCreate.UseVisualStyleBackColor = true;
@@ -165,6 +171,7 @@
             mainPanel.Controls.Add(txtProductStandardCost, 3, 5);
             mainPanel.Dock = DockStyle.Fill;
             mainPanel.Location = new Point(0, 0);
+            mainPanel.Margin = new Padding(2, 2, 2, 2);
             mainPanel.Name = "mainPanel";
             mainPanel.RowCount = 6;
             mainPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 16.6666679F));
@@ -173,7 +180,7 @@
             mainPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 16.6666679F));
             mainPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 16.6666679F));
             mainPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 16.6666679F));
-            mainPanel.Size = new Size(832, 653);
+            mainPanel.Size = new Size(648, 516);
             mainPanel.TabIndex = 1;
             // 
             // label1
@@ -181,9 +188,10 @@
             label1.Anchor = AnchorStyles.Right;
             label1.AutoSize = true;
             label1.Font = new Font("Microsoft JhengHei UI", 14F);
-            label1.Location = new Point(30, 39);
+            label1.Location = new Point(22, 31);
+            label1.Margin = new Padding(2, 0, 2, 0);
             label1.Name = "label1";
-            label1.Size = new Size(133, 30);
+            label1.Size = new Size(105, 24);
             label1.TabIndex = 0;
             label1.Text = "貨品編號：";
             // 
@@ -192,9 +200,10 @@
             label2.Anchor = AnchorStyles.Right;
             label2.AutoSize = true;
             label2.Font = new Font("Microsoft JhengHei UI", 14F);
-            label2.Location = new Point(78, 147);
+            label2.Location = new Point(60, 117);
+            label2.Margin = new Padding(2, 0, 2, 0);
             label2.Name = "label2";
-            label2.Size = new Size(85, 30);
+            label2.Size = new Size(67, 24);
             label2.TabIndex = 1;
             label2.Text = "品名：";
             // 
@@ -203,9 +212,10 @@
             label3.Anchor = AnchorStyles.Right;
             label3.AutoSize = true;
             label3.Font = new Font("Microsoft JhengHei UI", 14F);
-            label3.Location = new Point(30, 255);
+            label3.Location = new Point(22, 203);
+            label3.Margin = new Padding(2, 0, 2, 0);
             label3.Name = "label3";
-            label3.Size = new Size(133, 30);
+            label3.Size = new Size(105, 24);
             label3.TabIndex = 2;
             label3.Text = "基本單位：";
             // 
@@ -214,9 +224,10 @@
             label5.Anchor = AnchorStyles.Right;
             label5.AutoSize = true;
             label5.Font = new Font("Microsoft JhengHei UI", 14F);
-            label5.Location = new Point(30, 363);
+            label5.Location = new Point(22, 289);
+            label5.Margin = new Padding(2, 0, 2, 0);
             label5.Name = "label5";
-            label5.Size = new Size(133, 30);
+            label5.Size = new Size(105, 24);
             label5.TabIndex = 4;
             label5.Text = "標準售價：";
             // 
@@ -225,9 +236,10 @@
             label6.Anchor = AnchorStyles.Right;
             label6.AutoSize = true;
             label6.Font = new Font("Microsoft JhengHei UI", 14F);
-            label6.Location = new Point(476, 363);
+            label6.Location = new Point(370, 289);
+            label6.Margin = new Padding(2, 0, 2, 0);
             label6.Name = "label6";
-            label6.Size = new Size(102, 30);
+            label6.Size = new Size(80, 24);
             label6.TabIndex = 5;
             label6.Text = "售價A：";
             // 
@@ -236,9 +248,10 @@
             label7.Anchor = AnchorStyles.Right;
             label7.AutoSize = true;
             label7.Font = new Font("Microsoft JhengHei UI", 14F);
-            label7.Location = new Point(63, 471);
+            label7.Location = new Point(48, 375);
+            label7.Margin = new Padding(2, 0, 2, 0);
             label7.Name = "label7";
-            label7.Size = new Size(100, 30);
+            label7.Size = new Size(79, 24);
             label7.TabIndex = 6;
             label7.Text = "售價B：";
             // 
@@ -247,9 +260,10 @@
             label8.Anchor = AnchorStyles.Right;
             label8.AutoSize = true;
             label8.Font = new Font("Microsoft JhengHei UI", 14F);
-            label8.Location = new Point(477, 471);
+            label8.Location = new Point(370, 375);
+            label8.Margin = new Padding(2, 0, 2, 0);
             label8.Name = "label8";
-            label8.Size = new Size(101, 30);
+            label8.Size = new Size(80, 24);
             label8.TabIndex = 7;
             label8.Text = "售價C：";
             // 
@@ -258,9 +272,10 @@
             label4.Anchor = AnchorStyles.Right;
             label4.AutoSize = true;
             label4.Font = new Font("Microsoft JhengHei UI", 14F);
-            label4.Location = new Point(30, 581);
+            label4.Location = new Point(22, 461);
+            label4.Margin = new Padding(2, 0, 2, 0);
             label4.Name = "label4";
-            label4.Size = new Size(133, 30);
+            label4.Size = new Size(105, 24);
             label4.TabIndex = 3;
             label4.Text = "現行成本：";
             // 
@@ -269,9 +284,10 @@
             label9.Anchor = AnchorStyles.Right;
             label9.AutoSize = true;
             label9.Font = new Font("Microsoft JhengHei UI", 14F);
-            label9.Location = new Point(445, 581);
+            label9.Location = new Point(345, 461);
+            label9.Margin = new Padding(2, 0, 2, 0);
             label9.Name = "label9";
-            label9.Size = new Size(133, 30);
+            label9.Size = new Size(105, 24);
             label9.TabIndex = 8;
             label9.Text = "標準成本：";
             // 
@@ -282,9 +298,10 @@
             txtProductName.BorderStyle = BorderStyle.None;
             mainPanel.SetColumnSpan(txtProductName, 3);
             txtProductName.Font = new Font("Microsoft JhengHei UI", 14F);
-            txtProductName.Location = new Point(169, 143);
+            txtProductName.Location = new Point(131, 117);
+            txtProductName.Margin = new Padding(2, 2, 2, 2);
             txtProductName.Name = "txtProductName";
-            txtProductName.Size = new Size(660, 30);
+            txtProductName.Size = new Size(513, 24);
             txtProductName.TabIndex = 9;
             // 
             // txtProductId
@@ -293,9 +310,10 @@
             txtProductId.BackColor = SystemColors.Control;
             txtProductId.BorderStyle = BorderStyle.None;
             txtProductId.Font = new Font("Microsoft JhengHei UI", 14F);
-            txtProductId.Location = new Point(169, 35);
+            txtProductId.Location = new Point(131, 31);
+            txtProductId.Margin = new Padding(2, 2, 2, 2);
             txtProductId.Name = "txtProductId";
-            txtProductId.Size = new Size(243, 30);
+            txtProductId.Size = new Size(189, 24);
             txtProductId.TabIndex = 10;
             // 
             // txtProductUnit
@@ -304,9 +322,10 @@
             txtProductUnit.BackColor = SystemColors.Control;
             txtProductUnit.BorderStyle = BorderStyle.None;
             txtProductUnit.Font = new Font("Microsoft JhengHei UI", 14F);
-            txtProductUnit.Location = new Point(169, 251);
+            txtProductUnit.Location = new Point(131, 203);
+            txtProductUnit.Margin = new Padding(2, 2, 2, 2);
             txtProductUnit.Name = "txtProductUnit";
-            txtProductUnit.Size = new Size(243, 30);
+            txtProductUnit.Size = new Size(189, 24);
             txtProductUnit.TabIndex = 11;
             // 
             // txtProductStandardPrice
@@ -315,9 +334,10 @@
             txtProductStandardPrice.BackColor = SystemColors.Control;
             txtProductStandardPrice.BorderStyle = BorderStyle.None;
             txtProductStandardPrice.Font = new Font("Microsoft JhengHei UI", 14F);
-            txtProductStandardPrice.Location = new Point(169, 359);
+            txtProductStandardPrice.Location = new Point(131, 289);
+            txtProductStandardPrice.Margin = new Padding(2, 2, 2, 2);
             txtProductStandardPrice.Name = "txtProductStandardPrice";
-            txtProductStandardPrice.Size = new Size(243, 30);
+            txtProductStandardPrice.Size = new Size(189, 24);
             txtProductStandardPrice.TabIndex = 12;
             // 
             // txtProductPriceA
@@ -326,9 +346,10 @@
             txtProductPriceA.BackColor = SystemColors.Control;
             txtProductPriceA.BorderStyle = BorderStyle.None;
             txtProductPriceA.Font = new Font("Microsoft JhengHei UI", 14F);
-            txtProductPriceA.Location = new Point(584, 359);
+            txtProductPriceA.Location = new Point(454, 289);
+            txtProductPriceA.Margin = new Padding(2, 2, 2, 2);
             txtProductPriceA.Name = "txtProductPriceA";
-            txtProductPriceA.Size = new Size(243, 30);
+            txtProductPriceA.Size = new Size(189, 24);
             txtProductPriceA.TabIndex = 13;
             // 
             // txtProductPriceB
@@ -337,9 +358,10 @@
             txtProductPriceB.BackColor = SystemColors.Control;
             txtProductPriceB.BorderStyle = BorderStyle.None;
             txtProductPriceB.Font = new Font("Microsoft JhengHei UI", 14F);
-            txtProductPriceB.Location = new Point(169, 467);
+            txtProductPriceB.Location = new Point(131, 375);
+            txtProductPriceB.Margin = new Padding(2, 2, 2, 2);
             txtProductPriceB.Name = "txtProductPriceB";
-            txtProductPriceB.Size = new Size(243, 30);
+            txtProductPriceB.Size = new Size(189, 24);
             txtProductPriceB.TabIndex = 14;
             // 
             // txtProductCurrentCost
@@ -348,9 +370,10 @@
             txtProductCurrentCost.BackColor = SystemColors.Control;
             txtProductCurrentCost.BorderStyle = BorderStyle.None;
             txtProductCurrentCost.Font = new Font("Microsoft JhengHei UI", 14F);
-            txtProductCurrentCost.Location = new Point(169, 578);
+            txtProductCurrentCost.Location = new Point(131, 461);
+            txtProductCurrentCost.Margin = new Padding(2, 2, 2, 2);
             txtProductCurrentCost.Name = "txtProductCurrentCost";
-            txtProductCurrentCost.Size = new Size(243, 30);
+            txtProductCurrentCost.Size = new Size(189, 24);
             txtProductCurrentCost.TabIndex = 15;
             // 
             // txtProductPriceC
@@ -359,9 +382,10 @@
             txtProductPriceC.BackColor = SystemColors.Control;
             txtProductPriceC.BorderStyle = BorderStyle.None;
             txtProductPriceC.Font = new Font("Microsoft JhengHei UI", 14F);
-            txtProductPriceC.Location = new Point(584, 467);
+            txtProductPriceC.Location = new Point(454, 375);
+            txtProductPriceC.Margin = new Padding(2, 2, 2, 2);
             txtProductPriceC.Name = "txtProductPriceC";
-            txtProductPriceC.Size = new Size(243, 30);
+            txtProductPriceC.Size = new Size(189, 24);
             txtProductPriceC.TabIndex = 16;
             // 
             // txtProductStandardCost
@@ -370,19 +394,22 @@
             txtProductStandardCost.BackColor = SystemColors.Control;
             txtProductStandardCost.BorderStyle = BorderStyle.None;
             txtProductStandardCost.Font = new Font("Microsoft JhengHei UI", 14F);
-            txtProductStandardCost.Location = new Point(584, 578);
+            txtProductStandardCost.Location = new Point(454, 461);
+            txtProductStandardCost.Margin = new Padding(2, 2, 2, 2);
             txtProductStandardCost.Name = "txtProductStandardCost";
-            txtProductStandardCost.Size = new Size(243, 30);
+            txtProductStandardCost.Size = new Size(189, 24);
             txtProductStandardCost.TabIndex = 17;
             // 
             // ProductManageForm
             // 
-            AutoScaleDimensions = new SizeF(9F, 19F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1082, 653);
+            ClientSize = new Size(842, 516);
             Controls.Add(mainPanel);
             Controls.Add(buttonPanel);
+            Margin = new Padding(2, 2, 2, 2);
             Name = "ProductManageForm";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "產品資料管理";
             buttonPanel.ResumeLayout(false);
             mainPanel.ResumeLayout(false);

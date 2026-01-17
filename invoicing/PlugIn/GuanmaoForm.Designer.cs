@@ -40,9 +40,10 @@
             // 
             downPanel.Controls.Add(btnLoad);
             downPanel.Dock = DockStyle.Bottom;
-            downPanel.Location = new Point(0, 361);
+            downPanel.Location = new Point(0, 285);
+            downPanel.Margin = new Padding(2, 2, 2, 2);
             downPanel.Name = "downPanel";
-            downPanel.Size = new Size(800, 89);
+            downPanel.Size = new Size(622, 70);
             downPanel.TabIndex = 0;
             // 
             // btnLoad
@@ -50,8 +51,9 @@
             btnLoad.Dock = DockStyle.Fill;
             btnLoad.Font = new Font("Microsoft JhengHei UI", 12F);
             btnLoad.Location = new Point(0, 0);
+            btnLoad.Margin = new Padding(2, 2, 2, 2);
             btnLoad.Name = "btnLoad";
-            btnLoad.Size = new Size(800, 89);
+            btnLoad.Size = new Size(622, 70);
             btnLoad.TabIndex = 0;
             btnLoad.Text = "讀取";
             btnLoad.UseVisualStyleBackColor = true;
@@ -71,19 +73,22 @@
             dgvInvoicing.DefaultCellStyle = dataGridViewCellStyle1;
             dgvInvoicing.Dock = DockStyle.Fill;
             dgvInvoicing.Location = new Point(0, 0);
+            dgvInvoicing.Margin = new Padding(2, 2, 2, 2);
             dgvInvoicing.Name = "dgvInvoicing";
             dgvInvoicing.RowHeadersWidth = 51;
-            dgvInvoicing.Size = new Size(800, 361);
+            dgvInvoicing.Size = new Size(622, 285);
             dgvInvoicing.TabIndex = 2;
             // 
             // GuanmaoForm
             // 
-            AutoScaleDimensions = new SizeF(9F, 19F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 450);
+            ClientSize = new Size(622, 355);
             Controls.Add(dgvInvoicing);
             Controls.Add(downPanel);
+            Margin = new Padding(2, 2, 2, 2);
             Name = "GuanmaoForm";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "關貿";
             downPanel.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dgvInvoicing).EndInit();

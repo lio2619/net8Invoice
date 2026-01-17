@@ -70,6 +70,7 @@
             mainPanel.Controls.Add(lblCustomerIdValue, 1, 0);
             mainPanel.Dock = DockStyle.Fill;
             mainPanel.Location = new Point(0, 0);
+            mainPanel.Margin = new Padding(2, 2, 2, 2);
             mainPanel.Name = "mainPanel";
             mainPanel.RowCount = 5;
             mainPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
@@ -77,17 +78,18 @@
             mainPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
             mainPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
             mainPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
-            mainPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            mainPanel.Size = new Size(1182, 483);
+            mainPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 16F));
+            mainPanel.Size = new Size(919, 381);
             mainPanel.TabIndex = 1;
             // 
             // btnFormClear
             // 
             btnFormClear.Anchor = AnchorStyles.Left;
             btnFormClear.Font = new Font("Microsoft JhengHei UI", 14F);
-            btnFormClear.Location = new Point(1007, 406);
+            btnFormClear.Location = new Point(782, 321);
+            btnFormClear.Margin = new Padding(2, 2, 2, 2);
             btnFormClear.Name = "btnFormClear";
-            btnFormClear.Size = new Size(172, 55);
+            btnFormClear.Size = new Size(134, 43);
             btnFormClear.TabIndex = 14;
             btnFormClear.Text = "清空";
             btnFormClear.UseVisualStyleBackColor = true;
@@ -97,9 +99,10 @@
             // 
             btnCustomerDelete.Anchor = AnchorStyles.Left;
             btnCustomerDelete.Font = new Font("Microsoft JhengHei UI", 14F);
-            btnCustomerDelete.Location = new Point(1007, 308);
+            btnCustomerDelete.Location = new Point(782, 244);
+            btnCustomerDelete.Margin = new Padding(2, 2, 2, 2);
             btnCustomerDelete.Name = "btnCustomerDelete";
-            btnCustomerDelete.Size = new Size(172, 55);
+            btnCustomerDelete.Size = new Size(134, 43);
             btnCustomerDelete.TabIndex = 13;
             btnCustomerDelete.Text = "刪除";
             btnCustomerDelete.UseVisualStyleBackColor = true;
@@ -109,9 +112,10 @@
             // 
             btnCustomerSearch.Anchor = AnchorStyles.Left;
             btnCustomerSearch.Font = new Font("Microsoft JhengHei UI", 14F);
-            btnCustomerSearch.Location = new Point(1007, 212);
+            btnCustomerSearch.Location = new Point(782, 168);
+            btnCustomerSearch.Margin = new Padding(2, 2, 2, 2);
             btnCustomerSearch.Name = "btnCustomerSearch";
-            btnCustomerSearch.Size = new Size(172, 55);
+            btnCustomerSearch.Size = new Size(134, 43);
             btnCustomerSearch.TabIndex = 12;
             btnCustomerSearch.Text = "查詢";
             btnCustomerSearch.UseVisualStyleBackColor = true;
@@ -121,9 +125,10 @@
             // 
             btnCustomerModify.Anchor = AnchorStyles.Left;
             btnCustomerModify.Font = new Font("Microsoft JhengHei UI", 14F);
-            btnCustomerModify.Location = new Point(1007, 116);
+            btnCustomerModify.Location = new Point(782, 92);
+            btnCustomerModify.Margin = new Padding(2, 2, 2, 2);
             btnCustomerModify.Name = "btnCustomerModify";
-            btnCustomerModify.Size = new Size(172, 55);
+            btnCustomerModify.Size = new Size(134, 43);
             btnCustomerModify.TabIndex = 11;
             btnCustomerModify.Text = "修改";
             btnCustomerModify.UseVisualStyleBackColor = true;
@@ -134,9 +139,10 @@
             lblCustomerId.Anchor = AnchorStyles.Right;
             lblCustomerId.AutoSize = true;
             lblCustomerId.Font = new Font("Microsoft JhengHei UI", 14F);
-            lblCustomerId.Location = new Point(41, 33);
+            lblCustomerId.Location = new Point(30, 26);
+            lblCustomerId.Margin = new Padding(2, 0, 2, 0);
             lblCustomerId.Name = "lblCustomerId";
-            lblCustomerId.Size = new Size(133, 30);
+            lblCustomerId.Size = new Size(105, 24);
             lblCustomerId.TabIndex = 0;
             lblCustomerId.Text = "客戶編號：";
             // 
@@ -145,9 +151,10 @@
             lblCustomerName.Anchor = AnchorStyles.Right;
             lblCustomerName.AutoSize = true;
             lblCustomerName.Font = new Font("Microsoft JhengHei UI", 14F);
-            lblCustomerName.Location = new Point(41, 129);
+            lblCustomerName.Location = new Point(30, 102);
+            lblCustomerName.Margin = new Padding(2, 0, 2, 0);
             lblCustomerName.Name = "lblCustomerName";
-            lblCustomerName.Size = new Size(133, 30);
+            lblCustomerName.Size = new Size(105, 24);
             lblCustomerName.TabIndex = 1;
             lblCustomerName.Text = "客戶名稱：";
             // 
@@ -156,9 +163,10 @@
             lblCustomerAddress.Anchor = AnchorStyles.Right;
             lblCustomerAddress.AutoSize = true;
             lblCustomerAddress.Font = new Font("Microsoft JhengHei UI", 14F);
-            lblCustomerAddress.Location = new Point(41, 225);
+            lblCustomerAddress.Location = new Point(30, 178);
+            lblCustomerAddress.Margin = new Padding(2, 0, 2, 0);
             lblCustomerAddress.Name = "lblCustomerAddress";
-            lblCustomerAddress.Size = new Size(133, 30);
+            lblCustomerAddress.Size = new Size(105, 24);
             lblCustomerAddress.TabIndex = 2;
             lblCustomerAddress.Text = "客戶地址：";
             // 
@@ -167,9 +175,10 @@
             lblCustomerTel.Anchor = AnchorStyles.Right;
             lblCustomerTel.AutoSize = true;
             lblCustomerTel.Font = new Font("Microsoft JhengHei UI", 14F);
-            lblCustomerTel.Location = new Point(41, 321);
+            lblCustomerTel.Location = new Point(30, 254);
+            lblCustomerTel.Margin = new Padding(2, 0, 2, 0);
             lblCustomerTel.Name = "lblCustomerTel";
-            lblCustomerTel.Size = new Size(133, 30);
+            lblCustomerTel.Size = new Size(105, 24);
             lblCustomerTel.TabIndex = 3;
             lblCustomerTel.Text = "聯絡號碼：";
             // 
@@ -178,9 +187,10 @@
             lblCustomerFax.Anchor = AnchorStyles.Right;
             lblCustomerFax.AutoSize = true;
             lblCustomerFax.Font = new Font("Microsoft JhengHei UI", 14F);
-            lblCustomerFax.Location = new Point(41, 418);
+            lblCustomerFax.Location = new Point(30, 330);
+            lblCustomerFax.Margin = new Padding(2, 0, 2, 0);
             lblCustomerFax.Name = "lblCustomerFax";
-            lblCustomerFax.Size = new Size(133, 30);
+            lblCustomerFax.Size = new Size(105, 24);
             lblCustomerFax.TabIndex = 4;
             lblCustomerFax.Text = "傳真號碼：";
             // 
@@ -190,9 +200,10 @@
             txtCustomerName.BackColor = SystemColors.Control;
             txtCustomerName.BorderStyle = BorderStyle.None;
             txtCustomerName.Font = new Font("Microsoft JhengHei UI", 14F);
-            txtCustomerName.Location = new Point(180, 129);
+            txtCustomerName.Location = new Point(139, 102);
+            txtCustomerName.Margin = new Padding(2, 2, 2, 2);
             txtCustomerName.Name = "txtCustomerName";
-            txtCustomerName.Size = new Size(787, 30);
+            txtCustomerName.Size = new Size(612, 24);
             txtCustomerName.TabIndex = 6;
             // 
             // txtCustomerAddress
@@ -201,9 +212,10 @@
             txtCustomerAddress.BackColor = SystemColors.Control;
             txtCustomerAddress.BorderStyle = BorderStyle.None;
             txtCustomerAddress.Font = new Font("Microsoft JhengHei UI", 14F);
-            txtCustomerAddress.Location = new Point(180, 225);
+            txtCustomerAddress.Location = new Point(139, 178);
+            txtCustomerAddress.Margin = new Padding(2, 2, 2, 2);
             txtCustomerAddress.Name = "txtCustomerAddress";
-            txtCustomerAddress.Size = new Size(787, 30);
+            txtCustomerAddress.Size = new Size(612, 24);
             txtCustomerAddress.TabIndex = 7;
             // 
             // txtCustomerTel
@@ -212,9 +224,10 @@
             txtCustomerTel.BackColor = SystemColors.Control;
             txtCustomerTel.BorderStyle = BorderStyle.None;
             txtCustomerTel.Font = new Font("Microsoft JhengHei UI", 14F);
-            txtCustomerTel.Location = new Point(180, 321);
+            txtCustomerTel.Location = new Point(139, 254);
+            txtCustomerTel.Margin = new Padding(2, 2, 2, 2);
             txtCustomerTel.Name = "txtCustomerTel";
-            txtCustomerTel.Size = new Size(787, 30);
+            txtCustomerTel.Size = new Size(612, 24);
             txtCustomerTel.TabIndex = 8;
             // 
             // txtCustomerFax
@@ -223,18 +236,20 @@
             txtCustomerFax.BackColor = SystemColors.Control;
             txtCustomerFax.BorderStyle = BorderStyle.None;
             txtCustomerFax.Font = new Font("Microsoft JhengHei UI", 14F);
-            txtCustomerFax.Location = new Point(180, 418);
+            txtCustomerFax.Location = new Point(139, 330);
+            txtCustomerFax.Margin = new Padding(2, 2, 2, 2);
             txtCustomerFax.Name = "txtCustomerFax";
-            txtCustomerFax.Size = new Size(787, 30);
+            txtCustomerFax.Size = new Size(612, 24);
             txtCustomerFax.TabIndex = 9;
             // 
             // btnCustomerCreate
             // 
             btnCustomerCreate.Anchor = AnchorStyles.Left;
             btnCustomerCreate.Font = new Font("Microsoft JhengHei UI", 14F);
-            btnCustomerCreate.Location = new Point(1007, 20);
+            btnCustomerCreate.Location = new Point(782, 16);
+            btnCustomerCreate.Margin = new Padding(2, 2, 2, 2);
             btnCustomerCreate.Name = "btnCustomerCreate";
-            btnCustomerCreate.Size = new Size(172, 55);
+            btnCustomerCreate.Size = new Size(134, 43);
             btnCustomerCreate.TabIndex = 10;
             btnCustomerCreate.Text = "新增";
             btnCustomerCreate.UseVisualStyleBackColor = true;
@@ -245,18 +260,21 @@
             lblCustomerIdValue.Anchor = AnchorStyles.Left;
             lblCustomerIdValue.AutoSize = true;
             lblCustomerIdValue.Font = new Font("Microsoft JhengHei UI", 14F);
-            lblCustomerIdValue.Location = new Point(180, 33);
+            lblCustomerIdValue.Location = new Point(139, 26);
+            lblCustomerIdValue.Margin = new Padding(2, 0, 2, 0);
             lblCustomerIdValue.Name = "lblCustomerIdValue";
-            lblCustomerIdValue.Size = new Size(0, 30);
+            lblCustomerIdValue.Size = new Size(0, 24);
             lblCustomerIdValue.TabIndex = 15;
             // 
             // CustomerManageForm
             // 
-            AutoScaleDimensions = new SizeF(9F, 19F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1182, 483);
+            ClientSize = new Size(919, 381);
             Controls.Add(mainPanel);
+            Margin = new Padding(2, 2, 2, 2);
             Name = "CustomerManageForm";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "客戶資料管理";
             mainPanel.ResumeLayout(false);
             mainPanel.PerformLayout();

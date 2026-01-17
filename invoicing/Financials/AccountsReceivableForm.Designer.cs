@@ -67,10 +67,11 @@
             searchPanel.Controls.Add(cboCustomer, 5, 0);
             searchPanel.Dock = DockStyle.Top;
             searchPanel.Location = new Point(0, 0);
+            searchPanel.Margin = new Padding(2);
             searchPanel.Name = "searchPanel";
             searchPanel.RowCount = 1;
             searchPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            searchPanel.Size = new Size(982, 76);
+            searchPanel.Size = new Size(831, 60);
             searchPanel.TabIndex = 4;
             // 
             // lblCustomer
@@ -78,9 +79,10 @@
             lblCustomer.Anchor = AnchorStyles.Right;
             lblCustomer.AutoSize = true;
             lblCustomer.Font = new Font("Microsoft JhengHei UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            lblCustomer.Location = new Point(674, 25);
+            lblCustomer.Location = new Point(573, 20);
+            lblCustomer.Margin = new Padding(2, 0, 2, 0);
             lblCustomer.Name = "lblCustomer";
-            lblCustomer.Size = new Size(72, 25);
+            lblCustomer.Size = new Size(57, 20);
             lblCustomer.TabIndex = 4;
             lblCustomer.Text = "客戶：";
             // 
@@ -89,9 +91,10 @@
             lblStartText.Anchor = AnchorStyles.Right;
             lblStartText.AutoSize = true;
             lblStartText.Font = new Font("Microsoft JhengHei UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            lblStartText.Location = new Point(6, 25);
+            lblStartText.Location = new Point(11, 20);
+            lblStartText.Margin = new Padding(2, 0, 2, 0);
             lblStartText.Name = "lblStartText";
-            lblStartText.Size = new Size(112, 25);
+            lblStartText.Size = new Size(89, 20);
             lblStartText.TabIndex = 0;
             lblStartText.Text = "起始時間：";
             // 
@@ -100,9 +103,10 @@
             lblEndText.Anchor = AnchorStyles.Right;
             lblEndText.AutoSize = true;
             lblEndText.Font = new Font("Microsoft JhengHei UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            lblEndText.Location = new Point(336, 25);
+            lblEndText.Location = new Point(290, 20);
+            lblEndText.Margin = new Padding(2, 0, 2, 0);
             lblEndText.Name = "lblEndText";
-            lblEndText.Size = new Size(112, 25);
+            lblEndText.Size = new Size(89, 20);
             lblEndText.TabIndex = 1;
             lblEndText.Text = "結束時間：";
             // 
@@ -111,9 +115,10 @@
             dtpStart.Anchor = AnchorStyles.Left;
             dtpStart.CalendarFont = new Font("Microsoft JhengHei UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             dtpStart.Font = new Font("Microsoft JhengHei UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            dtpStart.Location = new Point(124, 21);
+            dtpStart.Location = new Point(104, 16);
+            dtpStart.Margin = new Padding(2);
             dtpStart.Name = "dtpStart";
-            dtpStart.Size = new Size(202, 33);
+            dtpStart.Size = new Size(157, 28);
             dtpStart.TabIndex = 2;
             // 
             // dtpEnd
@@ -121,9 +126,10 @@
             dtpEnd.Anchor = AnchorStyles.Left;
             dtpEnd.CalendarFont = new Font("Microsoft JhengHei UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             dtpEnd.Font = new Font("Microsoft JhengHei UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            dtpEnd.Location = new Point(454, 21);
+            dtpEnd.Location = new Point(383, 16);
+            dtpEnd.Margin = new Padding(2);
             dtpEnd.Name = "dtpEnd";
-            dtpEnd.Size = new Size(210, 33);
+            dtpEnd.Size = new Size(164, 28);
             dtpEnd.TabIndex = 3;
             // 
             // cboCustomer
@@ -131,9 +137,10 @@
             cboCustomer.Anchor = AnchorStyles.Left;
             cboCustomer.Font = new Font("Microsoft JhengHei UI", 12F);
             cboCustomer.FormattingEnabled = true;
-            cboCustomer.Location = new Point(752, 21);
+            cboCustomer.Location = new Point(634, 16);
+            cboCustomer.Margin = new Padding(2);
             cboCustomer.Name = "cboCustomer";
-            cboCustomer.Size = new Size(227, 33);
+            cboCustomer.Size = new Size(195, 28);
             cboCustomer.TabIndex = 5;
             // 
             // buttonPanel
@@ -150,11 +157,12 @@
             buttonPanel.Controls.Add(btnPrint, 4, 0);
             buttonPanel.Controls.Add(txtTax, 3, 0);
             buttonPanel.Dock = DockStyle.Bottom;
-            buttonPanel.Location = new Point(0, 430);
+            buttonPanel.Location = new Point(0, 376);
+            buttonPanel.Margin = new Padding(2);
             buttonPanel.Name = "buttonPanel";
             buttonPanel.RowCount = 1;
             buttonPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            buttonPanel.Size = new Size(982, 73);
+            buttonPanel.Size = new Size(831, 58);
             buttonPanel.TabIndex = 5;
             // 
             // lblNTotalumber
@@ -162,9 +170,10 @@
             lblNTotalumber.Anchor = AnchorStyles.Left;
             lblNTotalumber.AutoSize = true;
             lblNTotalumber.Font = new Font("Microsoft JhengHei UI", 13.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            lblNTotalumber.Location = new Point(130, 22);
+            lblNTotalumber.Location = new Point(109, 17);
+            lblNTotalumber.Margin = new Padding(2, 0, 2, 0);
             lblNTotalumber.Name = "lblNTotalumber";
-            lblNTotalumber.Size = new Size(26, 29);
+            lblNTotalumber.Size = new Size(21, 24);
             lblNTotalumber.TabIndex = 8;
             lblNTotalumber.Text = "0";
             // 
@@ -173,9 +182,10 @@
             lblTotal.Anchor = AnchorStyles.Right;
             lblTotal.AutoSize = true;
             lblTotal.Font = new Font("Microsoft JhengHei UI", 12F);
-            lblTotal.Location = new Point(12, 24);
+            lblTotal.Location = new Point(16, 19);
+            lblTotal.Margin = new Padding(2, 0, 2, 0);
             lblTotal.Name = "lblTotal";
-            lblTotal.Size = new Size(112, 25);
+            lblTotal.Size = new Size(89, 20);
             lblTotal.TabIndex = 0;
             lblTotal.Text = "本期合計：";
             // 
@@ -184,9 +194,10 @@
             lblTax.Anchor = AnchorStyles.Right;
             lblTax.AutoSize = true;
             lblTax.Font = new Font("Microsoft JhengHei UI", 12F);
-            lblTax.Location = new Point(472, 24);
+            lblTax.Location = new Point(404, 19);
+            lblTax.Margin = new Padding(2, 0, 2, 0);
             lblTax.Name = "lblTax";
-            lblTax.Size = new Size(92, 25);
+            lblTax.Size = new Size(73, 20);
             lblTax.TabIndex = 1;
             lblTax.Text = "營業稅：";
             // 
@@ -194,9 +205,10 @@
             // 
             btnPrint.Dock = DockStyle.Fill;
             btnPrint.Font = new Font("Microsoft JhengHei UI", 12F);
-            btnPrint.Location = new Point(815, 3);
+            btnPrint.Location = new Point(688, 2);
+            btnPrint.Margin = new Padding(2);
             btnPrint.Name = "btnPrint";
-            btnPrint.Size = new Size(164, 67);
+            btnPrint.Size = new Size(141, 54);
             btnPrint.TabIndex = 2;
             btnPrint.Text = "列印";
             btnPrint.UseVisualStyleBackColor = true;
@@ -207,18 +219,20 @@
             txtTax.BackColor = SystemColors.Control;
             txtTax.BorderStyle = BorderStyle.None;
             txtTax.Font = new Font("Microsoft JhengHei UI", 14F);
-            txtTax.Location = new Point(570, 21);
+            txtTax.Location = new Point(481, 17);
+            txtTax.Margin = new Padding(2);
             txtTax.Name = "txtTax";
-            txtTax.Size = new Size(239, 30);
+            txtTax.Size = new Size(186, 24);
             txtTax.TabIndex = 7;
             // 
             // mainPanel
             // 
             mainPanel.Controls.Add(dgvAccountsReceivable);
             mainPanel.Dock = DockStyle.Fill;
-            mainPanel.Location = new Point(0, 76);
+            mainPanel.Location = new Point(0, 60);
+            mainPanel.Margin = new Padding(2);
             mainPanel.Name = "mainPanel";
-            mainPanel.Size = new Size(982, 354);
+            mainPanel.Size = new Size(831, 316);
             mainPanel.TabIndex = 6;
             // 
             // dgvAccountsReceivable
@@ -236,20 +250,23 @@
             dgvAccountsReceivable.DefaultCellStyle = dataGridViewCellStyle1;
             dgvAccountsReceivable.Dock = DockStyle.Fill;
             dgvAccountsReceivable.Location = new Point(0, 0);
+            dgvAccountsReceivable.Margin = new Padding(2);
             dgvAccountsReceivable.Name = "dgvAccountsReceivable";
             dgvAccountsReceivable.RowHeadersWidth = 51;
-            dgvAccountsReceivable.Size = new Size(982, 354);
+            dgvAccountsReceivable.Size = new Size(831, 316);
             dgvAccountsReceivable.TabIndex = 8;
             // 
             // AccountsReceivableForm
             // 
-            AutoScaleDimensions = new SizeF(9F, 19F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(982, 503);
+            ClientSize = new Size(831, 434);
             Controls.Add(mainPanel);
             Controls.Add(searchPanel);
             Controls.Add(buttonPanel);
+            Margin = new Padding(2);
             Name = "AccountsReceivableForm";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "應收帳款";
             searchPanel.ResumeLayout(false);
             searchPanel.PerformLayout();

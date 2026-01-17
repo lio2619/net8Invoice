@@ -170,8 +170,7 @@ namespace invoicing.Service
             }
         }
 
-        /// <summary>
-        /// 計算新的 NewOrderNumber（每月20號重置，4位數格式）
+        /// 計算新的 NewOrderNumber（每月1號重置，4位數格式）
         /// </summary>
         /// <param name="dateStr">日期字串（yyyyMMdd 格式）</param>
         /// <param name="orderType">單子類型</param>
@@ -179,36 +178,28 @@ namespace invoicing.Service
         private async Task<string> GenerateNewOrderNumberAsync(string dateStr, string orderType)
         {
             // 解析日期
-            if (!DateTime.TryParseExact(dateStr, "yyyyMMdd", null, 
+            if (!DateTime.TryParseExact(dateStr, "yyyyMMdd", null,
                 System.Globalization.DateTimeStyles.None, out var orderDate))
             {
                 orderDate = DateTime.Now;
             }
 
-            // 計算週期的起始日期（每月20號為分隔點）
-            DateTime periodStart;
-            DateTime periodEnd;
+            // --- 修改開始：計算週期的起始日期（每月1號為分隔點） ---
 
-            if (orderDate.Day >= 20)
-            {
-                // 當月20號 ~ 下月19號
-                periodStart = new DateTime(orderDate.Year, orderDate.Month, 20);
-                periodEnd = periodStart.AddMonths(1).AddDays(-1);
-            }
-            else
-            {
-                // 上月20號 ~ 當月19號
-                periodStart = new DateTime(orderDate.Year, orderDate.Month, 1).AddMonths(-1);
-                periodStart = new DateTime(periodStart.Year, periodStart.Month, 20);
-                periodEnd = new DateTime(orderDate.Year, orderDate.Month, 19);
-            }
+            // 週期起始日：當月 1 號
+            DateTime periodStart = new DateTime(orderDate.Year, orderDate.Month, 1);
+
+            // 週期結束日：當月最後一天 (下個月1號 減去 1天)
+            DateTime periodEnd = periodStart.AddMonths(1).AddDays(-1);
+
+            // --- 修改結束 ---
 
             string periodStartStr = periodStart.ToString("yyyyMMdd");
             string periodEndStr = periodEnd.ToString("yyyyMMdd");
 
             // 查詢該週期內同類型單子的最大 NewOrderNumber
             var existingOrders = await _dbContext.CustomerOrders
-                .Where(x => x.OrderName == orderType 
+                .Where(x => x.OrderName == orderType
                          && x.NewOrderNumber != null
                          && string.Compare(x.Date, periodStartStr) >= 0
                          && string.Compare(x.Date, periodEndStr) <= 0)

@@ -136,7 +136,7 @@ namespace invoicing.Financials
                     .Sum(d => d.TotalAmount);
                 _currentTotal = positiveSum - negativeSum;
 
-                lblNTotalumber.Text = _currentTotal.ToString("N0");
+                lblNTotalumber.Text = _currentTotal.ToString("#,##0.###");
             }
             catch (Exception ex)
             {

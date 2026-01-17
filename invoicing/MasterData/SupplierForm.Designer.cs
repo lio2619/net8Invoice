@@ -47,10 +47,11 @@
             searchPanel.Controls.Add(txtInput, 1, 0);
             searchPanel.Dock = DockStyle.Top;
             searchPanel.Location = new Point(0, 0);
+            searchPanel.Margin = new Padding(2, 2, 2, 2);
             searchPanel.Name = "searchPanel";
             searchPanel.RowCount = 1;
             searchPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            searchPanel.Size = new Size(782, 125);
+            searchPanel.Size = new Size(608, 99);
             searchPanel.TabIndex = 2;
             // 
             // lblInput
@@ -58,9 +59,10 @@
             lblInput.Anchor = AnchorStyles.Right;
             lblInput.AutoSize = true;
             lblInput.Font = new Font("Microsoft JhengHei UI", 14F);
-            lblInput.Location = new Point(11, 47);
+            lblInput.Location = new Point(7, 37);
+            lblInput.Margin = new Padding(2, 0, 2, 0);
             lblInput.Name = "lblInput";
-            lblInput.Size = new Size(181, 30);
+            lblInput.Size = new Size(143, 24);
             lblInput.TabIndex = 0;
             lblInput.Text = "輸入廠商名稱：";
             // 
@@ -70,9 +72,10 @@
             txtInput.BackColor = SystemColors.Control;
             txtInput.BorderStyle = BorderStyle.None;
             txtInput.Font = new Font("Microsoft JhengHei UI", 14F);
-            txtInput.Location = new Point(198, 47);
+            txtInput.Location = new Point(154, 37);
+            txtInput.Margin = new Padding(2, 2, 2, 2);
             txtInput.Name = "txtInput";
-            txtInput.Size = new Size(581, 30);
+            txtInput.Size = new Size(452, 24);
             txtInput.TabIndex = 1;
             txtInput.TextChanged += txtInput_TextChanged;
             // 
@@ -80,9 +83,10 @@
             // 
             dataPanel.Controls.Add(dgvSupplierAll);
             dataPanel.Dock = DockStyle.Fill;
-            dataPanel.Location = new Point(0, 125);
+            dataPanel.Location = new Point(0, 99);
+            dataPanel.Margin = new Padding(2, 2, 2, 2);
             dataPanel.Name = "dataPanel";
-            dataPanel.Size = new Size(782, 328);
+            dataPanel.Size = new Size(608, 259);
             dataPanel.TabIndex = 3;
             // 
             // dgvSupplierAll
@@ -91,20 +95,23 @@
             dgvSupplierAll.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvSupplierAll.Dock = DockStyle.Fill;
             dgvSupplierAll.Location = new Point(0, 0);
+            dgvSupplierAll.Margin = new Padding(2, 2, 2, 2);
             dgvSupplierAll.Name = "dgvSupplierAll";
             dgvSupplierAll.RowHeadersWidth = 51;
-            dgvSupplierAll.Size = new Size(782, 328);
+            dgvSupplierAll.Size = new Size(608, 259);
             dgvSupplierAll.TabIndex = 0;
             dgvSupplierAll.CellClick += dgvSupplierAll_CellClick;
             // 
             // SupplierForm
             // 
-            AutoScaleDimensions = new SizeF(9F, 19F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(782, 453);
+            ClientSize = new Size(608, 358);
             Controls.Add(dataPanel);
             Controls.Add(searchPanel);
+            Margin = new Padding(2, 2, 2, 2);
             Name = "SupplierForm";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "廠商資料";
             searchPanel.ResumeLayout(false);
             searchPanel.PerformLayout();

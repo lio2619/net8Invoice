@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
             btnPrint = new Button();
             btnCreateExcel = new Button();
             btnLoad = new Button();
@@ -60,9 +60,10 @@
             // 
             btnPrint.Anchor = AnchorStyles.Left;
             btnPrint.Font = new Font("Microsoft JhengHei UI", 13.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            btnPrint.Location = new Point(3, 127);
+            btnPrint.Location = new Point(2, 100);
+            btnPrint.Margin = new Padding(2, 2, 2, 2);
             btnPrint.Name = "btnPrint";
-            btnPrint.Size = new Size(154, 58);
+            btnPrint.Size = new Size(120, 46);
             btnPrint.TabIndex = 5;
             btnPrint.Text = "預覽列印";
             btnPrint.UseVisualStyleBackColor = true;
@@ -71,9 +72,10 @@
             // 
             btnCreateExcel.Anchor = AnchorStyles.Left;
             btnCreateExcel.Font = new Font("Microsoft JhengHei UI", 13.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            btnCreateExcel.Location = new Point(3, 439);
+            btnCreateExcel.Location = new Point(2, 346);
+            btnCreateExcel.Margin = new Padding(2, 2, 2, 2);
             btnCreateExcel.Name = "btnCreateExcel";
-            btnCreateExcel.Size = new Size(154, 58);
+            btnCreateExcel.Size = new Size(120, 46);
             btnCreateExcel.TabIndex = 4;
             btnCreateExcel.Text = "創建Excel";
             btnCreateExcel.UseVisualStyleBackColor = true;
@@ -82,9 +84,10 @@
             // 
             btnLoad.Anchor = AnchorStyles.Left;
             btnLoad.Font = new Font("Microsoft JhengHei UI", 13.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            btnLoad.Location = new Point(3, 23);
+            btnLoad.Location = new Point(2, 18);
+            btnLoad.Margin = new Padding(2, 2, 2, 2);
             btnLoad.Name = "btnLoad";
-            btnLoad.Size = new Size(154, 58);
+            btnLoad.Size = new Size(120, 46);
             btnLoad.TabIndex = 2;
             btnLoad.Text = "讀檔";
             btnLoad.UseVisualStyleBackColor = true;
@@ -93,9 +96,10 @@
             // 
             btnRefresh.Anchor = AnchorStyles.Left;
             btnRefresh.Font = new Font("Microsoft JhengHei UI", 13.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            btnRefresh.Location = new Point(3, 335);
+            btnRefresh.Location = new Point(2, 264);
+            btnRefresh.Margin = new Padding(2, 2, 2, 2);
             btnRefresh.Name = "btnRefresh";
-            btnRefresh.Size = new Size(154, 58);
+            btnRefresh.Size = new Size(120, 46);
             btnRefresh.TabIndex = 1;
             btnRefresh.Text = "刷新";
             btnRefresh.UseVisualStyleBackColor = true;
@@ -104,9 +108,10 @@
             // 
             btnSave.Anchor = AnchorStyles.Left;
             btnSave.Font = new Font("Microsoft JhengHei UI", 13.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            btnSave.Location = new Point(3, 231);
+            btnSave.Location = new Point(2, 182);
+            btnSave.Margin = new Padding(2, 2, 2, 2);
             btnSave.Name = "btnSave";
-            btnSave.Size = new Size(154, 58);
+            btnSave.Size = new Size(120, 46);
             btnSave.TabIndex = 0;
             btnSave.Text = "儲存";
             btnSave.UseVisualStyleBackColor = true;
@@ -116,28 +121,30 @@
             dgvInvoicing.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             dgvInvoicing.BackgroundColor = SystemColors.Control;
             dgvInvoicing.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle4.BackColor = SystemColors.Window;
-            dataGridViewCellStyle4.Font = new Font("Microsoft JhengHei UI", 12F);
-            dataGridViewCellStyle4.ForeColor = SystemColors.ControlText;
-            dataGridViewCellStyle4.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle4.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle4.WrapMode = DataGridViewTriState.False;
-            dgvInvoicing.DefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = SystemColors.Window;
+            dataGridViewCellStyle1.Font = new Font("Microsoft JhengHei UI", 12F);
+            dataGridViewCellStyle1.ForeColor = SystemColors.ControlText;
+            dataGridViewCellStyle1.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.False;
+            dgvInvoicing.DefaultCellStyle = dataGridViewCellStyle1;
             dgvInvoicing.Dock = DockStyle.Fill;
             dgvInvoicing.Location = new Point(0, 0);
+            dgvInvoicing.Margin = new Padding(2, 2, 2, 2);
             dgvInvoicing.Name = "dgvInvoicing";
             dgvInvoicing.RowHeadersWidth = 51;
-            dgvInvoicing.Size = new Size(1022, 548);
+            dgvInvoicing.Size = new Size(795, 432);
             dgvInvoicing.TabIndex = 1;
             // 
             // mainPanel
             // 
             mainPanel.Controls.Add(dgvInvoicing);
             mainPanel.Dock = DockStyle.Fill;
-            mainPanel.Location = new Point(0, 125);
+            mainPanel.Location = new Point(0, 99);
+            mainPanel.Margin = new Padding(2, 2, 2, 2);
             mainPanel.Name = "mainPanel";
-            mainPanel.Size = new Size(1022, 548);
+            mainPanel.Size = new Size(795, 432);
             mainPanel.TabIndex = 15;
             // 
             // txtRemark
@@ -146,9 +153,10 @@
             txtRemark.BackColor = SystemColors.Control;
             txtRemark.BorderStyle = BorderStyle.None;
             txtRemark.Font = new Font("Microsoft JhengHei UI", 14F);
-            txtRemark.Location = new Point(156, 25);
+            txtRemark.Location = new Point(121, 19);
+            txtRemark.Margin = new Padding(2, 2, 2, 2);
             txtRemark.Name = "txtRemark";
-            txtRemark.Size = new Size(351, 30);
+            txtRemark.Size = new Size(273, 24);
             txtRemark.TabIndex = 6;
             // 
             // lblRemark
@@ -156,9 +164,10 @@
             lblRemark.Anchor = AnchorStyles.Right;
             lblRemark.AutoSize = true;
             lblRemark.Font = new Font("Microsoft JhengHei UI", 14F);
-            lblRemark.Location = new Point(65, 25);
+            lblRemark.Location = new Point(50, 19);
+            lblRemark.Margin = new Padding(2, 0, 2, 0);
             lblRemark.Name = "lblRemark";
-            lblRemark.Size = new Size(85, 30);
+            lblRemark.Size = new Size(67, 24);
             lblRemark.TabIndex = 3;
             lblRemark.Text = "備註：";
             // 
@@ -167,9 +176,10 @@
             lblTotlaAmountText.Anchor = AnchorStyles.Right;
             lblTotlaAmountText.AutoSize = true;
             lblTotlaAmountText.Font = new Font("Microsoft JhengHei UI", 14F);
-            lblTotlaAmountText.Location = new Point(575, 25);
+            lblTotlaAmountText.Location = new Point(447, 19);
+            lblTotlaAmountText.Margin = new Padding(2, 0, 2, 0);
             lblTotlaAmountText.Name = "lblTotlaAmountText";
-            lblTotlaAmountText.Size = new Size(85, 30);
+            lblTotlaAmountText.Size = new Size(67, 24);
             lblTotlaAmountText.TabIndex = 4;
             lblTotlaAmountText.Text = "總計：";
             // 
@@ -178,9 +188,10 @@
             lblAmount.Anchor = AnchorStyles.Left;
             lblAmount.AutoSize = true;
             lblAmount.Font = new Font("Microsoft JhengHei UI", 13.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            lblAmount.Location = new Point(666, 25);
+            lblAmount.Location = new Point(518, 19);
+            lblAmount.Margin = new Padding(2, 0, 2, 0);
             lblAmount.Name = "lblAmount";
-            lblAmount.Size = new Size(26, 29);
+            lblAmount.Size = new Size(21, 24);
             lblAmount.TabIndex = 5;
             lblAmount.Text = "0";
             // 
@@ -196,11 +207,12 @@
             downAmountPanel.Controls.Add(lblTotlaAmountText, 2, 0);
             downAmountPanel.Controls.Add(lblAmount, 3, 0);
             downAmountPanel.Dock = DockStyle.Bottom;
-            downAmountPanel.Location = new Point(0, 673);
+            downAmountPanel.Location = new Point(0, 531);
+            downAmountPanel.Margin = new Padding(2, 2, 2, 2);
             downAmountPanel.Name = "downAmountPanel";
             downAmountPanel.RowCount = 1;
             downAmountPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            downAmountPanel.Size = new Size(1022, 80);
+            downAmountPanel.Size = new Size(795, 63);
             downAmountPanel.TabIndex = 13;
             // 
             // lblDate
@@ -208,9 +220,10 @@
             lblDate.Anchor = AnchorStyles.Right;
             lblDate.AutoSize = true;
             lblDate.Font = new Font("Microsoft JhengHei UI", 14F);
-            lblDate.Location = new Point(89, 16);
+            lblDate.Location = new Point(68, 12);
+            lblDate.Margin = new Padding(2, 0, 2, 0);
             lblDate.Name = "lblDate";
-            lblDate.Size = new Size(85, 30);
+            lblDate.Size = new Size(67, 24);
             lblDate.TabIndex = 1;
             lblDate.Text = "日期：";
             // 
@@ -219,9 +232,10 @@
             lblCustomer.Anchor = AnchorStyles.Right;
             lblCustomer.AutoSize = true;
             lblCustomer.Font = new Font("Microsoft JhengHei UI", 14F);
-            lblCustomer.Location = new Point(89, 78);
+            lblCustomer.Location = new Point(68, 62);
+            lblCustomer.Margin = new Padding(2, 0, 2, 0);
             lblCustomer.Name = "lblCustomer";
-            lblCustomer.Size = new Size(85, 30);
+            lblCustomer.Size = new Size(67, 24);
             lblCustomer.TabIndex = 2;
             lblCustomer.Text = "客戶：";
             // 
@@ -230,9 +244,10 @@
             lblPageNumberText.Anchor = AnchorStyles.Right;
             lblPageNumberText.AutoSize = true;
             lblPageNumberText.Font = new Font("Microsoft JhengHei UI", 14F);
-            lblPageNumberText.Location = new Point(631, 78);
+            lblPageNumberText.Location = new Point(488, 62);
+            lblPageNumberText.Margin = new Padding(2, 0, 2, 0);
             lblPageNumberText.Name = "lblPageNumberText";
-            lblPageNumberText.Size = new Size(133, 30);
+            lblPageNumberText.Size = new Size(105, 24);
             lblPageNumberText.TabIndex = 3;
             lblPageNumberText.Text = "單子編號：";
             // 
@@ -241,9 +256,10 @@
             lblNumber.Anchor = AnchorStyles.Left;
             lblNumber.AutoSize = true;
             lblNumber.Font = new Font("Microsoft JhengHei UI", 13.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            lblNumber.Location = new Point(770, 79);
+            lblNumber.Location = new Point(597, 62);
+            lblNumber.Margin = new Padding(2, 0, 2, 0);
             lblNumber.Name = "lblNumber";
-            lblNumber.Size = new Size(26, 29);
+            lblNumber.Size = new Size(21, 24);
             lblNumber.TabIndex = 4;
             lblNumber.Text = "0";
             // 
@@ -252,9 +268,10 @@
             dtpDate.Anchor = AnchorStyles.Left | AnchorStyles.Right;
             dtpDate.CalendarFont = new Font("Microsoft JhengHei UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             dtpDate.Font = new Font("Microsoft JhengHei UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            dtpDate.Location = new Point(180, 14);
+            dtpDate.Location = new Point(139, 10);
+            dtpDate.Margin = new Padding(2, 2, 2, 2);
             dtpDate.Name = "dtpDate";
-            dtpDate.Size = new Size(407, 33);
+            dtpDate.Size = new Size(317, 28);
             dtpDate.TabIndex = 5;
             // 
             // cboCustomer
@@ -262,9 +279,10 @@
             cboCustomer.Anchor = AnchorStyles.Left | AnchorStyles.Right;
             cboCustomer.Font = new Font("Microsoft JhengHei UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             cboCustomer.FormattingEnabled = true;
-            cboCustomer.Location = new Point(180, 77);
+            cboCustomer.Location = new Point(139, 60);
+            cboCustomer.Margin = new Padding(2, 2, 2, 2);
             cboCustomer.Name = "cboCustomer";
-            cboCustomer.Size = new Size(407, 33);
+            cboCustomer.Size = new Size(317, 28);
             cboCustomer.TabIndex = 6;
             // 
             // buutonPanel
@@ -277,7 +295,8 @@
             buutonPanel.Controls.Add(btnSave, 0, 2);
             buutonPanel.Controls.Add(btnRefresh, 0, 3);
             buutonPanel.Dock = DockStyle.Right;
-            buutonPanel.Location = new Point(1022, 125);
+            buutonPanel.Location = new Point(795, 99);
+            buutonPanel.Margin = new Padding(2, 2, 2, 2);
             buutonPanel.Name = "buutonPanel";
             buutonPanel.RowCount = 6;
             buutonPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 16.66F));
@@ -286,7 +305,7 @@
             buutonPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 16.66F));
             buutonPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 16.66F));
             buutonPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 16.66F));
-            buutonPanel.Size = new Size(160, 628);
+            buutonPanel.Size = new Size(124, 495);
             buutonPanel.TabIndex = 14;
             // 
             // UpIDNamePanel
@@ -304,23 +323,26 @@
             UpIDNamePanel.Controls.Add(cboCustomer, 1, 1);
             UpIDNamePanel.Dock = DockStyle.Top;
             UpIDNamePanel.Location = new Point(0, 0);
+            UpIDNamePanel.Margin = new Padding(2, 2, 2, 2);
             UpIDNamePanel.Name = "UpIDNamePanel";
             UpIDNamePanel.RowCount = 2;
             UpIDNamePanel.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
             UpIDNamePanel.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            UpIDNamePanel.Size = new Size(1182, 125);
+            UpIDNamePanel.Size = new Size(919, 99);
             UpIDNamePanel.TabIndex = 12;
             // 
             // JinDaForm
             // 
-            AutoScaleDimensions = new SizeF(9F, 19F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1182, 753);
+            ClientSize = new Size(919, 594);
             Controls.Add(mainPanel);
             Controls.Add(downAmountPanel);
             Controls.Add(buutonPanel);
             Controls.Add(UpIDNamePanel);
+            Margin = new Padding(2, 2, 2, 2);
             Name = "JinDaForm";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "金大";
             ((System.ComponentModel.ISupportInitialize)dgvInvoicing).EndInit();
             mainPanel.ResumeLayout(false);

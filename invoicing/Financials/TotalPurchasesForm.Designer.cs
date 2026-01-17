@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
             searchPanel = new TableLayoutPanel();
             lblStartText = new Label();
             lblEndText = new Label();
@@ -61,11 +61,12 @@
             searchPanel.Controls.Add(dtpEnd, 3, 0);
             searchPanel.Dock = DockStyle.Top;
             searchPanel.Location = new Point(0, 0);
+            searchPanel.Margin = new Padding(2, 2, 2, 2);
             searchPanel.Name = "searchPanel";
             searchPanel.RowCount = 1;
             searchPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            searchPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            searchPanel.Size = new Size(882, 76);
+            searchPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 60F));
+            searchPanel.Size = new Size(686, 60);
             searchPanel.TabIndex = 5;
             // 
             // lblStartText
@@ -73,9 +74,10 @@
             lblStartText.Anchor = AnchorStyles.Right;
             lblStartText.AutoSize = true;
             lblStartText.Font = new Font("Microsoft JhengHei UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            lblStartText.Location = new Point(45, 25);
+            lblStartText.Location = new Point(33, 20);
+            lblStartText.Margin = new Padding(2, 0, 2, 0);
             lblStartText.Name = "lblStartText";
-            lblStartText.Size = new Size(112, 25);
+            lblStartText.Size = new Size(89, 20);
             lblStartText.TabIndex = 0;
             lblStartText.Text = "起始時間：";
             // 
@@ -84,9 +86,10 @@
             lblEndText.Anchor = AnchorStyles.Right;
             lblEndText.AutoSize = true;
             lblEndText.Font = new Font("Microsoft JhengHei UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            lblEndText.Location = new Point(480, 25);
+            lblEndText.Location = new Point(371, 20);
+            lblEndText.Margin = new Padding(2, 0, 2, 0);
             lblEndText.Name = "lblEndText";
-            lblEndText.Size = new Size(112, 25);
+            lblEndText.Size = new Size(89, 20);
             lblEndText.TabIndex = 1;
             lblEndText.Text = "結束時間：";
             // 
@@ -95,9 +98,10 @@
             dtpStart.Anchor = AnchorStyles.Left;
             dtpStart.CalendarFont = new Font("Microsoft JhengHei UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             dtpStart.Font = new Font("Microsoft JhengHei UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            dtpStart.Location = new Point(163, 21);
+            dtpStart.Location = new Point(126, 16);
+            dtpStart.Margin = new Padding(2, 2, 2, 2);
             dtpStart.Name = "dtpStart";
-            dtpStart.Size = new Size(202, 33);
+            dtpStart.Size = new Size(158, 28);
             dtpStart.TabIndex = 2;
             // 
             // dtpEnd
@@ -105,27 +109,29 @@
             dtpEnd.Anchor = AnchorStyles.Left;
             dtpEnd.CalendarFont = new Font("Microsoft JhengHei UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             dtpEnd.Font = new Font("Microsoft JhengHei UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            dtpEnd.Location = new Point(598, 21);
+            dtpEnd.Location = new Point(464, 16);
+            dtpEnd.Margin = new Padding(2, 2, 2, 2);
             dtpEnd.Name = "dtpEnd";
-            dtpEnd.Size = new Size(210, 33);
+            dtpEnd.Size = new Size(164, 28);
             dtpEnd.TabIndex = 3;
             // 
             // rightPanel
             // 
             rightPanel.ColumnCount = 2;
-            rightPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 40F));
-            rightPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 60F));
+            rightPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 47.64398F));
+            rightPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 52.35602F));
             rightPanel.Controls.Add(lblTotalNumer, 1, 0);
-            rightPanel.Controls.Add(lblTotal, 0, 0);
             rightPanel.Controls.Add(btnSearch, 0, 1);
+            rightPanel.Controls.Add(lblTotal, 0, 0);
             rightPanel.Dock = DockStyle.Right;
-            rightPanel.Location = new Point(637, 76);
+            rightPanel.Location = new Point(495, 60);
+            rightPanel.Margin = new Padding(2, 2, 2, 2);
             rightPanel.Name = "rightPanel";
             rightPanel.RowCount = 2;
             rightPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 50.26738F));
             rightPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 49.73262F));
-            rightPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            rightPanel.Size = new Size(245, 374);
+            rightPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 16F));
+            rightPanel.Size = new Size(191, 295);
             rightPanel.TabIndex = 6;
             // 
             // lblTotalNumer
@@ -133,9 +139,10 @@
             lblTotalNumer.Anchor = AnchorStyles.Left;
             lblTotalNumer.AutoSize = true;
             lblTotalNumer.Font = new Font("Microsoft JhengHei UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            lblTotalNumer.Location = new Point(101, 81);
+            lblTotalNumer.Location = new Point(93, 64);
+            lblTotalNumer.Margin = new Padding(2, 0, 2, 0);
             lblTotalNumer.Name = "lblTotalNumer";
-            lblTotalNumer.Size = new Size(24, 25);
+            lblTotalNumer.Size = new Size(18, 20);
             lblTotalNumer.TabIndex = 5;
             lblTotalNumer.Text = "0";
             // 
@@ -144,9 +151,10 @@
             lblTotal.Anchor = AnchorStyles.Right;
             lblTotal.AutoSize = true;
             lblTotal.Font = new Font("Microsoft JhengHei UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            lblTotal.Location = new Point(3, 81);
+            lblTotal.Location = new Point(16, 64);
+            lblTotal.Margin = new Padding(2, 0, 2, 0);
             lblTotal.Name = "lblTotal";
-            lblTotal.Size = new Size(92, 25);
+            lblTotal.Size = new Size(73, 20);
             lblTotal.TabIndex = 4;
             lblTotal.Text = "總金額：";
             // 
@@ -155,9 +163,10 @@
             btnSearch.Anchor = AnchorStyles.Left;
             rightPanel.SetColumnSpan(btnSearch, 2);
             btnSearch.Font = new Font("Microsoft JhengHei UI", 12F);
-            btnSearch.Location = new Point(3, 238);
+            btnSearch.Location = new Point(2, 187);
+            btnSearch.Margin = new Padding(2, 2, 2, 2);
             btnSearch.Name = "btnSearch";
-            btnSearch.Size = new Size(239, 86);
+            btnSearch.Size = new Size(186, 68);
             btnSearch.TabIndex = 6;
             btnSearch.Text = "查詢";
             btnSearch.UseVisualStyleBackColor = true;
@@ -166,9 +175,10 @@
             // 
             mainPanel.Controls.Add(dgvTotalPurchases);
             mainPanel.Dock = DockStyle.Fill;
-            mainPanel.Location = new Point(0, 76);
+            mainPanel.Location = new Point(0, 60);
+            mainPanel.Margin = new Padding(2, 2, 2, 2);
             mainPanel.Name = "mainPanel";
-            mainPanel.Size = new Size(637, 374);
+            mainPanel.Size = new Size(495, 295);
             mainPanel.TabIndex = 7;
             // 
             // dgvTotalPurchases
@@ -176,30 +186,33 @@
             dgvTotalPurchases.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             dgvTotalPurchases.BackgroundColor = SystemColors.Control;
             dgvTotalPurchases.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = SystemColors.Window;
-            dataGridViewCellStyle1.Font = new Font("Microsoft JhengHei UI", 12F);
-            dataGridViewCellStyle1.ForeColor = SystemColors.ControlText;
-            dataGridViewCellStyle1.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.False;
-            dgvTotalPurchases.DefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = SystemColors.Window;
+            dataGridViewCellStyle2.Font = new Font("Microsoft JhengHei UI", 12F);
+            dataGridViewCellStyle2.ForeColor = SystemColors.ControlText;
+            dataGridViewCellStyle2.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.False;
+            dgvTotalPurchases.DefaultCellStyle = dataGridViewCellStyle2;
             dgvTotalPurchases.Dock = DockStyle.Fill;
             dgvTotalPurchases.Location = new Point(0, 0);
+            dgvTotalPurchases.Margin = new Padding(2, 2, 2, 2);
             dgvTotalPurchases.Name = "dgvTotalPurchases";
             dgvTotalPurchases.RowHeadersWidth = 51;
-            dgvTotalPurchases.Size = new Size(637, 374);
+            dgvTotalPurchases.Size = new Size(495, 295);
             dgvTotalPurchases.TabIndex = 8;
             // 
             // TotalPurchasesForm
             // 
-            AutoScaleDimensions = new SizeF(9F, 19F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(882, 450);
+            ClientSize = new Size(686, 355);
             Controls.Add(mainPanel);
             Controls.Add(rightPanel);
             Controls.Add(searchPanel);
+            Margin = new Padding(2, 2, 2, 2);
             Name = "TotalPurchasesForm";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "總進貨額";
             searchPanel.ResumeLayout(false);
             searchPanel.PerformLayout();
