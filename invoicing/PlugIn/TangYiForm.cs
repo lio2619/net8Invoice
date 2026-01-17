@@ -1,5 +1,6 @@
 ﻿//唐詣
 
+using invoicing.Event;
 using invoicing.Models.DTO;
 using invoicing.Service.Interface;
 using System.Data;
@@ -11,6 +12,7 @@ namespace invoicing.PlugIn
         private readonly IPluginFormService _pluginFormService;
         private readonly IExcelImportService _excelImportService;
         private readonly IPrintService _printService;
+        private readonly EventBus _eventBus;
 
         private bool _isSaved = false;
         private DataTable _sourceTable = new DataTable();
@@ -19,13 +21,15 @@ namespace invoicing.PlugIn
         public TangYiForm(
             IPluginFormService pluginFormService, 
             IExcelImportService excelImportService,
-            IPrintService printService)
+            IPrintService printService,
+            EventBus eventBus)
         {
             InitializeComponent();
             _pluginFormService = pluginFormService;
             _excelImportService = excelImportService;
             _printService = printService;
-            
+            _eventBus = eventBus;
+
             InitializeFormAsync();
             RegisterEvents();
         }
@@ -64,6 +68,7 @@ namespace invoicing.PlugIn
             dgvInvoicing.RowPostPaint += DgvInvoicing_RowPostPaint;
             dgvInvoicing.CellMouseDown += DgvInvoicing_CellMouseDown;
             dgvInvoicing.CellEndEdit += DgvInvoicing_CellEndEdit;
+            dgvInvoicing.CellClick += dgvInvoicing_CellClick;
         }
 
         #region 按鈕事件
@@ -399,6 +404,19 @@ namespace invoicing.PlugIn
                     MessageBox.Show("請輸入數量", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
+        }
+
+        private void dgvInvoicing_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return;
+
+            string? productCode = dgvInvoicing.Rows[e.RowIndex].Cells[0].Value?.ToString();
+
+            if (string.IsNullOrEmpty(productCode))
+                return;
+
+            // 觸發事件
+            _eventBus.Publish(new MasterSelectEvent(productCode));
         }
 
         #endregion

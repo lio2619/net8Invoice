@@ -236,6 +236,8 @@ namespace invoicing.Service
         {
             var isPurchaseOrder = request.OrderType == "採購單";
             int columnCount = isPurchaseOrder ? 5 : 7;
+            // 設定固定顯示位置的門檻值
+            const int FixedRowThreshold = 16;
 
             container.Column(column =>
             {
@@ -324,6 +326,39 @@ namespace invoicing.Service
                             table.Cell().BorderTop(needSeparator ? 0.5f : 0).Padding(1).AlignCenter().Text(detail.Remark ?? "").ClampLines(1);
 
                             rowCounter++;
+                        }
+                    }
+
+                    if (itemCount < FixedRowThreshold)
+                    {
+                        // 計算需要補幾行空白
+                        int emptyRowsNeeded = FixedRowThreshold - itemCount;
+
+                        for (int i = 0; i < emptyRowsNeeded; i++)
+                        {
+                            // 注意：空白儲存格的數量必須跟上面的 ColumnsDefinition 欄位數量一致
+                            // 這裡只設定 Padding(1) 讓高度跟有文字時差不多，但不給內容 Text("")
+
+                            if (isPurchaseOrder)
+                            {
+                                // 採購單有 5 個欄位
+                                table.Cell().Padding(1).Text("");
+                                table.Cell().Padding(1).Text("");
+                                table.Cell().Padding(1).Text("");
+                                table.Cell().Padding(1).Text("");
+                                table.Cell().Padding(1).Text("");
+                            }
+                            else
+                            {
+                                // 一般單據有 7 個欄位
+                                table.Cell().Padding(1).Text("");
+                                table.Cell().Padding(1).Text("");
+                                table.Cell().Padding(1).Text("");
+                                table.Cell().Padding(1).Text("");
+                                table.Cell().Padding(1).Text("");
+                                table.Cell().Padding(1).Text("");
+                                table.Cell().Padding(1).Text("");
+                            }
                         }
                     }
                 });

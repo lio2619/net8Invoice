@@ -106,6 +106,7 @@ namespace invoicing.Transactions
             // DataGridView 事件（使用服務層方法）
             dgvInvoicing.RowPostPaint += _transactionsdgvService.HandleRowPostPaint;
             dgvInvoicing.MouseDown += (sender, e) => _transactionsdgvService.HandleRightClickDelete(sender, e);
+            dgvInvoicing.CellClick += (sender, e) => dgvInvoicing_CellClick(sender, e);
 
             // 業務邏輯事件（使用自訂的 CellEndEdit 處理器，處理特殊廠商價格邏輯）
             dgvInvoicing.CellEndEdit += async (sender, e) =>
@@ -584,6 +585,19 @@ namespace invoicing.Transactions
         private void UpdateTotalAmountLabel(double total)
         {
             lblAmount.Text = total.ToString("0.##");
+        }
+
+        private void dgvInvoicing_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return;
+
+            string? productCode = dgvInvoicing.Rows[e.RowIndex].Cells[0].Value?.ToString();
+
+            if (string.IsNullOrEmpty(productCode))
+                return;
+
+            // 觸發事件
+            _eventBus.Publish(new MasterSelectEvent(productCode));
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)

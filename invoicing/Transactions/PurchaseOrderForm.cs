@@ -113,6 +113,7 @@ namespace invoicing.Transactions
         {
             dgvInvoicing.RowPostPaint += _transactionsdgvService.HandleRowPostPaint;
             dgvInvoicing.MouseDown += (sender, e) => HandleRightClickDelete(sender, e);
+            dgvInvoicing.CellClick += (sender, e) => dgvInvoicing_CellClick(sender, e);
 
             // 採購單：只需取得品名和單位，不需計算金額
             dgvInvoicing.CellEndEdit += async (sender, e) =>
@@ -507,6 +508,19 @@ namespace invoicing.Transactions
                 }
                 _isSaved = true;
             }
+        }
+
+        private void dgvInvoicing_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return;
+
+            string? productCode = dgvInvoicing.Rows[e.RowIndex].Cells[0].Value?.ToString();
+
+            if (string.IsNullOrEmpty(productCode))
+                return;
+
+            // 觸發事件
+            _eventBus.Publish(new MasterSelectEvent(productCode));
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)

@@ -57,7 +57,7 @@ namespace invoicing.ReadForm
         private void InitializeFormControls()
         {
             // 設定 DateTimePicker 預設值
-            dtpStart.Value = DateTime.Today.AddMonths(-1);
+            dtpStart.Value = DateTime.Today;
             dtpEnd.Value = DateTime.Today;
 
             // 初始化 DataGridView
