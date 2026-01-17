@@ -39,6 +39,7 @@ namespace invoicing.MasterData
             //售價C不要顯示
             label8.Visible = false;
             txtProductPriceC.Visible = false;
+            txtProductPriceC.Text = "0";
 
             //訂閱事件
             //TODO 這邊有一個bug，如果先開了產品的form並且沒有關閉此form，接下來開啟其他的form也會訂閱這個東西

@@ -72,6 +72,7 @@ namespace invoicing.PlugIn
             dgvInvoicing.RowPostPaint += DgvInvoicing_RowPostPaint;
             dgvInvoicing.CellMouseDown += DgvInvoicing_CellMouseDown;
             dgvInvoicing.CellEndEdit += DgvInvoicing_CellEndEdit;
+            dgvInvoicing.CellClick += dgvInvoicing_CellClick;
         }
 
         #region 按鈕事件

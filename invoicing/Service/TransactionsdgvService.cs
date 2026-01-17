@@ -53,6 +53,21 @@ namespace invoicing.Service
         private CancellationToken _autoCompleteCancellationToken;
 
         /// <summary>
+        /// EditingControlShowing 事件處理器
+        /// </summary>
+        private DataGridViewEditingControlShowingEventHandler? _editingControlShowingHandler;
+
+        /// <summary>
+        /// CellEndEdit 事件處理器
+        /// </summary>
+        private DataGridViewCellEventHandler? _cellEndEditHandler;
+
+        /// <summary>
+        /// 目前綁定的 DataGridView
+        /// </summary>
+        private DataGridView? _boundDataGridView;
+
+        /// <summary>
         /// 建構函式，注入產品資料庫儲存庫
         /// </summary>
         /// <param name="productRepository">產品資料庫儲存庫</param>
@@ -206,6 +221,21 @@ namespace invoicing.Service
         {
             ArgumentNullException.ThrowIfNull(dgv);
 
+            // 如果已綁定，先移除舊的事件處理器
+            if (_boundDataGridView != null)
+            {
+                if (_editingControlShowingHandler != null)
+                {
+                    _boundDataGridView.EditingControlShowing -= _editingControlShowingHandler;
+                }
+                if (_cellEndEditHandler != null)
+                {
+                    _boundDataGridView.CellEndEdit -= _cellEndEditHandler;
+                }
+            }
+
+            _boundDataGridView = dgv;
+
             // 儲存 CancellationToken 並建立事件處理器（保留為成員變數以正確移除事件）
             _autoCompleteCancellationToken = cancellationToken;
             _productCodeTextChangedHandler = async (sender, e) =>
@@ -237,7 +267,8 @@ namespace invoicing.Service
             _suggestionListBox.Click += SuggestionListBox_Click;
             _suggestionListBox.KeyDown += SuggestionListBox_KeyDown;
 
-            dgv.EditingControlShowing += (sender, e) =>
+            // 建立 EditingControlShowing 事件處理器
+            _editingControlShowingHandler = (sender, e) =>
             {
                 if (cancellationToken.IsCancellationRequested) return;
 
@@ -268,12 +299,16 @@ namespace invoicing.Service
                 }
             };
 
-            // 當編輯結束時隱藏下拉選單並清除狀態
-            dgv.CellEndEdit += (sender, e) =>
+            // 建立 CellEndEdit 事件處理器
+            _cellEndEditHandler = (sender, e) =>
             {
                 _currentTextBox = null;
                 HideSuggestionListBox();
             };
+
+            // 註冊事件處理器
+            dgv.EditingControlShowing += _editingControlShowingHandler;
+            dgv.CellEndEdit += _cellEndEditHandler;
         }
 
         /// <summary>

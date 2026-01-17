@@ -25,18 +25,47 @@ namespace invoicing.Repository
 
         public virtual async Task UpdateAsync(T entity)
         {
-            _dbSet.Update(entity);
+            // 先檢查 DbContext 中是否已有追蹤的實體
+            var trackedEntity = _context.ChangeTracker.Entries<T>()
+                .FirstOrDefault(e => e.Entity.Id == entity.Id);
+
+            if (trackedEntity != null)
+            {
+                // 使用已追蹤的實體，更新其屬性值
+                _context.Entry(trackedEntity.Entity).CurrentValues.SetValues(entity);
+            }
+            else
+            {
+                // 沒有追蹤的實體，直接更新
+                _dbSet.Update(entity);
+            }
+            
             await _context.SaveChangesAsync();
         }
 
         public virtual async Task DeleteAsync(int id)
         {
-            var entity = await GetById(id).FirstOrDefaultAsync();
-            if (entity != null)
+            // 先檢查 DbContext 中是否已有追蹤的實體
+            var trackedEntity = _context.ChangeTracker.Entries<T>()
+                .FirstOrDefault(e => e.Entity.Id == id);
+
+            if (trackedEntity != null)
             {
-                _dbSet.Remove(entity);
-                await _context.SaveChangesAsync();
+                // 使用已追蹤的實體進行刪除
+                _dbSet.Remove(trackedEntity.Entity);
             }
+            else
+            {
+                // 沒有追蹤的實體，直接查詢（會自動追蹤）
+                var entity = await _dbSet.FindAsync(id);
+                if (entity == null || entity.IsDeleted)
+                {
+                    return; // 實體不存在或已刪除
+                }
+                _dbSet.Remove(entity);
+            }
+            
+            await _context.SaveChangesAsync();
         }
 
         public virtual IQueryable<T> Get()
