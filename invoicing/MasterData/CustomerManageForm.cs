@@ -49,6 +49,12 @@ namespace invoicing.MasterData
 
         private async Task SearchAsync(string companyName)
         {
+            if (string.IsNullOrWhiteSpace(companyName))
+            {
+                MessageBox.Show("請輸入客戶名稱", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             var customer = await _customerRepository.Get(x => x.CompanyFullName == companyName)
                                                     .Select(
                                                         y => new
@@ -70,52 +76,143 @@ namespace invoicing.MasterData
             }
             else
             {
-                MessageBox.Show("請輸入正確的客戶名稱", "錯誤");
+                MessageBox.Show("找不到此客戶", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        /// <summary>
+        /// 驗證必填欄位
+        /// </summary>
+        private bool ValidateRequiredFields()
+        {
+            if (string.IsNullOrWhiteSpace(txtCustomerName.Text))
+            {
+                MessageBox.Show("請輸入客戶名稱", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtCustomerName.Focus();
+                return false;
+            }
+            return true;
         }
 
         private async void btnCustomerCreate_Click(object sender, EventArgs e)
         {
-            int nowMaxCompanyCode = await _customerRepository.GetMaxCompanyCode();
-            Customer customer = new Customer
+            try
             {
-                CompanyCode = (nowMaxCompanyCode + 1).ToString(),
-                CompanyFullName = txtCustomerName.Text,
-                DeliveryAddress = txtCustomerAddress.Text,
-                Phone1 = txtCustomerTel.Text,
-                FaxNumber = txtCustomerFax.Text,
-            };
-            await _customerRepository.AddAsync(customer);
+                // 驗證必填欄位
+                if (!ValidateRequiredFields()) return;
+
+                // 檢查客戶名稱是否已存在
+                var existingCustomer = await _customerRepository.Get(x => x.CompanyFullName == txtCustomerName.Text).FirstOrDefaultAsync();
+                if (existingCustomer != null)
+                {
+                    MessageBox.Show("此客戶名稱已存在", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    txtCustomerName.Focus();
+                    return;
+                }
+
+                int nowMaxCompanyCode = await _customerRepository.GetMaxCompanyCode();
+                Customer customer = new Customer
+                {
+                    CompanyCode = (nowMaxCompanyCode + 1).ToString(),
+                    CompanyFullName = txtCustomerName.Text,
+                    DeliveryAddress = txtCustomerAddress.Text,
+                    Phone1 = txtCustomerTel.Text,
+                    FaxNumber = txtCustomerFax.Text,
+                };
+                await _customerRepository.AddAsync(customer);
+                
+                // 顯示新客戶編號
+                lblCustomerIdValue.Text = customer.CompanyCode;
+                MessageBox.Show("新增成功", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"新增失敗：{ex.Message}", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private async void btnCustomerModify_Click(object sender, EventArgs e)
         {
-            var customer = await _customerRepository.Get(x => x.CompanyCode == lblCustomerIdValue.Text).FirstOrDefaultAsync();
-            customer.CompanyFullName = txtCustomerName.Text;
-            customer.DeliveryAddress = txtCustomerAddress.Text;
-            customer.Phone1 = txtCustomerTel.Text;
-            customer.FaxNumber = txtCustomerFax.Text;
-            await _customerRepository.UpdateAsync(customer);
+            try
+            {
+                // 驗證必填欄位
+                if (!ValidateRequiredFields()) return;
+
+                if (string.IsNullOrWhiteSpace(lblCustomerIdValue.Text))
+                {
+                    MessageBox.Show("請先搜尋要修改的客戶", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                var customer = await _customerRepository.Get(x => x.CompanyCode == lblCustomerIdValue.Text).FirstOrDefaultAsync();
+                if (customer == null)
+                {
+                    MessageBox.Show("找不到此客戶，請先搜尋或新增", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                customer.CompanyFullName = txtCustomerName.Text;
+                customer.DeliveryAddress = txtCustomerAddress.Text;
+                customer.Phone1 = txtCustomerTel.Text;
+                customer.FaxNumber = txtCustomerFax.Text;
+                await _customerRepository.UpdateAsync(customer);
+                MessageBox.Show("修改成功", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"修改失敗：{ex.Message}", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private async void btnCustomerSearch_Click(object sender, EventArgs e)
         {
-            string customerName = Interaction.InputBox("請輸入客戶名稱", "標題", "輸入框預設內容", -1, -1);
-            await SearchAsync(customerName);
+            string customerName = Interaction.InputBox("請輸入客戶名稱", "搜尋客戶", "", -1, -1);
+            if (!string.IsNullOrWhiteSpace(customerName))
+            {
+                await SearchAsync(customerName);
+            }
         }
 
         private async void btnCustomerDelete_Click(object sender, EventArgs e)
         {
-            string companyName = txtCustomerName.Text;
-            DialogResult result = MessageBox.Show($"確定要刪除{companyName}嗎？", "確認", MessageBoxButtons.YesNo);
-            if (result == DialogResult.Yes)
+            try
             {
-                var pk = await _customerRepository.Get(x => x.CompanyCode == lblCustomerIdValue.Text).Select(y => y.Id).FirstOrDefaultAsync();
-                await _customerRepository.DeleteAsync(pk);
+                if (string.IsNullOrWhiteSpace(lblCustomerIdValue.Text))
+                {
+                    MessageBox.Show("請先搜尋要刪除的客戶", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                string companyName = txtCustomerName.Text;
+                DialogResult result = MessageBox.Show($"確定要刪除「{companyName}」嗎？", "確認刪除", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (result == DialogResult.Yes)
+                {
+                    var pk = await _customerRepository.Get(x => x.CompanyCode == lblCustomerIdValue.Text).Select(y => y.Id).FirstOrDefaultAsync();
+                    if (pk == 0)
+                    {
+                        MessageBox.Show("找不到此客戶", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+                    await _customerRepository.DeleteAsync(pk);
+                    MessageBox.Show("刪除成功", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    ClearForm();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"刪除失敗：{ex.Message}", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private void btnFormClear_Click(object sender, EventArgs e)
+        {
+            ClearForm();
+        }
+
+        /// <summary>
+        /// 清空表單
+        /// </summary>
+        private void ClearForm()
         {
             lblCustomerIdValue.Text = string.Empty;
             txtCustomerName.Text = string.Empty;

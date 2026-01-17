@@ -60,6 +60,12 @@ namespace invoicing.MasterData
 
         private async Task SearchAsync(string productCode)
         {
+            if (string.IsNullOrWhiteSpace(productCode))
+            {
+                MessageBox.Show("請輸入產品編號", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             var product = await _productRepository.Get(x => x.ProductCode == productCode)
                                                     .Select(
                                                         y => new
@@ -88,62 +94,157 @@ namespace invoicing.MasterData
             }
             else
             {
-                MessageBox.Show("請輸入正確的產品編號", "錯誤");
+                MessageBox.Show("找不到此產品編號", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        /// <summary>
+        /// 驗證必填欄位
+        /// </summary>
+        private bool ValidateRequiredFields()
+        {
+            if (string.IsNullOrWhiteSpace(txtProductId.Text))
+            {
+                MessageBox.Show("請輸入產品編號", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtProductId.Focus();
+                return false;
+            }
+            if (string.IsNullOrWhiteSpace(txtProductName.Text))
+            {
+                MessageBox.Show("請輸入產品名稱", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtProductName.Focus();
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// 安全解析數字，若解析失敗則返回預設值 0
+        /// </summary>
+        private decimal SafeParseDecimal(string text)
+        {
+            return decimal.TryParse(text, out var result) ? result : 0;
         }
 
         private async void btnProductCreate_Click(object sender, EventArgs e)
         {
-            Product product = new Product
+            try
             {
-                ProductCode = txtProductId.Text,
-                ProductName = txtProductName.Text,
-                Unit = txtProductUnit.Text,
-                StandardPrice = decimal.Parse(txtProductStandardPrice.Text),
-                PriceA = decimal.Parse(txtProductPriceA.Text),
-                PriceB = decimal.Parse(txtProductPriceB.Text),
-                PriceC = decimal.Parse(txtProductPriceC.Text),
-                CurrentCost = decimal.Parse(txtProductCurrentCost.Text),
-                StandardCost = decimal.Parse(txtProductStandardCost.Text)
-            };
-            await _productRepository.AddAsync(product);
+                // 驗證必填欄位
+                if (!ValidateRequiredFields()) return;
+
+                // 檢查產品編號是否已存在
+                var existingProduct = await _productRepository.Get(x => x.ProductCode == txtProductId.Text).FirstOrDefaultAsync();
+                if (existingProduct != null)
+                {
+                    MessageBox.Show("此產品編號已存在，請使用其他編號", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    txtProductId.Focus();
+                    return;
+                }
+
+                Product product = new Product
+                {
+                    ProductCode = txtProductId.Text,
+                    ProductName = txtProductName.Text,
+                    Unit = txtProductUnit.Text,
+                    StandardPrice = SafeParseDecimal(txtProductStandardPrice.Text),
+                    PriceA = SafeParseDecimal(txtProductPriceA.Text),
+                    PriceB = SafeParseDecimal(txtProductPriceB.Text),
+                    PriceC = SafeParseDecimal(txtProductPriceC.Text),
+                    CurrentCost = SafeParseDecimal(txtProductCurrentCost.Text),
+                    StandardCost = SafeParseDecimal(txtProductStandardCost.Text)
+                };
+                await _productRepository.AddAsync(product);
+                MessageBox.Show("新增成功", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"新增失敗：{ex.Message}", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private async void btnProductModify_Click(object sender, EventArgs e)
         {
-            var product = await _productRepository.Get(x => x.ProductCode == txtProductId.Text).FirstOrDefaultAsync();
-            product.ProductCode = txtProductId.Text;
-            product.ProductName = txtProductName.Text;
-            product.Unit = txtProductUnit.Text;
-            product.StandardPrice = decimal.Parse(txtProductStandardPrice.Text);
-            product.PriceA = decimal.Parse(txtProductPriceA.Text);
-            product.PriceB = decimal.Parse(txtProductPriceB.Text);
-            product.PriceC = decimal.Parse(txtProductPriceC.Text);
-            product.CurrentCost = decimal.Parse(txtProductCurrentCost.Text);
-            product.StandardCost = decimal.Parse(txtProductStandardCost.Text);
-            await _productRepository.UpdateAsync(product);
+            try
+            {
+                // 驗證必填欄位
+                if (!ValidateRequiredFields()) return;
+
+                var product = await _productRepository.Get(x => x.ProductCode == txtProductId.Text).FirstOrDefaultAsync();
+                if (product == null)
+                {
+                    MessageBox.Show("找不到此產品，請先搜尋或新增", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                product.ProductCode = txtProductId.Text;
+                product.ProductName = txtProductName.Text;
+                product.Unit = txtProductUnit.Text;
+                product.StandardPrice = SafeParseDecimal(txtProductStandardPrice.Text);
+                product.PriceA = SafeParseDecimal(txtProductPriceA.Text);
+                product.PriceB = SafeParseDecimal(txtProductPriceB.Text);
+                product.PriceC = SafeParseDecimal(txtProductPriceC.Text);
+                product.CurrentCost = SafeParseDecimal(txtProductCurrentCost.Text);
+                product.StandardCost = SafeParseDecimal(txtProductStandardCost.Text);
+                await _productRepository.UpdateAsync(product);
+                MessageBox.Show("修改成功", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"修改失敗：{ex.Message}", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private async void btnProductSearch_Click(object sender, EventArgs e)
         {
-            string prodcuctCode = Interaction.InputBox("請輸入產品編號", "標題", "輸入框預設內容", -1, -1);
-            await SearchAsync(prodcuctCode);
-
+            string prodcuctCode = Interaction.InputBox("請輸入產品編號", "搜尋產品", "", -1, -1);
+            if (!string.IsNullOrWhiteSpace(prodcuctCode))
+            {
+                await SearchAsync(prodcuctCode);
+            }
         }
 
         private async void btnProductDelete_Click(object sender, EventArgs e)
         {
-            string prodcutCode = txtProductId.Text;
-            string productName = txtProductName.Text;
-            DialogResult result = MessageBox.Show($"確定要刪除{productName}嗎？", "確認", MessageBoxButtons.YesNo);
-            if (result == DialogResult.Yes)
+            try
             {
-                var pk = await _productRepository.Get(x => x.ProductCode == prodcutCode).Select(y => y.Id).FirstOrDefaultAsync();
-                await _productRepository.DeleteAsync(pk);
+                if (string.IsNullOrWhiteSpace(txtProductId.Text))
+                {
+                    MessageBox.Show("請先搜尋要刪除的產品", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                string prodcutCode = txtProductId.Text;
+                string productName = txtProductName.Text;
+                DialogResult result = MessageBox.Show($"確定要刪除「{productName}」嗎？", "確認刪除", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (result == DialogResult.Yes)
+                {
+                    var pk = await _productRepository.Get(x => x.ProductCode == prodcutCode).Select(y => y.Id).FirstOrDefaultAsync();
+                    if (pk == 0)
+                    {
+                        MessageBox.Show("找不到此產品", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+                    await _productRepository.DeleteAsync(pk);
+                    MessageBox.Show("刪除成功", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    ClearForm();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"刪除失敗：{ex.Message}", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private void btnFormClear_Click(object sender, EventArgs e)
+        {
+            ClearForm();
+        }
+
+        /// <summary>
+        /// 清空表單
+        /// </summary>
+        private void ClearForm()
         {
             txtProductId.Text = string.Empty;
             txtProductName.Text = string.Empty;
