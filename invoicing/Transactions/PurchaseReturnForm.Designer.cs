@@ -37,6 +37,7 @@
             btnSave = new Button();
             mainPanel = new Panel();
             buutonPanel = new TableLayoutPanel();
+            btnPrint = new Button();
             txtRemark = new TextBox();
             lblRemark = new Label();
             lblTotlaAmountText = new Label();
@@ -71,7 +72,7 @@
             dgvInvoicing.DefaultCellStyle = dataGridViewCellStyle1;
             dgvInvoicing.Dock = DockStyle.Fill;
             dgvInvoicing.Location = new Point(0, 0);
-            dgvInvoicing.Margin = new Padding(2, 2, 2, 2);
+            dgvInvoicing.Margin = new Padding(2);
             dgvInvoicing.Name = "dgvInvoicing";
             dgvInvoicing.RowHeadersWidth = 51;
             dgvInvoicing.Size = new Size(795, 432);
@@ -81,8 +82,8 @@
             // 
             btnCreateExcel.Anchor = AnchorStyles.Left;
             btnCreateExcel.Font = new Font("Microsoft JhengHei UI", 13.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            btnCreateExcel.Location = new Point(2, 365);
-            btnCreateExcel.Margin = new Padding(2, 2, 2, 2);
+            btnCreateExcel.Location = new Point(2, 373);
+            btnCreateExcel.Margin = new Padding(2);
             btnCreateExcel.Name = "btnCreateExcel";
             btnCreateExcel.Size = new Size(120, 46);
             btnCreateExcel.TabIndex = 4;
@@ -93,8 +94,8 @@
             // 
             btnDelete.Anchor = AnchorStyles.Left;
             btnDelete.Font = new Font("Microsoft JhengHei UI", 13.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            btnDelete.Location = new Point(2, 278);
-            btnDelete.Margin = new Padding(2, 2, 2, 2);
+            btnDelete.Location = new Point(2, 301);
+            btnDelete.Margin = new Padding(2);
             btnDelete.Name = "btnDelete";
             btnDelete.Size = new Size(120, 46);
             btnDelete.TabIndex = 3;
@@ -105,8 +106,8 @@
             // 
             btnLoad.Anchor = AnchorStyles.Left;
             btnLoad.Font = new Font("Microsoft JhengHei UI", 13.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            btnLoad.Location = new Point(2, 192);
-            btnLoad.Margin = new Padding(2, 2, 2, 2);
+            btnLoad.Location = new Point(2, 229);
+            btnLoad.Margin = new Padding(2);
             btnLoad.Name = "btnLoad";
             btnLoad.Size = new Size(120, 46);
             btnLoad.TabIndex = 2;
@@ -117,8 +118,8 @@
             // 
             btnRefresh.Anchor = AnchorStyles.Left;
             btnRefresh.Font = new Font("Microsoft JhengHei UI", 13.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            btnRefresh.Location = new Point(2, 106);
-            btnRefresh.Margin = new Padding(2, 2, 2, 2);
+            btnRefresh.Location = new Point(2, 157);
+            btnRefresh.Margin = new Padding(2);
             btnRefresh.Name = "btnRefresh";
             btnRefresh.Size = new Size(120, 46);
             btnRefresh.TabIndex = 1;
@@ -129,8 +130,8 @@
             // 
             btnSave.Anchor = AnchorStyles.Left;
             btnSave.Font = new Font("Microsoft JhengHei UI", 13.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            btnSave.Location = new Point(2, 20);
-            btnSave.Margin = new Padding(2, 2, 2, 2);
+            btnSave.Location = new Point(2, 85);
+            btnSave.Margin = new Padding(2);
             btnSave.Name = "btnSave";
             btnSave.Size = new Size(120, 46);
             btnSave.TabIndex = 0;
@@ -142,7 +143,7 @@
             mainPanel.Controls.Add(dgvInvoicing);
             mainPanel.Dock = DockStyle.Fill;
             mainPanel.Location = new Point(0, 99);
-            mainPanel.Margin = new Padding(2, 2, 2, 2);
+            mainPanel.Margin = new Padding(2);
             mainPanel.Name = "mainPanel";
             mainPanel.Size = new Size(795, 432);
             mainPanel.TabIndex = 7;
@@ -151,23 +152,37 @@
             // 
             buutonPanel.ColumnCount = 1;
             buutonPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            buutonPanel.Controls.Add(btnCreateExcel, 0, 4);
-            buutonPanel.Controls.Add(btnDelete, 0, 3);
-            buutonPanel.Controls.Add(btnLoad, 0, 2);
-            buutonPanel.Controls.Add(btnRefresh, 0, 1);
-            buutonPanel.Controls.Add(btnSave, 0, 0);
+            buutonPanel.Controls.Add(btnPrint, 0, 0);
+            buutonPanel.Controls.Add(btnCreateExcel, 0, 5);
+            buutonPanel.Controls.Add(btnDelete, 0, 4);
+            buutonPanel.Controls.Add(btnLoad, 0, 3);
+            buutonPanel.Controls.Add(btnRefresh, 0, 2);
+            buutonPanel.Controls.Add(btnSave, 0, 1);
             buutonPanel.Dock = DockStyle.Right;
             buutonPanel.Location = new Point(795, 99);
-            buutonPanel.Margin = new Padding(2, 2, 2, 2);
+            buutonPanel.Margin = new Padding(2);
             buutonPanel.Name = "buutonPanel";
-            buutonPanel.RowCount = 5;
-            buutonPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
-            buutonPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
-            buutonPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
-            buutonPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
-            buutonPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+            buutonPanel.RowCount = 6;
+            buutonPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 16.666666F));
+            buutonPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 16.666666F));
+            buutonPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 16.666666F));
+            buutonPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 16.666666F));
+            buutonPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 16.666666F));
+            buutonPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 16.666666F));
             buutonPanel.Size = new Size(124, 432);
             buutonPanel.TabIndex = 6;
+            // 
+            // btnPrint
+            // 
+            btnPrint.Anchor = AnchorStyles.Left;
+            btnPrint.Font = new Font("Microsoft JhengHei UI", 13.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            btnPrint.Location = new Point(2, 13);
+            btnPrint.Margin = new Padding(2);
+            btnPrint.Name = "btnPrint";
+            btnPrint.Size = new Size(120, 46);
+            btnPrint.TabIndex = 7;
+            btnPrint.Text = "預覽列印";
+            btnPrint.UseVisualStyleBackColor = true;
             // 
             // txtRemark
             // 
@@ -176,7 +191,7 @@
             txtRemark.BorderStyle = BorderStyle.None;
             txtRemark.Font = new Font("Microsoft JhengHei UI", 14F);
             txtRemark.Location = new Point(139, 19);
-            txtRemark.Margin = new Padding(2, 2, 2, 2);
+            txtRemark.Margin = new Padding(2);
             txtRemark.Name = "txtRemark";
             txtRemark.Size = new Size(317, 24);
             txtRemark.TabIndex = 6;
@@ -239,7 +254,7 @@
             lblCustomer.Name = "lblCustomer";
             lblCustomer.Size = new Size(67, 24);
             lblCustomer.TabIndex = 2;
-            lblCustomer.Text = "客戶：";
+            lblCustomer.Text = "廠商：";
             // 
             // lblPageNumberText
             // 
@@ -271,7 +286,7 @@
             dtpDate.CalendarFont = new Font("Microsoft JhengHei UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             dtpDate.Font = new Font("Microsoft JhengHei UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             dtpDate.Location = new Point(139, 10);
-            dtpDate.Margin = new Padding(2, 2, 2, 2);
+            dtpDate.Margin = new Padding(2);
             dtpDate.Name = "dtpDate";
             dtpDate.Size = new Size(317, 28);
             dtpDate.TabIndex = 5;
@@ -282,7 +297,7 @@
             cboCustomer.Font = new Font("Microsoft JhengHei UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             cboCustomer.FormattingEnabled = true;
             cboCustomer.Location = new Point(139, 60);
-            cboCustomer.Margin = new Padding(2, 2, 2, 2);
+            cboCustomer.Margin = new Padding(2);
             cboCustomer.Name = "cboCustomer";
             cboCustomer.Size = new Size(317, 28);
             cboCustomer.TabIndex = 6;
@@ -300,7 +315,7 @@
             downAmountPanel.Controls.Add(lblAmount, 3, 0);
             downAmountPanel.Dock = DockStyle.Bottom;
             downAmountPanel.Location = new Point(0, 531);
-            downAmountPanel.Margin = new Padding(2, 2, 2, 2);
+            downAmountPanel.Margin = new Padding(2);
             downAmountPanel.Name = "downAmountPanel";
             downAmountPanel.RowCount = 1;
             downAmountPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
@@ -322,7 +337,7 @@
             UpIDNamePanel.Controls.Add(cboCustomer, 1, 1);
             UpIDNamePanel.Dock = DockStyle.Top;
             UpIDNamePanel.Location = new Point(0, 0);
-            UpIDNamePanel.Margin = new Padding(2, 2, 2, 2);
+            UpIDNamePanel.Margin = new Padding(2);
             UpIDNamePanel.Name = "UpIDNamePanel";
             UpIDNamePanel.RowCount = 2;
             UpIDNamePanel.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
@@ -339,7 +354,7 @@
             Controls.Add(buutonPanel);
             Controls.Add(downAmountPanel);
             Controls.Add(UpIDNamePanel);
-            Margin = new Padding(2, 2, 2, 2);
+            Margin = new Padding(2);
             Name = "PurchaseReturnForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "進貨退出單";
@@ -375,5 +390,6 @@
         private ComboBox cboCustomer;
         private TableLayoutPanel downAmountPanel;
         private TableLayoutPanel UpIDNamePanel;
+        private Button btnPrint;
     }
 }

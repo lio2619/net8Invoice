@@ -48,34 +48,40 @@ namespace invoicing.Service
                 {
                     int currentPage = pageNum;
                     int startIndex = itemIndex;
-                    int itemsOnThisPage = Math.Min(MaxRowsPerPage, totalItems - startIndex);
-                    bool isLastPage = (currentPage == totalPages);
 
-                    // 判斷最後一頁是否需要特殊處理（≤16筆時表尾在中間）
-                    bool useMiddleFooter = isLastPage && itemsOnThisPage <= SmallPageThreshold && itemsOnThisPage > 0;
+                    // 計算這一頁實際有多少筆資料
+                    int itemsOnThisPage = Math.Min(MaxRowsPerPage, totalItems - startIndex);
+
+                    // 【修改重點 1】判斷這一頁是否使用中間表尾
+                    // 邏輯改為：只要這一頁筆數少於等於 16 筆，就使用中間表尾 (不管是不是最後一頁)
+                    // 由於 MaxRowsPerPage = 40，所以前幾頁通常筆數都是 40 (>16)，會自動跑到頁尾
+                    bool useMiddleFooter = itemsOnThisPage <= SmallPageThreshold && itemsOnThisPage > 0;
 
                     container.Page(page =>
                     {
                         page.Size(PageSizes.A4);
-                        page.Margin(20);
-                        page.DefaultTextStyle(x => x.FontFamily("Microsoft JhengHei").FontSize(8));
+                        page.Margin(30);
+                        page.DefaultTextStyle(x => x.FontFamily("Microsoft JhengHei").FontSize(10));
 
                         page.Header().Element(c => ComposeHeaderWithPageNumber(c, request, currentPage, totalPages));
+
+                        // 傳入 useMiddleFooter，如果是 True，ComposeContentPaged 內部會畫出中間表尾
                         page.Content().Element(c => ComposeContentPaged(c, request, startIndex, itemsOnThisPage, useMiddleFooter));
 
-                        // 只在最後一頁顯示表尾
-                        if (isLastPage)
-                        {
-                            if (useMiddleFooter)
-                            {
-                                // ≤16筆：表尾已包含在 Content 中（中間位置）
-                                page.Footer().Element(c => { });
-                            }
-                            else
-                            {
-                                page.Footer().Element(c => ComposeFooter(c, request));
-                            }
-                        }
+                        // 【修改重點 2 & 3】每一頁都執行 Footer 設定
+                        //page.Footer().Element(c =>
+                        //{
+                        //    // 如果這頁使用的是中間表尾 (useMiddleFooter == true)，這裡就留空，避免重複顯示
+                        //    if (useMiddleFooter)
+                        //    {
+                        //        // 空的 Element，因為表尾已經畫在 Content 裡了
+                        //    }
+                        //    else
+                        //    {
+                        //        // 如果資料多，表尾就畫在頁面最底部
+                        //        ComposeFooter(c, request);
+                        //    }
+                        //});
                     });
 
                     itemIndex += itemsOnThisPage;
@@ -84,7 +90,7 @@ namespace invoicing.Service
 
             return document.GeneratePdf();
         }
-
+        
         /// <summary>
         /// 使用 PdfiumViewer 顯示 PDF 預覽視窗並提供列印功能
         /// </summary>
@@ -219,7 +225,7 @@ namespace invoicing.Service
                 column.Item().Text($"送貨地址：{request.Address}");
 
                 // 分隔線
-                column.Item().PaddingVertical(5).LineHorizontal(1);
+                column.Item().PaddingVertical(1).LineHorizontal(1);
             });
         }
 
@@ -253,32 +259,32 @@ namespace invoicing.Service
                         table.ColumnsDefinition(columns =>
                         {
                             columns.RelativeColumn(1.5f); // 編號
-                            columns.RelativeColumn(3f);   // 品名
+                            columns.RelativeColumn(3.5f);   // 品名
                             columns.RelativeColumn(1f);   // 數量
                             columns.RelativeColumn(1f);   // 單位
                             columns.RelativeColumn(1f);   // 單價
                             columns.RelativeColumn(1f);   // 金額
-                            columns.RelativeColumn(1.5f); // 備註
+                            columns.RelativeColumn(1f); // 建議售價
                         });
                     }
 
                     // 表頭
                     table.Header(header =>
                     {
-                        header.Cell().BorderBottom(1).Padding(5).Text("編號").Bold();
-                        header.Cell().BorderBottom(1).Padding(5).Text("品名").Bold();
-                        header.Cell().BorderBottom(1).Padding(5).AlignRight().Text("數量").Bold();
-                        header.Cell().BorderBottom(1).Padding(5).Text("單位").Bold();
+                        header.Cell().BorderBottom(1).Padding(0).Text("編號").Bold();
+                        header.Cell().BorderBottom(1).Padding(0).Text("品名").Bold();
+                        header.Cell().BorderBottom(1).Padding(0).AlignCenter().Text("數量").Bold();
+                        header.Cell().BorderBottom(1).Padding(0).AlignCenter().Text("單位").Bold();
 
                         if (isPurchaseOrder)
                         {
-                            header.Cell().BorderBottom(1).Padding(5).Text("備註").Bold();
+                            header.Cell().BorderBottom(1).Padding(0).Text("備註").Bold();
                         }
                         else
                         {
-                            header.Cell().BorderBottom(1).Padding(5).AlignRight().Text("單價").Bold();
-                            header.Cell().BorderBottom(1).Padding(5).AlignRight().Text("金額").Bold();
-                            header.Cell().BorderBottom(1).Padding(5).Text("備註").Bold();
+                            header.Cell().BorderBottom(1).Padding(0).AlignRight().Text("單價").Bold();
+                            header.Cell().BorderBottom(1).Padding(0).AlignRight().Text("金額").Bold();
+                            header.Cell().BorderBottom(1).Padding(0).AlignCenter().Text("建議售價").Bold();
                         }
                     });
 
@@ -292,11 +298,11 @@ namespace invoicing.Service
                             bool needSeparator = (rowCounter > 0) && (rowCounter % 5 == 0);
 
                             // 每 5 筆加一條分隔線
-                            table.Cell().BorderTop(needSeparator ? 0.5f : 0).Padding(3).Text(detail.ProductCode ?? "").ClampLines(1);
-                            table.Cell().BorderTop(needSeparator ? 0.5f : 0).Padding(3).Text(detail.ProductName ?? "").ClampLines(1);
-                            table.Cell().BorderTop(needSeparator ? 0.5f : 0).Padding(3).AlignRight().Text(detail.Quantity ?? "").ClampLines(1);
-                            table.Cell().BorderTop(needSeparator ? 0.5f : 0).Padding(3).Text(detail.Unit ?? "").ClampLines(1);
-                            table.Cell().BorderTop(needSeparator ? 0.5f : 0).Padding(3).Text(detail.Remark ?? "").ClampLines(1);
+                            table.Cell().BorderTop(needSeparator ? 0.5f : 0).Padding(1).Text(detail.ProductCode ?? "").ClampLines(1);
+                            table.Cell().BorderTop(needSeparator ? 0.5f : 0).Padding(1).Text(detail.ProductName ?? "").ClampLines(1);
+                            table.Cell().BorderTop(needSeparator ? 0.5f : 0).Padding(1).AlignCenter().Text(detail.Quantity ?? "").ClampLines(1);
+                            table.Cell().BorderTop(needSeparator ? 0.5f : 0).Padding(1).AlignCenter().Text(detail.Unit ?? "").ClampLines(1);
+                            table.Cell().BorderTop(needSeparator ? 0.5f : 0).Padding(1).Text(detail.Remark ?? "").ClampLines(1);
 
                             rowCounter++;
                         }
@@ -309,36 +315,49 @@ namespace invoicing.Service
                             bool needSeparator = (rowCounter > 0) && (rowCounter % 5 == 0);
 
                             // 每 5 筆加一條分隔線
-                            table.Cell().BorderTop(needSeparator ? 0.5f : 0).Padding(3).Text(detail.ProductCode ?? "").ClampLines(1);
-                            table.Cell().BorderTop(needSeparator ? 0.5f : 0).Padding(3).Text(detail.ProductName ?? "").ClampLines(1);
-                            table.Cell().BorderTop(needSeparator ? 0.5f : 0).Padding(3).AlignRight().Text(detail.Quantity ?? "").ClampLines(1);
-                            table.Cell().BorderTop(needSeparator ? 0.5f : 0).Padding(3).Text(detail.Unit ?? "").ClampLines(1);
-                            table.Cell().BorderTop(needSeparator ? 0.5f : 0).Padding(3).AlignRight().Text(detail.UnitPrice ?? "").ClampLines(1);
-                            table.Cell().BorderTop(needSeparator ? 0.5f : 0).Padding(3).AlignRight().Text(detail.Amount ?? "").ClampLines(1);
-                            table.Cell().BorderTop(needSeparator ? 0.5f : 0).Padding(3).Text(detail.Remark ?? "").ClampLines(1);
+                            table.Cell().BorderTop(needSeparator ? 0.5f : 0).Padding(1).Text(detail.ProductCode ?? "").ClampLines(1);
+                            table.Cell().BorderTop(needSeparator ? 0.5f : 0).Padding(1).Text(detail.ProductName ?? "").ClampLines(1);
+                            table.Cell().BorderTop(needSeparator ? 0.5f : 0).Padding(1).AlignCenter().Text(detail.Quantity ?? "").ClampLines(1);
+                            table.Cell().BorderTop(needSeparator ? 0.5f : 0).Padding(1).AlignCenter().Text(detail.Unit ?? "").ClampLines(1);
+                            table.Cell().BorderTop(needSeparator ? 0.5f : 0).Padding(1).AlignRight().Text(detail.UnitPrice ?? "").ClampLines(1);
+                            table.Cell().BorderTop(needSeparator ? 0.5f : 0).Padding(1).AlignRight().Text(detail.Amount ?? "").ClampLines(1);
+                            table.Cell().BorderTop(needSeparator ? 0.5f : 0).Padding(1).AlignCenter().Text(detail.Remark ?? "").ClampLines(1);
 
                             rowCounter++;
                         }
                     }
                 });
 
-                // 如果需要在中間顯示表尾（≤SmallPageThreshold筆時）
-                if (includeFooterInMiddle)
+                //// 如果需要在中間顯示表尾（≤SmallPageThreshold筆時）
+                //if (includeFooterInMiddle)
+                //{
+                //    // 加入一些垂直間距，讓表尾顯示在表格下方（中間位置）
+                //    column.Item().PaddingTop(20).Column(footerColumn =>
+                //    {
+                //        footerColumn.Item().LineHorizontal(1);
+                //        footerColumn.Item().PaddingTop(5).Row(row =>
+                //        {
+                //            row.RelativeItem().Text($"備註：{request.Remark}");
+                //            if (!string.IsNullOrEmpty(request.TotalAmount) && request.TotalAmount != "0")
+                //            {
+                //                row.ConstantItem(150).AlignRight().Text($"總計：{request.TotalAmount}").Bold();
+                //            }
+                //        });
+                //    });
+                //}
+                // 加入一些垂直間距，讓表尾顯示在表格下方（中間位置）
+                column.Item().PaddingTop(20).Column(footerColumn =>
                 {
-                    // 加入一些垂直間距，讓表尾顯示在表格下方（中間位置）
-                    column.Item().PaddingTop(20).Column(footerColumn =>
+                    footerColumn.Item().LineHorizontal(1);
+                    footerColumn.Item().PaddingTop(5).Row(row =>
                     {
-                        footerColumn.Item().LineHorizontal(1);
-                        footerColumn.Item().PaddingTop(5).Row(row =>
+                        row.RelativeItem().Text($"備註：{request.Remark}");
+                        if (!string.IsNullOrEmpty(request.TotalAmount) && request.TotalAmount != "0")
                         {
-                            row.RelativeItem().Text($"備註：{request.Remark}");
-                            if (!string.IsNullOrEmpty(request.TotalAmount) && request.TotalAmount != "0")
-                            {
-                                row.ConstantItem(150).AlignRight().Text($"總計：{request.TotalAmount}").Bold();
-                            }
-                        });
+                            row.ConstantItem(150).AlignRight().Text($"總計：{request.TotalAmount}").Bold();
+                        }
                     });
-                }
+                });
             });
         }
 

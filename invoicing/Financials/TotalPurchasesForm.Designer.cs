@@ -36,8 +36,8 @@
             dtpEnd = new DateTimePicker();
             rightPanel = new TableLayoutPanel();
             lblTotalNumer = new Label();
-            lblTotal = new Label();
             btnSearch = new Button();
+            lblTotal = new Label();
             mainPanel = new Panel();
             dgvTotalPurchases = new DataGridView();
             searchPanel.SuspendLayout();
@@ -61,12 +61,12 @@
             searchPanel.Controls.Add(dtpEnd, 3, 0);
             searchPanel.Dock = DockStyle.Top;
             searchPanel.Location = new Point(0, 0);
-            searchPanel.Margin = new Padding(2, 2, 2, 2);
+            searchPanel.Margin = new Padding(2);
             searchPanel.Name = "searchPanel";
             searchPanel.RowCount = 1;
             searchPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             searchPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 60F));
-            searchPanel.Size = new Size(686, 60);
+            searchPanel.Size = new Size(784, 60);
             searchPanel.TabIndex = 5;
             // 
             // lblStartText
@@ -74,7 +74,7 @@
             lblStartText.Anchor = AnchorStyles.Right;
             lblStartText.AutoSize = true;
             lblStartText.Font = new Font("Microsoft JhengHei UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            lblStartText.Location = new Point(33, 20);
+            lblStartText.Location = new Point(51, 20);
             lblStartText.Margin = new Padding(2, 0, 2, 0);
             lblStartText.Name = "lblStartText";
             lblStartText.Size = new Size(89, 20);
@@ -86,7 +86,7 @@
             lblEndText.Anchor = AnchorStyles.Right;
             lblEndText.AutoSize = true;
             lblEndText.Font = new Font("Microsoft JhengHei UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            lblEndText.Location = new Point(371, 20);
+            lblEndText.Location = new Point(438, 20);
             lblEndText.Margin = new Padding(2, 0, 2, 0);
             lblEndText.Name = "lblEndText";
             lblEndText.Size = new Size(89, 20);
@@ -98,8 +98,8 @@
             dtpStart.Anchor = AnchorStyles.Left;
             dtpStart.CalendarFont = new Font("Microsoft JhengHei UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             dtpStart.Font = new Font("Microsoft JhengHei UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            dtpStart.Location = new Point(126, 16);
-            dtpStart.Margin = new Padding(2, 2, 2, 2);
+            dtpStart.Location = new Point(144, 16);
+            dtpStart.Margin = new Padding(2);
             dtpStart.Name = "dtpStart";
             dtpStart.Size = new Size(158, 28);
             dtpStart.TabIndex = 2;
@@ -109,8 +109,8 @@
             dtpEnd.Anchor = AnchorStyles.Left;
             dtpEnd.CalendarFont = new Font("Microsoft JhengHei UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             dtpEnd.Font = new Font("Microsoft JhengHei UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            dtpEnd.Location = new Point(464, 16);
-            dtpEnd.Margin = new Padding(2, 2, 2, 2);
+            dtpEnd.Location = new Point(531, 16);
+            dtpEnd.Margin = new Padding(2);
             dtpEnd.Name = "dtpEnd";
             dtpEnd.Size = new Size(164, 28);
             dtpEnd.TabIndex = 3;
@@ -118,20 +118,20 @@
             // rightPanel
             // 
             rightPanel.ColumnCount = 2;
-            rightPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 47.64398F));
-            rightPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 52.35602F));
+            rightPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 31.225296F));
+            rightPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 68.774704F));
             rightPanel.Controls.Add(lblTotalNumer, 1, 0);
             rightPanel.Controls.Add(btnSearch, 0, 1);
             rightPanel.Controls.Add(lblTotal, 0, 0);
             rightPanel.Dock = DockStyle.Right;
-            rightPanel.Location = new Point(495, 60);
-            rightPanel.Margin = new Padding(2, 2, 2, 2);
+            rightPanel.Location = new Point(531, 60);
+            rightPanel.Margin = new Padding(2);
             rightPanel.Name = "rightPanel";
             rightPanel.RowCount = 2;
             rightPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 50.26738F));
             rightPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 49.73262F));
             rightPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 16F));
-            rightPanel.Size = new Size(191, 295);
+            rightPanel.Size = new Size(253, 301);
             rightPanel.TabIndex = 6;
             // 
             // lblTotalNumer
@@ -139,46 +139,46 @@
             lblTotalNumer.Anchor = AnchorStyles.Left;
             lblTotalNumer.AutoSize = true;
             lblTotalNumer.Font = new Font("Microsoft JhengHei UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            lblTotalNumer.Location = new Point(93, 64);
+            lblTotalNumer.Location = new Point(81, 65);
             lblTotalNumer.Margin = new Padding(2, 0, 2, 0);
             lblTotalNumer.Name = "lblTotalNumer";
             lblTotalNumer.Size = new Size(18, 20);
             lblTotalNumer.TabIndex = 5;
             lblTotalNumer.Text = "0";
             // 
+            // btnSearch
+            // 
+            btnSearch.Anchor = AnchorStyles.Left;
+            rightPanel.SetColumnSpan(btnSearch, 2);
+            btnSearch.Font = new Font("Microsoft JhengHei UI", 12F);
+            btnSearch.Location = new Point(2, 192);
+            btnSearch.Margin = new Padding(2);
+            btnSearch.Name = "btnSearch";
+            btnSearch.Size = new Size(249, 68);
+            btnSearch.TabIndex = 6;
+            btnSearch.Text = "查詢";
+            btnSearch.UseVisualStyleBackColor = true;
+            // 
             // lblTotal
             // 
             lblTotal.Anchor = AnchorStyles.Right;
             lblTotal.AutoSize = true;
             lblTotal.Font = new Font("Microsoft JhengHei UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            lblTotal.Location = new Point(16, 64);
+            lblTotal.Location = new Point(4, 65);
             lblTotal.Margin = new Padding(2, 0, 2, 0);
             lblTotal.Name = "lblTotal";
             lblTotal.Size = new Size(73, 20);
             lblTotal.TabIndex = 4;
             lblTotal.Text = "總金額：";
             // 
-            // btnSearch
-            // 
-            btnSearch.Anchor = AnchorStyles.Left;
-            rightPanel.SetColumnSpan(btnSearch, 2);
-            btnSearch.Font = new Font("Microsoft JhengHei UI", 12F);
-            btnSearch.Location = new Point(2, 187);
-            btnSearch.Margin = new Padding(2, 2, 2, 2);
-            btnSearch.Name = "btnSearch";
-            btnSearch.Size = new Size(186, 68);
-            btnSearch.TabIndex = 6;
-            btnSearch.Text = "查詢";
-            btnSearch.UseVisualStyleBackColor = true;
-            // 
             // mainPanel
             // 
             mainPanel.Controls.Add(dgvTotalPurchases);
             mainPanel.Dock = DockStyle.Fill;
             mainPanel.Location = new Point(0, 60);
-            mainPanel.Margin = new Padding(2, 2, 2, 2);
+            mainPanel.Margin = new Padding(2);
             mainPanel.Name = "mainPanel";
-            mainPanel.Size = new Size(495, 295);
+            mainPanel.Size = new Size(531, 301);
             mainPanel.TabIndex = 7;
             // 
             // dgvTotalPurchases
@@ -196,21 +196,21 @@
             dgvTotalPurchases.DefaultCellStyle = dataGridViewCellStyle2;
             dgvTotalPurchases.Dock = DockStyle.Fill;
             dgvTotalPurchases.Location = new Point(0, 0);
-            dgvTotalPurchases.Margin = new Padding(2, 2, 2, 2);
+            dgvTotalPurchases.Margin = new Padding(2);
             dgvTotalPurchases.Name = "dgvTotalPurchases";
             dgvTotalPurchases.RowHeadersWidth = 51;
-            dgvTotalPurchases.Size = new Size(495, 295);
+            dgvTotalPurchases.Size = new Size(531, 301);
             dgvTotalPurchases.TabIndex = 8;
             // 
             // TotalPurchasesForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(686, 355);
+            ClientSize = new Size(784, 361);
             Controls.Add(mainPanel);
             Controls.Add(rightPanel);
             Controls.Add(searchPanel);
-            Margin = new Padding(2, 2, 2, 2);
+            Margin = new Padding(2);
             Name = "TotalPurchasesForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "總進貨額";

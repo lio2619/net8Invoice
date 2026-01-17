@@ -2,7 +2,9 @@
 
 using invoicing.Event;
 using invoicing.Models.DTO;
+using invoicing.Repository;
 using invoicing.Repository.Interface;
+using invoicing.Service;
 using invoicing.Service.Interface;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel;
@@ -19,6 +21,7 @@ namespace invoicing.Transactions
         private readonly ITransactionsbtnService _transactionsbtnService;
         private readonly ISupplierRepository _supplierRepository;
         private readonly IProductRepository _productRepository;
+        private readonly IPrintService _printService;
         private readonly EventBus _eventBus;
 
         /// <summary>
@@ -67,6 +70,7 @@ namespace invoicing.Transactions
             ITransactionsbtnService transactionsbtnService,
             ISupplierRepository supplierRepository,
             IProductRepository productRepository,
+            IPrintService printService,
             EventBus eventBus)
         {
             InitializeComponent();
@@ -75,6 +79,7 @@ namespace invoicing.Transactions
             _transactionsbtnService = transactionsbtnService;
             _supplierRepository = supplierRepository;
             _productRepository = productRepository;
+            _printService = printService;
             _eventBus = eventBus;
 
             InitializeFormControls();
@@ -119,6 +124,7 @@ namespace invoicing.Transactions
             btnRefresh.Click += BtnRefresh_Click;
             btnDelete.Click += BtnDelete_Click;
             btnCreateExcel.Click += BtnCreateExcel_Click;
+            btnPrint.Click += BtnPrint_Click;
 
             // 表單關閉事件
             FormClosing += (sender, e) =>
@@ -406,6 +412,55 @@ namespace invoicing.Transactions
             catch (Exception ex)
             {
                 MessageBox.Show($"建立 Excel 失敗：{ex.Message}", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// 列印按鈕點擊事件
+        /// </summary>
+        private async void BtnPrint_Click(object? sender, EventArgs e)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(cboCustomer.Text))
+                {
+                    MessageBox.Show("請選擇客戶", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                if (!_isSaved)
+                {
+                    MessageBox.Show("請先儲存單子", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // 取得客戶資訊
+                var supplier = await _supplierRepository.Get()
+                    .Where(x => x.CompanyFullName == cboCustomer.Text && !x.IsDeleted)
+                    .FirstOrDefaultAsync();
+
+                var request = new PrintInvoiceRequest
+                {
+                    OrderType = OrderType,
+                    CustomerName = cboCustomer.Text,
+                    Phone = supplier?.Phone1 ?? "",
+                    Fax = supplier?.FaxNumber ?? "",
+                    Address = supplier?.DeliveryAddress ?? "",
+                    // 關貿格式使用空白日期
+                    Date = dtpDate.Text,
+                    OrderNumber = dtpDate.Value.ToString("yyyyMMdd") + _currentOrderNumber.PadLeft(3, '0'),
+                    Remark = txtRemark.Text,
+                    TotalAmount = lblAmount.Text,
+                    IsSupplier = false,
+                    Details = _invoicingData.ToList()
+                };
+
+                var pdfBytes = _printService.GenerateInvoicePdf(request);
+                _printService.ShowPrintPreviewAndPrint(pdfBytes);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"列印失敗：{ex.Message}", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
