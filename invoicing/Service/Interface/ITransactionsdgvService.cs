@@ -69,8 +69,9 @@ namespace invoicing.Service.Interface
         /// </summary>
         /// <param name="row">要填入資料的 DataGridView 行</param>
         /// <param name="productCode">產品編號</param>
+        /// <param name="orderType">只有採購單會傳入， 因為它不需要單價</param>
         /// <returns>若找到產品回傳 true，否則回傳 false</returns>
-        Task<bool> FetchProductInfoAsync(DataGridViewRow row, string productCode);
+        Task<bool> FetchProductInfoAsync(DataGridViewRow row, string productCode, string orderType = "");
 
         /// <summary>
         /// 計算單行金額（數量 × 單價）
@@ -104,6 +105,7 @@ namespace invoicing.Service.Interface
             string quantityColumnHeaderText,
             string priceColumnHeaderText,
             Action<double> onTotalAmountChanged,
+            Action<string>? onProductCodeSelected,
             CancellationToken cancellationToken);
 
         /// <summary>

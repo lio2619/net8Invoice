@@ -106,8 +106,10 @@ namespace invoicing.Transactions
                     quantityColumnHeaderText: "數量",
                     priceColumnHeaderText: "單價",
                     onTotalAmountChanged: UpdateTotalAmountLabel,
+                    onProductCodeSelected: code => _eventBus.Publish(new MasterSelectEvent(code)),
                     _cancellationTokenSource.Token);
             };
+
 
             dgvInvoicing.RowsRemoved += (sender, e) =>
             {

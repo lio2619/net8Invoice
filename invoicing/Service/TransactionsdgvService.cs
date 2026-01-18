@@ -68,6 +68,16 @@ namespace invoicing.Service
         private DataGridView? _boundDataGridView;
 
         /// <summary>
+        /// 標記是否需要忽略第一次 NumPad 按鍵（防止重複輸入）
+        /// </summary>
+        private bool _ignoreFirstNumPadKey = false;
+
+        /// <summary>
+        /// KeyDown 事件處理器（用於處理 NumPad 重複輸入問題）
+        /// </summary>
+        private KeyEventHandler? _keyDownHandler;
+
+        /// <summary>
         /// 建構函式，注入產品資料庫儲存庫
         /// </summary>
         /// <param name="productRepository">產品資料庫儲存庫</param>
@@ -103,6 +113,10 @@ namespace invoicing.Service
             // 設定 DataGridView 基本屬性
             dgv.AllowUserToAddRows = true;
             dgv.AllowUserToDeleteRows = allowDelete;
+            
+            // 設定 EditMode 為 EditOnEnter，避免按鍵觸發進入編輯模式時的重複輸入問題
+            // 這與舊專案的設定一致
+            dgv.EditMode = DataGridViewEditMode.EditOnEnter;
 
             // 使用 BindingList 作為資料來源
             dgv.DataSource = dataSource;
@@ -110,6 +124,7 @@ namespace invoicing.Service
             // 註冊事件處理器以優化使用者體驗
             dgv.DataError += HandleDataError;
         }
+
 
         /// <summary>
         /// 處理 DataGridView 的 RowPostPaint 事件，在行標題中顯示行號
@@ -246,8 +261,8 @@ namespace invoicing.Service
                 }
             };
 
-            // 建立自訂下拉選單
-            _suggestionListBox = new ListBox
+            // 建立自訂下拉選單 (使用 NoFocusListBox 避免搶走焦點)
+            _suggestionListBox = new NoFocusListBox
             {
                 Visible = false,
                 BorderStyle = BorderStyle.FixedSingle,
@@ -263,16 +278,72 @@ namespace invoicing.Service
                 _suggestionListBox.BringToFront();
             }
 
+
             // 下拉選單選擇事件
-            _suggestionListBox.Click += SuggestionListBox_Click;
+            _suggestionListBox.MouseDown += SuggestionListBox_MouseDown;
+            _suggestionListBox.MouseMove += SuggestionListBox_MouseMove;
             _suggestionListBox.KeyDown += SuggestionListBox_KeyDown;
+
+            // 建立 PreviewKeyDown 事件處理器（在 KeyDown 之前觸發，用於更精確地追蹤按鍵）
+            PreviewKeyDownEventHandler previewKeyDownHandler = (sender, e) =>
+            {
+                // 檢查是否為 NumPad 數字鍵
+                bool isNumPadKey = e.KeyCode >= Keys.NumPad0 && e.KeyCode <= Keys.NumPad9;
+                
+                if (isNumPadKey && _ignoreFirstNumPadKey)
+                {
+                    // 在 PreviewKeyDown 中標記這是一個需要取消的 NumPad 按鍵
+                    // 實際取消會在 KeyDown 事件中處理
+                    e.IsInputKey = true;
+                }
+            };
+
+            // 建立 KeyDown 事件處理器（處理 NumPad 重複輸入問題）
+            // 注意：必須在 EditingControlShowing 事件處理器之前建立
+            _keyDownHandler = (sender, e) =>
+            {
+                // 檢查是否為 NumPad 數字鍵或 ProcessKey（IME 處理後的按鍵）
+                // 在某些情況下（非第一欄位），NumPad 會被轉換為 ProcessKey
+                bool isNumPadOrProcessKey = (e.KeyCode >= Keys.NumPad0 && e.KeyCode <= Keys.NumPad9) || 
+                                             e.KeyCode == Keys.ProcessKey;
+                
+                if (isNumPadOrProcessKey && _ignoreFirstNumPadKey)
+                {
+                    // 忽略第一次按鍵，防止重複輸入
+                    _ignoreFirstNumPadKey = false;
+                    e.Handled = true;
+                    e.SuppressKeyPress = true;
+                    return;
+                }
+                
+                // 任何按鍵後，重設標記
+                _ignoreFirstNumPadKey = false;
+            };
 
             // 建立 EditingControlShowing 事件處理器
             _editingControlShowingHandler = (sender, e) =>
             {
                 if (cancellationToken.IsCancellationRequested) return;
 
+                // 設定標記：新進入編輯模式時，需要忽略第一次按鍵
+                _ignoreFirstNumPadKey = true;
+
                 var currentColumnHeader = dgv.CurrentCell?.OwningColumn?.HeaderCell?.Value?.ToString();
+
+                // 為所有編輯控制項加入事件處理器（處理 NumPad 重複問題）
+                if (e.Control is TextBox editTextBox)
+                {
+                    // 移除舊的處理器並加入新的
+                    editTextBox.PreviewKeyDown -= previewKeyDownHandler;
+                    editTextBox.PreviewKeyDown += previewKeyDownHandler;
+                    
+                    if (_keyDownHandler != null)
+                    {
+                        editTextBox.KeyDown -= _keyDownHandler;
+                        editTextBox.KeyDown += _keyDownHandler;
+                    }
+                }
+
 
                 if (currentColumnHeader == productColumnHeaderText && e.Control is TextBox textBox)
                 {
@@ -310,6 +381,7 @@ namespace invoicing.Service
             dgv.EditingControlShowing += _editingControlShowingHandler;
             dgv.CellEndEdit += _cellEndEditHandler;
         }
+
 
         /// <summary>
         /// TextBox 失去焦點事件處理
@@ -373,11 +445,34 @@ namespace invoicing.Service
         }
 
         /// <summary>
-        /// 下拉選單點擊事件
+        /// 下拉選單滑鼠點擊事件 (MouseDown 取代 Click 以獲得更佳體驗)
         /// </summary>
-        private void SuggestionListBox_Click(object? sender, EventArgs e)
+        private void SuggestionListBox_MouseDown(object? sender, MouseEventArgs e)
         {
-            SelectSuggestion();
+            if (_suggestionListBox == null) return;
+
+            // 取得點擊位置的索引
+            int index = _suggestionListBox.IndexFromPoint(e.Location);
+            if (index != ListBox.NoMatches)
+            {
+                _suggestionListBox.SelectedIndex = index;
+                SelectSuggestion();
+            }
+        }
+
+        /// <summary>
+        /// 下拉選單滑鼠移動事件 (提供懸停視覺回饋)
+        /// </summary>
+        private void SuggestionListBox_MouseMove(object? sender, MouseEventArgs e)
+        {
+            if (_suggestionListBox == null) return;
+
+            // 取得游標所在位置的索引
+            int index = _suggestionListBox.IndexFromPoint(e.Location);
+            if (index != ListBox.NoMatches && index != _suggestionListBox.SelectedIndex)
+            {
+                _suggestionListBox.SelectedIndex = index;
+            }
         }
 
         /// <summary>
@@ -558,8 +653,9 @@ namespace invoicing.Service
         /// </summary>
         /// <param name="row">要填入資料的 DataGridView 行</param>
         /// <param name="productCode">產品編號</param>
+        /// <param name="orderType">只有採購單會傳入， 因為它不需要單價</param>
         /// <returns>若找到產品回傳 true，否則回傳 false</returns>
-        public async Task<bool> FetchProductInfoAsync(DataGridViewRow row, string productCode)
+        public async Task<bool> FetchProductInfoAsync(DataGridViewRow row, string productCode, string orderType = "")
         {
             ArgumentNullException.ThrowIfNull(row);
 
@@ -573,7 +669,8 @@ namespace invoicing.Service
                 {
                     row.Cells["ProductName"].Value = product.ProductName;
                     row.Cells["Unit"].Value = product.Unit;
-                    row.Cells["UnitPrice"].Value = product.StandardPrice?.ToString("0.##") ?? "0";
+                    if (orderType != "採購單")
+                        row.Cells["UnitPrice"].Value = product.StandardPrice?.ToString("0.##") ?? "0";
                     return true;
                 }
 
@@ -635,6 +732,14 @@ namespace invoicing.Service
         /// <summary>
         /// 處理 DataGridView 的 CellEndEdit 事件
         /// </summary>
+        /// <param name="dgv">DataGridView 控制項</param>
+        /// <param name="e">儲存格事件參數</param>
+        /// <param name="productColumnHeaderText">產品編號欄位的標題文字</param>
+        /// <param name="quantityColumnHeaderText">數量欄位的標題文字</param>
+        /// <param name="priceColumnHeaderText">單價欄位的標題文字</param>
+        /// <param name="onTotalAmountChanged">總金額變更時的回呼 Action</param>
+        /// <param name="onProductCodeSelected">產品編號欄位編輯完成時的回呼 Action（用於通知管理貨品表單）</param>
+        /// <param name="cancellationToken">用於取消非同步操作的 Token</param>
         public async Task HandleCellEndEditAsync(
             DataGridView dgv,
             DataGridViewCellEventArgs e,
@@ -642,6 +747,7 @@ namespace invoicing.Service
             string quantityColumnHeaderText,
             string priceColumnHeaderText,
             Action<double> onTotalAmountChanged,
+            Action<string>? onProductCodeSelected,
             CancellationToken cancellationToken)
         {
             if (cancellationToken.IsCancellationRequested) return;
@@ -655,7 +761,16 @@ namespace invoicing.Service
                 if (!string.IsNullOrWhiteSpace(productCode))
                 {
                     bool found = await FetchProductInfoAsync(row, productCode);
-                    if (!found)
+                    if (found)
+                    {
+                        // 強制刷新該行以確保資料顯示正確（EditOnEnter 模式下必要）
+                        dgv.InvalidateRow(e.RowIndex);
+                        dgv.Update();
+                        
+                        // 通知管理貨品表單（如果有開啟）
+                        onProductCodeSelected?.Invoke(productCode);
+                    }
+                    else
                     {
                         MessageBox.Show("請輸入正確的編號", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
@@ -676,6 +791,16 @@ namespace invoicing.Service
         {
             double total = CalculateTotalAmount(dgv);
             onTotalAmountChanged?.Invoke(total);
+        }
+        /// <summary>
+        /// 不會搶走焦點的 ListBox，避免點擊時造成 TextBox 失去焦點而觸發 EndEdit
+        /// </summary>
+        private class NoFocusListBox : ListBox
+        {
+            public NoFocusListBox()
+            {
+                this.SetStyle(ControlStyles.Selectable, false);
+            }
         }
         #endregion
     }

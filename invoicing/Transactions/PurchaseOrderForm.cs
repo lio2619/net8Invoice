@@ -98,6 +98,9 @@ namespace invoicing.Transactions
             dgvInvoicing.DataSource = _invoicingData;
             dgvInvoicing.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             dgvInvoicing.AllowUserToAddRows = true;
+            
+            // 設定 EditMode 為 EditOnEnter，避免 NumPad 重複輸入問題
+            dgvInvoicing.EditMode = DataGridViewEditMode.EditOnEnter;
 
             // 禁用所有欄位的排序
             foreach (DataGridViewColumn column in dgvInvoicing.Columns)
@@ -105,6 +108,7 @@ namespace invoicing.Transactions
                 column.SortMode = DataGridViewColumnSortMode.NotSortable;
             }
         }
+
 
         /// <summary>
         /// 註冊事件處理器
@@ -171,9 +175,19 @@ namespace invoicing.Transactions
             {
                 // 從服務層取得產品資訊（不含價格）
                 var row = dgvInvoicing.Rows[e.RowIndex];
-                var result = await _transactionsdgvService.FetchProductInfoAsync(row, productCode);
+                var result = await _transactionsdgvService.FetchProductInfoAsync(row, productCode, OrderType);
                 
-                // 由於採購單沒有單價欄位，需要清除可能設定的單價
+                if (result)
+                {
+                    // 強制刷新該行以確保資料顯示正確
+                    dgvInvoicing.InvalidateRow(e.RowIndex);
+                    dgvInvoicing.Update();
+                    
+                    // 通知管理貨品表單（如果有開啟）
+                    _eventBus.Publish(new MasterSelectEvent(productCode));
+                }
+                
+                // 由於採購單沒有單價欄位，不需要清除可能設定的單價
                 // （FetchProductInfoAsync 可能會設定 UnitPrice，但採購單不需要）
             }
             catch (Exception ex)

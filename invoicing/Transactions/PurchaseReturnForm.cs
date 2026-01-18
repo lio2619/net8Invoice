@@ -152,7 +152,16 @@ namespace invoicing.Transactions
                 if (!string.IsNullOrWhiteSpace(productCode))
                 {
                     bool found = await FetchProductInfoWithSpecialPriceAsync(row, productCode);
-                    if (!found)
+                    if (found)
+                    {
+                        // 強制刷新該行以確保資料顯示正確
+                        dgvInvoicing.InvalidateRow(e.RowIndex);
+                        dgvInvoicing.Update();
+                        
+                        // 通知管理貨品表單（如果有開啟）
+                        _eventBus.Publish(new MasterSelectEvent(productCode));
+                    }
+                    else
                     {
                         MessageBox.Show("請輸入正確的編號", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
