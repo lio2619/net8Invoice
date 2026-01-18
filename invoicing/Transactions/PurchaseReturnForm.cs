@@ -154,8 +154,16 @@ namespace invoicing.Transactions
                     bool found = await FetchProductInfoWithSpecialPriceAsync(row, productCode);
                     if (found)
                     {
-                        // 強制刷新該行以確保資料顯示正確
+                        // 結束當前的編輯模式以確保資料可以正確顯示
+                        dgvInvoicing.EndEdit();
+                        
+                        // 強制刷新該行
                         dgvInvoicing.InvalidateRow(e.RowIndex);
+                        
+                        // 刷新編輯控制項
+                        dgvInvoicing.RefreshEdit();
+                        
+                        // 強制更新顯示
                         dgvInvoicing.Update();
                         
                         // 通知管理貨品表單（如果有開啟）

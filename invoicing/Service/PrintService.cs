@@ -363,28 +363,11 @@ namespace invoicing.Service
                     }
                 });
 
-                //// 如果需要在中間顯示表尾（≤SmallPageThreshold筆時）
-                //if (includeFooterInMiddle)
-                //{
-                //    // 加入一些垂直間距，讓表尾顯示在表格下方（中間位置）
-                //    column.Item().PaddingTop(20).Column(footerColumn =>
-                //    {
-                //        footerColumn.Item().LineHorizontal(1);
-                //        footerColumn.Item().PaddingTop(5).Row(row =>
-                //        {
-                //            row.RelativeItem().Text($"備註：{request.Remark}");
-                //            if (!string.IsNullOrEmpty(request.TotalAmount) && request.TotalAmount != "0")
-                //            {
-                //                row.ConstantItem(150).AlignRight().Text($"總計：{request.TotalAmount}").Bold();
-                //            }
-                //        });
-                //    });
-                //}
                 // 加入一些垂直間距，讓表尾顯示在表格下方（中間位置）
-                column.Item().PaddingTop(20).Column(footerColumn =>
+                column.Item().PaddingTop(2).Column(footerColumn =>
                 {
                     footerColumn.Item().LineHorizontal(1);
-                    footerColumn.Item().PaddingTop(5).Row(row =>
+                    footerColumn.Item().PaddingTop(2).Row(row =>
                     {
                         row.RelativeItem().Text($"備註：{request.Remark}");
                         if (!string.IsNullOrEmpty(request.TotalAmount) && request.TotalAmount != "0")

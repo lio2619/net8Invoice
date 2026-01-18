@@ -763,8 +763,16 @@ namespace invoicing.Service
                     bool found = await FetchProductInfoAsync(row, productCode);
                     if (found)
                     {
-                        // 強制刷新該行以確保資料顯示正確（EditOnEnter 模式下必要）
+                        // 結束當前的編輯模式以確保資料可以正確顯示
+                        dgv.EndEdit();
+                        
+                        // 強制刷新該行
                         dgv.InvalidateRow(e.RowIndex);
+                        
+                        // 刷新編輯控制項（如果有的話）
+                        dgv.RefreshEdit();
+                        
+                        // 強制更新顯示
                         dgv.Update();
                         
                         // 通知管理貨品表單（如果有開啟）
