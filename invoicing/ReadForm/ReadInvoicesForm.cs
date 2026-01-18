@@ -121,7 +121,8 @@ namespace invoicing.ReadForm
                         Customer = y.Customer,
                         OrderName = y.OrderName,
                         TotalAmount = y.TotalAmount,
-                        Remark = y.Remark
+                        Remark = y.Remark,
+                        Customs = y.Customs
                     }).ToList();
 
                 // 重新設定 DataGridView

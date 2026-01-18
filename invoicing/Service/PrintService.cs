@@ -55,7 +55,7 @@ namespace invoicing.Service
                     // 【修改重點 1】判斷這一頁是否使用中間表尾
                     // 邏輯改為：只要這一頁筆數少於等於 16 筆，就使用中間表尾 (不管是不是最後一頁)
                     // 由於 MaxRowsPerPage = 40，所以前幾頁通常筆數都是 40 (>16)，會自動跑到頁尾
-                    bool useMiddleFooter = itemsOnThisPage <= SmallPageThreshold && itemsOnThisPage > 0;
+                    bool useMiddleFooter = itemsOnThisPage < SmallPageThreshold && itemsOnThisPage > 0;
 
                     container.Page(page =>
                     {
@@ -69,19 +69,19 @@ namespace invoicing.Service
                         page.Content().Element(c => ComposeContentPaged(c, request, startIndex, itemsOnThisPage, useMiddleFooter));
 
                         // 【修改重點 2 & 3】每一頁都執行 Footer 設定
-                        //page.Footer().Element(c =>
-                        //{
-                        //    // 如果這頁使用的是中間表尾 (useMiddleFooter == true)，這裡就留空，避免重複顯示
-                        //    if (useMiddleFooter)
-                        //    {
-                        //        // 空的 Element，因為表尾已經畫在 Content 裡了
-                        //    }
-                        //    else
-                        //    {
-                        //        // 如果資料多，表尾就畫在頁面最底部
-                        //        ComposeFooter(c, request);
-                        //    }
-                        //});
+                        page.Footer().Element(c =>
+                        {
+                            // 如果這頁使用的是中間表尾 (useMiddleFooter == true)，這裡就留空，避免重複顯示
+                            if (useMiddleFooter)
+                            {
+                                // 空的 Element，因為表尾已經畫在 Content 裡了
+                            }
+                            else
+                            {
+                                // 如果資料多，表尾就畫在頁面最底部
+                                ComposeFooter(c, request);
+                            }
+                        });
                     });
 
                     itemIndex += itemsOnThisPage;
@@ -364,18 +364,21 @@ namespace invoicing.Service
                 });
 
                 // 加入一些垂直間距，讓表尾顯示在表格下方（中間位置）
-                column.Item().PaddingTop(2).Column(footerColumn =>
+                if (includeFooterInMiddle)
                 {
-                    footerColumn.Item().LineHorizontal(1);
-                    footerColumn.Item().PaddingTop(2).Row(row =>
+                    column.Item().PaddingTop(2).Column(footerColumn =>
                     {
-                        row.RelativeItem().Text($"備註：{request.Remark}");
-                        if (!string.IsNullOrEmpty(request.TotalAmount) && request.TotalAmount != "0")
+                        footerColumn.Item().LineHorizontal(1);
+                        footerColumn.Item().PaddingTop(2).Row(row =>
                         {
-                            row.ConstantItem(150).AlignRight().Text($"總計：{request.TotalAmount}").Bold();
-                        }
+                            row.RelativeItem().Text($"備註：{request.Remark}");
+                            if (!string.IsNullOrEmpty(request.TotalAmount) && request.TotalAmount != "0")
+                            {
+                                row.ConstantItem(150).AlignRight().Text($"總計：{request.TotalAmount}").Bold();
+                            }
+                        });
                     });
-                });
+                }
             });
         }
 

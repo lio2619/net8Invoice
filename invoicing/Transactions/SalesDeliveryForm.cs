@@ -443,6 +443,9 @@ namespace invoicing.Transactions
             {
                 var firstInvoice = e.SelectedInvoices[0];
 
+                // 設定關貿格式旗標
+                _isCustomsFormat = firstInvoice.Customs == "1";
+
                 if (!string.IsNullOrEmpty(firstInvoice.Customer))
                 {
                     cboCustomer.Text = firstInvoice.Customer;

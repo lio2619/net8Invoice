@@ -40,6 +40,12 @@ namespace invoicing.Models.DTO
         [DisplayName("總金額")]
         public string? TotalAmount { get; set; }
 
+        /// <summary>
+        /// 關貿標記（"1" 表示關貿資料）
+        /// </summary>
+        [Browsable(false)]
+        public string? Customs { get; set; }
+
         [DisplayName("備註")]
         public string? Remark { get; set; }
     }
