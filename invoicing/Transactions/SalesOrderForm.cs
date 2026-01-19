@@ -47,6 +47,11 @@ namespace invoicing.Transactions
         private bool _isUsingNewOrderNumber = false;
 
         /// <summary>
+        /// 當前訂單的 CustomerOrder.Id（用於精確定位）
+        /// </summary>
+        private int _currentCustomerOrderId = 0;
+
+        /// <summary>
         /// 單子類型名稱
         /// </summary>
         private const string OrderType = "訂貨單";
@@ -191,7 +196,8 @@ namespace invoicing.Transactions
                     OrderNumber = _isSaved && !_isUsingNewOrderNumber ? _currentOrderNumber : null,
                     NewOrderNumber = _isSaved && _isUsingNewOrderNumber ? _currentOrderNumber : null,
                     IsUpdate = _isSaved,
-                    Details = _invoicingData.ToList()
+                    Details = _invoicingData.ToList(),
+                    CustomerOrderId = _isSaved ? _currentCustomerOrderId : null
                 };
 
                 var result = await _transactionsbtnService.SaveTransactionAsync(request);
@@ -231,6 +237,7 @@ namespace invoicing.Transactions
                     _isSaved = false;
                     _currentOrderNumber = string.Empty;
                     _isUsingNewOrderNumber = false;
+                    _currentCustomerOrderId = 0;
                     cboCustomer.Text = "";
                     txtRemark.Text = "";
                     lblNumber.Text = "0";
@@ -256,14 +263,18 @@ namespace invoicing.Transactions
                 }
 
                 var result = await _transactionsbtnService.DeleteTransactionAsync(
+                    _currentCustomerOrderId,
                     _currentOrderNumber,
-                    _isUsingNewOrderNumber);
+                    _isUsingNewOrderNumber,
+                    OrderType,
+                    dtpDate.Value.ToString("yyyyMMdd"));
 
                 if (result.Success)
                 {
                     _isSaved = false;
                     _currentOrderNumber = string.Empty;
                     _isUsingNewOrderNumber = false;
+                    _currentCustomerOrderId = 0;
                     cboCustomer.Text = "";
                     txtRemark.Text = "";
                     lblNumber.Text = "0";
@@ -432,6 +443,7 @@ namespace invoicing.Transactions
                     _isUsingNewOrderNumber = false;
                     lblNumber.Text = firstInvoice.OrderNumber;
                 }
+                _currentCustomerOrderId = firstInvoice.Id;
                 _isSaved = true;
             }
 

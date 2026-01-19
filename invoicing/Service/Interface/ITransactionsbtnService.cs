@@ -31,10 +31,13 @@ namespace invoicing.Service.Interface
         /// <summary>
         /// 刪除交易單子
         /// </summary>
-        /// <param name="orderNumber">單子編號</param>
+        /// <param name="customerOrderId">CustomerOrder 的 Id（優先使用）</param>
+        /// <param name="orderNumber">單子編號（備用）</param>
         /// <param name="isNewOrderNumber">是否為新編號系統（NewOrderNumber）</param>
+        /// <param name="orderType">單子類型（備用查詢時使用）</param>
+        /// <param name="date">單子日期（備用查詢時使用，格式 yyyyMMdd）</param>
         /// <returns>刪除結果</returns>
-        Task<DeleteResult> DeleteTransactionAsync(string orderNumber, bool isNewOrderNumber);
+        Task<DeleteResult> DeleteTransactionAsync(int customerOrderId, string orderNumber, bool isNewOrderNumber, string orderType, string date);
 
         /// <summary>
         /// 建立 Excel 檔案

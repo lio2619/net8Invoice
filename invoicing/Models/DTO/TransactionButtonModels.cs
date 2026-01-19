@@ -51,6 +51,11 @@ namespace invoicing.Models.DTO
         /// 明細資料
         /// </summary>
         public List<InvoicingDetailDTO> Details { get; set; } = new();
+
+        /// <summary>
+        /// CustomerOrder 的 Id（用於更新時精確定位訂單）
+        /// </summary>
+        public int? CustomerOrderId { get; set; }
     }
 
     /// <summary>

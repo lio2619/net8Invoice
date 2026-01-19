@@ -54,23 +54,62 @@ namespace invoicing.Service
                     return new SaveResult { Success = false, Message = "請選擇客戶" };
                 }
 
-                // 舊資料更新：使用 OrderNumber 查找
-                if (request.IsUpdate && !string.IsNullOrEmpty(request.OrderNumber))
+                // 更新模式：優先使用 CustomerOrderId 查找，確保精確定位
+                if (request.IsUpdate)
                 {
-                    var existingOrder = await _dbContext.CustomerOrders
-                        .FirstOrDefaultAsync(x => x.OrderNumber == request.OrderNumber);
-                    
+                    CustomerOrder? existingOrder = null;
+                    bool isNewOrderData = false;
+
+                    // 優先使用 CustomerOrderId 查詢（最精確）
+                    if (request.CustomerOrderId.HasValue && request.CustomerOrderId.Value > 0)
+                    {
+                        existingOrder = await _dbContext.CustomerOrders
+                            .FirstOrDefaultAsync(x => x.Id == request.CustomerOrderId.Value);
+                        if (existingOrder != null)
+                        {
+                            isNewOrderData = !string.IsNullOrEmpty(existingOrder.NewOrderNumber);
+                        }
+                    }
+                    // 次優先：舊資料使用 OrderNumber 查找
+                    else if (!string.IsNullOrEmpty(request.OrderNumber))
+                    {
+                        existingOrder = await _dbContext.CustomerOrders
+                            .FirstOrDefaultAsync(x => x.OrderNumber == request.OrderNumber);
+                        isNewOrderData = false;
+                    }
+                    // 再次優先：新資料使用 NewOrderNumber + OrderType + Date 組合查找
+                    else if (!string.IsNullOrEmpty(request.NewOrderNumber))
+                    {
+                        existingOrder = await _dbContext.CustomerOrders
+                            .FirstOrDefaultAsync(x => x.NewOrderNumber == request.NewOrderNumber
+                                && x.OrderName == request.OrderType
+                                && x.Date == request.Date);
+                        isNewOrderData = true;
+                    }
+
                     if (existingOrder == null)
                     {
                         return new SaveResult { Success = false, Message = "找不到對應的單子" };
                     }
 
-                    // 刪除舊的明細
-                    var existingDetails = await _dbContext.OrderDetails
-                        .Where(x => x.OrderNumber == existingOrder.OrderNumber)
-                        .ToListAsync();
-                    
+                    // 刪除舊的明細（根據資料類型使用不同關聯）
+                    List<OrderDetail> existingDetails;
+                    if (isNewOrderData)
+                    {
+                        existingDetails = await _dbContext.OrderDetails
+                            .Where(x => x.CustomerOrderId == existingOrder.Id)
+                            .ToListAsync();
+                    }
+                    else
+                    {
+                        existingDetails = await _dbContext.OrderDetails
+                            .Where(x => x.OrderNumber == existingOrder.OrderNumber)
+                            .ToListAsync();
+                    }
+
                     _dbContext.OrderDetails.RemoveRange(existingDetails);
+
+                    await _dbContext.SaveChangesAsync();
 
                     // 更新主單資料
                     existingOrder.TotalAmount = request.TotalAmount;
@@ -79,51 +118,21 @@ namespace invoicing.Service
                     existingOrder.Date = request.Date;
                     _dbContext.CustomerOrders.Update(existingOrder);
 
-                    // 插入新的明細
-                    await InsertOrderDetailsAsync(existingOrder.OrderNumber, request.Details);
-                    await _dbContext.SaveChangesAsync();
-
-                    return new SaveResult 
-                    { 
-                        Success = true, 
-                        Message = "儲存完成", 
-                        OrderNumber = existingOrder.OrderNumber,
-                        NewOrderNumber = existingOrder.NewOrderNumber
-                    };
-                }
-                // 新資料更新：使用 NewOrderNumber 查找
-                else if (request.IsUpdate && !string.IsNullOrEmpty(request.NewOrderNumber))
-                {
-                    var existingOrder = await _dbContext.CustomerOrders
-                        .FirstOrDefaultAsync(x => x.NewOrderNumber == request.NewOrderNumber);
-                    
-                    if (existingOrder == null)
+                    // 插入新的明細（根據資料類型使用不同關聯）
+                    if (isNewOrderData)
                     {
-                        return new SaveResult { Success = false, Message = "找不到對應的單子" };
+                        await InsertOrderDetailsWithCustomerOrderIdAsync(existingOrder.Id, request.Details);
                     }
-
-                    // 刪除舊的明細（新資料使用 CustomerOrderId 關聯）
-                    var existingDetails = await _dbContext.OrderDetails
-                        .Where(x => x.CustomerOrderId == existingOrder.Id)
-                        .ToListAsync();
-                    
-                    _dbContext.OrderDetails.RemoveRange(existingDetails);
-
-                    // 更新主單資料
-                    existingOrder.TotalAmount = request.TotalAmount;
-                    existingOrder.Remark = request.Remark;
-                    existingOrder.Customer = request.CustomerName;
-                    existingOrder.Date = request.Date;
-                    _dbContext.CustomerOrders.Update(existingOrder);
-
-                    // 插入新的明細（新資料使用 CustomerOrderId 關聯）
-                    await InsertOrderDetailsWithCustomerOrderIdAsync(existingOrder.Id, request.Details);
+                    else
+                    {
+                        await InsertOrderDetailsAsync(existingOrder.OrderNumber!, request.Details);
+                    }
                     await _dbContext.SaveChangesAsync();
 
-                    return new SaveResult 
-                    { 
-                        Success = true, 
-                        Message = "儲存完成", 
+                    return new SaveResult
+                    {
+                        Success = true,
+                        Message = "儲存完成",
                         OrderNumber = existingOrder.OrderNumber,
                         NewOrderNumber = existingOrder.NewOrderNumber
                     };
@@ -155,10 +164,10 @@ namespace invoicing.Service
                     await InsertOrderDetailsWithCustomerOrderIdAsync(newOrder.Id, request.Details);
                     await _dbContext.SaveChangesAsync();
 
-                    return new SaveResult 
-                    { 
-                        Success = true, 
-                        Message = "儲存完成", 
+                    return new SaveResult
+                    {
+                        Success = true,
+                        Message = "儲存完成",
                         OrderNumber = null,
                         NewOrderNumber = newOrderNumberStr
                     };
@@ -281,7 +290,7 @@ namespace invoicing.Service
         }
 
         /// <inheritdoc/>
-        public async Task<DeleteResult> DeleteTransactionAsync(string orderNumber, bool isNewOrderNumber)
+        public async Task<DeleteResult> DeleteTransactionAsync(int customerOrderId, string orderNumber, bool isNewOrderNumber, string orderType, string date)
         {
             try
             {
@@ -291,19 +300,32 @@ namespace invoicing.Service
                     return new DeleteResult { Success = false, Message = "已取消" };
                 }
 
-                // 根據編號類型查找主單
-                CustomerOrder? order;
-                if (isNewOrderNumber)
+                // 優先使用 CustomerOrderId 查找主單（最精確）
+                CustomerOrder? order = null;
+                if (customerOrderId > 0)
                 {
                     order = await _dbContext.CustomerOrders
-                        .FirstOrDefaultAsync(x => x.NewOrderNumber == orderNumber);
+                        .FirstOrDefaultAsync(x => x.Id == customerOrderId);
                 }
-                else
+                // 備用：根據編號類型 + 單子類型 + 日期查找主單（更精確）
+                if (order == null)
                 {
-                    order = await _dbContext.CustomerOrders
-                        .FirstOrDefaultAsync(x => x.OrderNumber == orderNumber);
+                    if (isNewOrderNumber)
+                    {
+                        order = await _dbContext.CustomerOrders
+                            .FirstOrDefaultAsync(x => x.NewOrderNumber == orderNumber 
+                                && x.OrderName == orderType 
+                                && x.Date == date);
+                    }
+                    else
+                    {
+                        order = await _dbContext.CustomerOrders
+                            .FirstOrDefaultAsync(x => x.OrderNumber == orderNumber 
+                                && x.OrderName == orderType 
+                                && x.Date == date);
+                    }
                 }
-                
+
                 if (order == null)
                 {
                     return new DeleteResult { Success = false, Message = "找不到對應的單子" };
@@ -316,7 +338,7 @@ namespace invoicing.Service
 
                 // 刪除明細（根據資料類型使用不同關聯）
                 List<OrderDetail> details;
-                if (isNewOrderNumber)
+                if (!string.IsNullOrEmpty(order.NewOrderNumber))
                 {
                     // 新資料：用 CustomerOrderId 查詢
                     details = await _dbContext.OrderDetails
@@ -330,7 +352,7 @@ namespace invoicing.Service
                         .Where(x => x.OrderNumber == order.OrderNumber)
                         .ToListAsync();
                 }
-                
+
                 _dbContext.OrderDetails.RemoveRange(details);
                 await _dbContext.SaveChangesAsync();
 
@@ -351,7 +373,7 @@ namespace invoicing.Service
                 {
                     string dateFolder = request.Date.ToString("yyyyMM");
                     string path = $"../單子/{dateFolder}/{request.OrderType}/";
-                    
+
                     if (!Directory.Exists(path))
                     {
                         Directory.CreateDirectory(path);
@@ -377,15 +399,15 @@ namespace invoicing.Service
                     {
                         // 沒有傳入編號，嘗試查詢
                         var order = await _dbContext.CustomerOrders
-                            .FirstOrDefaultAsync(x => 
-                                x.Date == request.Date.ToString("yyyyMMdd") && 
-                                x.Customer == request.CustomerName && 
+                            .FirstOrDefaultAsync(x =>
+                                x.Date == request.Date.ToString("yyyyMMdd") &&
+                                x.Customer == request.CustomerName &&
                                 x.OrderName == request.OrderType);
-                        
+
                         if (order != null)
                         {
-                            displayOrderNumber = !string.IsNullOrEmpty(order.NewOrderNumber) 
-                                ? order.NewOrderNumber 
+                            displayOrderNumber = !string.IsNullOrEmpty(order.NewOrderNumber)
+                                ? order.NewOrderNumber
                                 : order.OrderNumber;
                         }
                         else

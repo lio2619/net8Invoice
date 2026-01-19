@@ -113,7 +113,7 @@ namespace invoicing.Service
             // 設定 DataGridView 基本屬性
             dgv.AllowUserToAddRows = true;
             dgv.AllowUserToDeleteRows = allowDelete;
-            
+
             // 設定 EditMode 為 EditOnEnter，避免按鍵觸發進入編輯模式時的重複輸入問題
             // 這與舊專案的設定一致
             dgv.EditMode = DataGridViewEditMode.EditOnEnter;
@@ -289,7 +289,7 @@ namespace invoicing.Service
             {
                 // 檢查是否為 NumPad 數字鍵
                 bool isNumPadKey = e.KeyCode >= Keys.NumPad0 && e.KeyCode <= Keys.NumPad9;
-                
+
                 if (isNumPadKey && _ignoreFirstNumPadKey)
                 {
                     // 在 PreviewKeyDown 中標記這是一個需要取消的 NumPad 按鍵
@@ -304,9 +304,9 @@ namespace invoicing.Service
             {
                 // 檢查是否為 NumPad 數字鍵或 ProcessKey（IME 處理後的按鍵）
                 // 在某些情況下（非第一欄位），NumPad 會被轉換為 ProcessKey
-                bool isNumPadOrProcessKey = (e.KeyCode >= Keys.NumPad0 && e.KeyCode <= Keys.NumPad9) || 
+                bool isNumPadOrProcessKey = (e.KeyCode >= Keys.NumPad0 && e.KeyCode <= Keys.NumPad9) ||
                                              e.KeyCode == Keys.ProcessKey;
-                
+
                 if (isNumPadOrProcessKey && _ignoreFirstNumPadKey)
                 {
                     // 忽略第一次按鍵，防止重複輸入
@@ -315,7 +315,7 @@ namespace invoicing.Service
                     e.SuppressKeyPress = true;
                     return;
                 }
-                
+
                 // 任何按鍵後，重設標記
                 _ignoreFirstNumPadKey = false;
             };
@@ -336,7 +336,7 @@ namespace invoicing.Service
                     // 移除舊的處理器並加入新的
                     editTextBox.PreviewKeyDown -= previewKeyDownHandler;
                     editTextBox.PreviewKeyDown += previewKeyDownHandler;
-                    
+
                     if (_keyDownHandler != null)
                     {
                         editTextBox.KeyDown -= _keyDownHandler;
@@ -765,22 +765,22 @@ namespace invoicing.Service
                     {
                         // 結束當前的編輯模式以確保資料可以正確顯示
                         dgv.EndEdit();
-                        
+
                         // 強制刷新該行
                         dgv.InvalidateRow(e.RowIndex);
-                        
+
                         // 刷新編輯控制項（如果有的話）
                         dgv.RefreshEdit();
-                        
+
                         // 強制更新顯示
                         dgv.Update();
-                        
+
                         // 通知管理貨品表單（如果有開啟）
                         onProductCodeSelected?.Invoke(productCode);
                     }
                     else
                     {
-                        MessageBox.Show("請輸入正確的編號", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        //MessageBox.Show("請輸入正確的編號", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
             }
