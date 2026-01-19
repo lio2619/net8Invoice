@@ -90,7 +90,7 @@ namespace invoicing.Service
 
             return document.GeneratePdf();
         }
-        
+
         /// <summary>
         /// 使用 PdfiumViewer 顯示 PDF 預覽視窗並提供列印功能
         /// </summary>
@@ -366,10 +366,10 @@ namespace invoicing.Service
                 // 加入一些垂直間距，讓表尾顯示在表格下方（中間位置）
                 if (includeFooterInMiddle)
                 {
-                    column.Item().PaddingTop(2).Column(footerColumn =>
+                    column.Item().PaddingTop(0).Column(footerColumn =>
                     {
                         footerColumn.Item().LineHorizontal(1);
-                        footerColumn.Item().PaddingTop(2).Row(row =>
+                        footerColumn.Item().PaddingTop(0).Row(row =>
                         {
                             row.RelativeItem().Text($"備註：{request.Remark}");
                             if (!string.IsNullOrEmpty(request.TotalAmount) && request.TotalAmount != "0")
@@ -389,9 +389,9 @@ namespace invoicing.Service
         {
             container.Column(column =>
             {
-                column.Item().PaddingTop(10).LineHorizontal(1);
+                column.Item().PaddingTop(-12).LineHorizontal(1);
 
-                column.Item().Row(row =>
+                column.Item().PaddingTop(-10).Row(row =>
                 {
                     row.RelativeItem().Text($"備註：{request.Remark}");
                     if (!string.IsNullOrEmpty(request.TotalAmount) && request.TotalAmount != "0")
@@ -469,7 +469,7 @@ namespace invoicing.Service
                                 table.Cell().Padding(1).Text(detail.TransactionDate);
                                 table.Cell().Padding(1).Text(detail.TransactionNumber);
                                 table.Cell().Padding(1).AlignRight().Text(detail.TotalAmount.ToString("#,##0.###"));
-                                
+
                                 // 統計金額：出貨退出單顯示負數
                                 string statAmount = detail.StatisticalAmount < 0
                                     ? $"- {Math.Abs(detail.StatisticalAmount):#,##0.###}"

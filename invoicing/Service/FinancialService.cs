@@ -146,7 +146,7 @@ namespace invoicing.Service
                 string orderNumber = o.NewOrderNumber ?? o.OrderNumber ?? "0";
                 if (int.TryParse(orderNumber, out int no))
                 {
-                    orderNumber = no.ToString("000");
+                    orderNumber = no.ToString("0000");
                 }
                 string orderUid = (o.Date ?? "") + orderNumber;
 
