@@ -38,7 +38,7 @@ namespace invoicing.Models.DTO
         public string? OrderNumber { get; set; }
 
         /// <summary>
-        /// 新單子編號（每月20號重置，4位數顯示）- 用於顯示和 Excel
+        /// 新單子編號（每月1號重置，4位數顯示）- 用於顯示和 Excel
         /// </summary>
         public string? NewOrderNumber { get; set; }
 
@@ -79,7 +79,7 @@ namespace invoicing.Models.DTO
         public string? OrderNumber { get; set; }
 
         /// <summary>
-        /// 新單子編號（每月20號重置，4位數顯示）
+        /// 新單子編號（每月1號重置，4位數顯示）
         /// </summary>
         public string? NewOrderNumber { get; set; }
     }

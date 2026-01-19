@@ -194,7 +194,7 @@ namespace invoicing.Service
         }
 
         /// <summary>
-        /// 計算新的 NewOrderNumber（每月20號重置，4位數格式）
+        /// 計算新的 NewOrderNumber（每月1號重置，4位數格式）
         /// </summary>
         private async Task<string> GenerateNewOrderNumberAsync(string dateStr, string orderType)
         {
@@ -205,23 +205,13 @@ namespace invoicing.Service
                 orderDate = DateTime.Now;
             }
 
-            // 計算週期的起始日期（每月20號為分隔點）
-            DateTime periodStart;
-            DateTime periodEnd;
+            // --- 計算週期的起始日期（每月1號為分隔點） ---
 
-            if (orderDate.Day >= 20)
-            {
-                // 當月20號 ~ 下月19號
-                periodStart = new DateTime(orderDate.Year, orderDate.Month, 20);
-                periodEnd = periodStart.AddMonths(1).AddDays(-1);
-            }
-            else
-            {
-                // 上月20號 ~ 當月19號
-                periodStart = new DateTime(orderDate.Year, orderDate.Month, 1).AddMonths(-1);
-                periodStart = new DateTime(periodStart.Year, periodStart.Month, 20);
-                periodEnd = new DateTime(orderDate.Year, orderDate.Month, 19);
-            }
+            // 週期起始日：當月 1 號
+            DateTime periodStart = new DateTime(orderDate.Year, orderDate.Month, 1);
+
+            // 週期結束日：當月最後一天 (下個月1號 減去 1天)
+            DateTime periodEnd = periodStart.AddMonths(1).AddDays(-1);
 
             string periodStartStr = periodStart.ToString("yyyyMMdd");
             string periodEndStr = periodEnd.ToString("yyyyMMdd");

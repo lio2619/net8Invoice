@@ -140,7 +140,7 @@ namespace invoicing.Service
                 else
                 {
                     // 新增模式
-                    // 計算新的 NewOrderNumber（每月20號重置）
+                    // 計算新的 NewOrderNumber（每月1號重置）
                     string newOrderNumberStr = await GenerateNewOrderNumberAsync(request.Date, request.OrderType);
 
                     var newOrder = new CustomerOrder
