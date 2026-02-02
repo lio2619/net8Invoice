@@ -235,7 +235,12 @@ namespace invoicing.Service
         {
             foreach (var detail in details)
             {
-                if (string.IsNullOrEmpty(detail.ProductCode) && string.IsNullOrEmpty(detail.ProductName))
+                // 只有當所有主要欄位都是空白時才跳過
+                if (string.IsNullOrEmpty(detail.ProductCode) && 
+                    string.IsNullOrEmpty(detail.ProductName) &&
+                    string.IsNullOrEmpty(detail.Quantity) &&
+                    string.IsNullOrEmpty(detail.UnitPrice) &&
+                    string.IsNullOrEmpty(detail.Amount))
                     continue;
 
                 var orderDetail = new OrderDetail
@@ -262,7 +267,12 @@ namespace invoicing.Service
         {
             foreach (var detail in details)
             {
-                if (string.IsNullOrEmpty(detail.ProductCode) && string.IsNullOrEmpty(detail.ProductName))
+                // 只有當所有主要欄位都是空白時才跳過
+                if (string.IsNullOrEmpty(detail.ProductCode) && 
+                    string.IsNullOrEmpty(detail.ProductName) &&
+                    string.IsNullOrEmpty(detail.Quantity) &&
+                    string.IsNullOrEmpty(detail.UnitPrice) &&
+                    string.IsNullOrEmpty(detail.Amount))
                     continue;
 
                 var orderDetail = new OrderDetail

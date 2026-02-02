@@ -90,7 +90,9 @@ namespace invoicing.Service
         /// </summary>
         private async Task<string> GetCustomerNameAsync(string name, string number)
         {
-            var searchPattern = $"%{name}({number.Substring(0, 4)}%";
+            // 確保 number 長度足夠再進行 Substring，避免 ArgumentOutOfRangeException
+            var numberPrefix = number.Length >= 4 ? number.Substring(0, 4) : number;
+            var searchPattern = $"%{name}({numberPrefix}%";
             var customer = await _dbContext.Customers
                 .FirstOrDefaultAsync(c => EF.Functions.Like(c.CompanyFullName ?? "", searchPattern));
 

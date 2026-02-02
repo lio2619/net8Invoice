@@ -325,28 +325,23 @@ namespace invoicing.Service
             {
                 if (cancellationToken.IsCancellationRequested) return;
 
-                // 設定標記：新進入編輯模式時，需要忽略第一次按鍵
-                _ignoreFirstNumPadKey = true;
-
                 var currentColumnHeader = dgv.CurrentCell?.OwningColumn?.HeaderCell?.Value?.ToString();
-
-                // 為所有編輯控制項加入事件處理器（處理 NumPad 重複問題）
-                if (e.Control is TextBox editTextBox)
-                {
-                    // 移除舊的處理器並加入新的
-                    editTextBox.PreviewKeyDown -= previewKeyDownHandler;
-                    editTextBox.PreviewKeyDown += previewKeyDownHandler;
-
-                    if (_keyDownHandler != null)
-                    {
-                        editTextBox.KeyDown -= _keyDownHandler;
-                        editTextBox.KeyDown += _keyDownHandler;
-                    }
-                }
-
 
                 if (currentColumnHeader == productColumnHeaderText && e.Control is TextBox textBox)
                 {
+                    // 僅在貨品編號欄位才需要防止 NumPad 重複輸入
+                    _ignoreFirstNumPadKey = true;
+
+                    // 移除舊的處理器並加入新的
+                    textBox.PreviewKeyDown -= previewKeyDownHandler;
+                    textBox.PreviewKeyDown += previewKeyDownHandler;
+
+                    if (_keyDownHandler != null)
+                    {
+                        textBox.KeyDown -= _keyDownHandler;
+                        textBox.KeyDown += _keyDownHandler;
+                    }
+
                     _currentTextBox = textBox;
 
                     // 禁用內建自動完成（我們使用自訂下拉選單）
@@ -364,6 +359,9 @@ namespace invoicing.Service
                 }
                 else
                 {
+                    // 不是產品編號欄位時，不需要忽略第一次按鍵
+                    _ignoreFirstNumPadKey = false;
+
                     // 不是產品編號欄位時，清除狀態並隱藏建議清單
                     _currentTextBox = null;
                     HideSuggestionListBox();
