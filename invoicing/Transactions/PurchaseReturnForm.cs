@@ -207,8 +207,8 @@ namespace invoicing.Transactions
                     row.Cells["ProductName"].Value = product.ProductName;
                     row.Cells["Unit"].Value = product.Unit;
 
-                    // 取得標準成本作為單價
-                    double unitPrice = (double)(product.StandardCost ?? 0);
+                    // 取得現行成本作為單價
+                    double unitPrice = (double)(product.CurrentCost ?? 0);
 
                     // 如果是「唐詣」廠商，單價除以1.05
                     if (cboCustomer.Text == SpecialSupplierName && unitPrice > 0)

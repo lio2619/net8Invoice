@@ -32,14 +32,11 @@ namespace invoicing.MasterData
             _formUIService.AddTextBoxUnderline(txtProductStandardPrice);
             _formUIService.AddTextBoxUnderline(txtProductPriceA);
             _formUIService.AddTextBoxUnderline(txtProductPriceB);
-            _formUIService.AddTextBoxUnderline(txtProductPriceC);
+            _formUIService.AddTextBoxUnderline(txtProductBoxCost);
             _formUIService.AddTextBoxUnderline(txtProductCurrentCost);
             _formUIService.AddTextBoxUnderline(txtProductStandardCost);
-
-            //售價C不要顯示
-            label8.Visible = false;
-            txtProductPriceC.Visible = false;
-            txtProductPriceC.Text = "0";
+            // 初始化清空
+            btnFormClear_Click(null, null);
 
             //訂閱事件
             //TODO 這邊有一個bug，如果先開了產品的form並且沒有關閉此form，接下來開啟其他的form也會訂閱這個東西
@@ -75,7 +72,7 @@ namespace invoicing.MasterData
                                                             y.StandardPrice,
                                                             y.PriceA,
                                                             y.PriceB,
-                                                            y.PriceC,
+                                                            y.BoxCost,
                                                             y.StandardCost,
                                                             y.CurrentCost,
                                                         })
@@ -88,9 +85,9 @@ namespace invoicing.MasterData
                 txtProductStandardPrice.Text = product.StandardPrice.ToString();
                 txtProductPriceA.Text = product.PriceA.ToString();
                 txtProductPriceB.Text = product.PriceB.ToString();
-                txtProductPriceC.Text = product.PriceC.ToString();
-                txtProductCurrentCost.Text = product.CurrentCost.ToString();
+                txtProductBoxCost.Text = product.BoxCost.ToString();
                 txtProductStandardCost.Text = product.StandardCost.ToString();
+                txtProductCurrentCost.Text = product.CurrentCost.ToString();
             }
             else
             {
@@ -150,7 +147,7 @@ namespace invoicing.MasterData
                     StandardPrice = SafeParseDecimal(txtProductStandardPrice.Text),
                     PriceA = SafeParseDecimal(txtProductPriceA.Text),
                     PriceB = SafeParseDecimal(txtProductPriceB.Text),
-                    PriceC = SafeParseDecimal(txtProductPriceC.Text),
+                    BoxCost = SafeParseDecimal(txtProductBoxCost.Text),
                     CurrentCost = SafeParseDecimal(txtProductCurrentCost.Text),
                     StandardCost = SafeParseDecimal(txtProductStandardCost.Text)
                 };
@@ -183,7 +180,7 @@ namespace invoicing.MasterData
                 product.StandardPrice = SafeParseDecimal(txtProductStandardPrice.Text);
                 product.PriceA = SafeParseDecimal(txtProductPriceA.Text);
                 product.PriceB = SafeParseDecimal(txtProductPriceB.Text);
-                product.PriceC = SafeParseDecimal(txtProductPriceC.Text);
+                product.BoxCost = SafeParseDecimal(txtProductBoxCost.Text);
                 product.CurrentCost = SafeParseDecimal(txtProductCurrentCost.Text);
                 product.StandardCost = SafeParseDecimal(txtProductStandardCost.Text);
                 await _productRepository.UpdateAsync(product);
@@ -252,7 +249,7 @@ namespace invoicing.MasterData
             txtProductStandardPrice.Text = string.Empty;
             txtProductPriceA.Text = string.Empty;
             txtProductPriceB.Text = string.Empty;
-            txtProductPriceC.Text = string.Empty;
+            txtProductBoxCost.Text = string.Empty;
             txtProductCurrentCost.Text = string.Empty;
             txtProductStandardCost.Text = string.Empty;
         }

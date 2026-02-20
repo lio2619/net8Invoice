@@ -47,5 +47,8 @@ namespace invoicing.Models.Entity
 
         [Comment("現行成本")]
         public decimal? CurrentCost { get; set; }
+
+        [Comment("箱購成本")]
+        public decimal? BoxCost { get; set; }
     }
 }
