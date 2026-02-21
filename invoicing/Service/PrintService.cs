@@ -79,12 +79,14 @@ namespace invoicing.Service
             using var stream = new MemoryStream(pdfBytes);
             using var pdfDocument = PdfDocument.Load(stream);
 
+            int totalPages = pdfDocument.PageCount;
+
             // 建立預覽表單
             var previewForm = new Form
             {
                 Text = "列印預覽",
                 Width = 900,
-                Height = 700,
+                Height = 750,
                 StartPosition = FormStartPosition.CenterScreen
             };
 
@@ -95,20 +97,22 @@ namespace invoicing.Service
                 Document = pdfDocument
             };
 
-            // 控制面板 (包含印表機選擇、列印份數與列印按鈕)
+            // 控制面板 (包含印表機選擇、列印份數、頁碼選擇與列印按鈕)
             var controlPanel = new Panel
             {
                 Dock = DockStyle.Bottom,
-                Height = 60,
+                Height = 100,
                 Padding = new Padding(10)
             };
+
+            // ====== 第一列：印表機、份數、列印按鈕 ======
 
             // 印表機標籤
             var printerLabel = new Label
             {
                 Text = "印表機:",
                 AutoSize = true,
-                Location = new Point(20, 18),
+                Location = new Point(20, 12),
                 Font = new Font("Microsoft JhengHei UI", 12F)
             };
 
@@ -116,7 +120,7 @@ namespace invoicing.Service
             var printerCombo = new ComboBox
             {
                 DropDownStyle = ComboBoxStyle.DropDownList,
-                Location = new Point(110, 15),
+                Location = new Point(110, 9),
                 Width = 250,
                 Font = new Font("Microsoft JhengHei UI", 10F)
             };
@@ -144,7 +148,7 @@ namespace invoicing.Service
             {
                 Text = "份數:",
                 AutoSize = true,
-                Location = new Point(380, 18),
+                Location = new Point(380, 12),
                 Font = new Font("Microsoft JhengHei UI", 12F)
             };
 
@@ -154,7 +158,7 @@ namespace invoicing.Service
                 Minimum = 1,
                 Maximum = 100,
                 Value = copies,
-                Location = new Point(440, 15),
+                Location = new Point(440, 9),
                 Width = 60,
                 Font = new Font("Microsoft JhengHei UI", 12F)
             };
@@ -163,18 +167,143 @@ namespace invoicing.Service
             var printButton = new Button
             {
                 Text = "列印",
-                Location = new Point(520, 10),
+                Location = new Point(520, 5),
                 Width = 100,
                 Height = 35,
                 Font = new Font("Microsoft JhengHei UI", 12F)
             };
 
+            // ====== 第二列：頁碼選擇 ======
+            int row2Y = 50;
+
+            // 全部列印 RadioButton
+            var rbPrintAll = new RadioButton
+            {
+                Text = "全部列印",
+                AutoSize = true,
+                Location = new Point(20, row2Y),
+                Font = new Font("Microsoft JhengHei UI", 10F),
+                Checked = true
+            };
+
+            // 指定頁碼 RadioButton
+            var rbPrintRange = new RadioButton
+            {
+                Text = "指定頁碼:",
+                AutoSize = true,
+                Location = new Point(140, row2Y),
+                Font = new Font("Microsoft JhengHei UI", 10F)
+            };
+
+            // 頁碼輸入框
+            var txtPageRange = new TextBox
+            {
+                Location = new Point(270, row2Y - 2),
+                Width = 150,
+                Font = new Font("Microsoft JhengHei UI", 10F),
+                Enabled = false
+            };
+
+            // 總頁數標籤
+            var lblTotalPages = new Label
+            {
+                Text = $"共 {totalPages} 頁",
+                AutoSize = true,
+                Location = new Point(430, row2Y + 2),
+                Font = new Font("Microsoft JhengHei UI", 10F)
+            };
+
+            // 格式提示標籤
+            var lblFormatHint = new Label
+            {
+                Text = "（格式：2 = 第2頁、1,3,5 = 多頁、2-4 = 第2~4頁、1-3,5 = 混合）",
+                AutoSize = true,
+                Location = new Point(510, row2Y + 2),
+                Font = new Font("Microsoft JhengHei UI", 10F),
+                ForeColor = System.Drawing.Color.Gray
+            };
+
+            // RadioButton 切換邏輯
+            rbPrintAll.CheckedChanged += (sender, e) =>
+            {
+                if (rbPrintAll.Checked)
+                {
+                    txtPageRange.Enabled = false;
+                }
+            };
+
+            rbPrintRange.CheckedChanged += (sender, e) =>
+            {
+                if (rbPrintRange.Checked)
+                {
+                    txtPageRange.Enabled = true;
+                    txtPageRange.Focus();
+                }
+            };
+
+            // 列印按鈕事件
             printButton.Click += (sender, e) =>
             {
                 using var printDoc = pdfDocument.CreatePrintDocument();
                 printDoc.PrinterSettings.Copies = (short)copiesInput.Value;
                 printDoc.PrinterSettings.PrinterName = printerCombo.SelectedItem?.ToString()
                     ?? printDoc.PrinterSettings.PrinterName;
+
+                // 處理頁碼選擇
+                if (rbPrintRange.Checked)
+                {
+                    var selectedPages = ParsePageRange(txtPageRange.Text.Trim(), totalPages);
+                    if (selectedPages == null || selectedPages.Count == 0)
+                    {
+                        return; // ParsePageRange 已顯示錯誤訊息
+                    }
+
+                    // 使用 PrinterSettings 的頁碼範圍功能
+                    // PdfiumViewer 使用 0-based 頁碼，PrinterSettings 使用 1-based
+                    var sortedPages = selectedPages.OrderBy(p => p).ToList();
+
+                    printDoc.PrinterSettings.PrintRange = System.Drawing.Printing.PrintRange.SomePages;
+                    printDoc.PrinterSettings.FromPage = sortedPages.First();
+                    printDoc.PrinterSettings.ToPage = sortedPages.Last();
+
+                    // 若是非連續頁碼，需使用 PrintPage 事件來跳過不需要的頁面
+                    if (sortedPages.Count != (sortedPages.Last() - sortedPages.First() + 1))
+                    {
+                        // 非連續頁碼：使用自訂列印邏輯
+                        printDoc.PrinterSettings.PrintRange = System.Drawing.Printing.PrintRange.AllPages;
+                        int printPageIndex = 0;
+
+                        printDoc.PrintPage += (s, pe) =>
+                        {
+                            // 跳過不在選擇清單中的頁面
+                            while (printPageIndex < totalPages && !selectedPages.Contains(printPageIndex + 1))
+                            {
+                                printPageIndex++;
+                            }
+
+                            if (printPageIndex >= totalPages)
+                            {
+                                pe.HasMorePages = false;
+                                return;
+                            }
+
+                            printPageIndex++;
+
+                            // 檢查是否還有更多需要列印的頁面
+                            bool hasMore = false;
+                            for (int i = printPageIndex; i < totalPages; i++)
+                            {
+                                if (selectedPages.Contains(i + 1))
+                                {
+                                    hasMore = true;
+                                    break;
+                                }
+                            }
+                            pe.HasMorePages = hasMore;
+                        };
+                    }
+                }
+
                 printDoc.Print();
                 previewForm.Close();
             };
@@ -184,10 +313,100 @@ namespace invoicing.Service
             controlPanel.Controls.Add(copiesLabel);
             controlPanel.Controls.Add(copiesInput);
             controlPanel.Controls.Add(printButton);
+            controlPanel.Controls.Add(rbPrintAll);
+            controlPanel.Controls.Add(rbPrintRange);
+            controlPanel.Controls.Add(txtPageRange);
+            controlPanel.Controls.Add(lblTotalPages);
+            controlPanel.Controls.Add(lblFormatHint);
 
             previewForm.Controls.Add(pdfViewer);
             previewForm.Controls.Add(controlPanel);
             previewForm.ShowDialog();
+        }
+
+        /// <summary>
+        /// 解析使用者輸入的頁碼範圍字串
+        /// 支援格式：2（單頁）、1,3,5（多頁）、2-4（範圍）、1-3,5（混合）
+        /// </summary>
+        /// <param name="input">使用者輸入的頁碼字串</param>
+        /// <param name="totalPages">PDF 總頁數</param>
+        /// <returns>有效頁碼的集合（1-based），無效時回傳 null</returns>
+        private static HashSet<int>? ParsePageRange(string input, int totalPages)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                MessageBox.Show("請輸入頁碼", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return null;
+            }
+
+            var pages = new HashSet<int>();
+            // 以逗號分隔各區段
+            var segments = input.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+            foreach (var segment in segments)
+            {
+                if (segment.Contains('-'))
+                {
+                    // 範圍格式，例如 "2-4"
+                    var parts = segment.Split('-', StringSplitOptions.TrimEntries);
+                    if (parts.Length != 2
+                        || !int.TryParse(parts[0], out int rangeStart)
+                        || !int.TryParse(parts[1], out int rangeEnd))
+                    {
+                        MessageBox.Show(
+                            $"頁碼格式錯誤：「{segment}」\n\n" +
+                            "支援的格式：\n" +
+                            "  • 單頁：2\n" +
+                            "  • 多頁：1,3,5\n" +
+                            "  • 範圍：2-4（第2頁到第4頁）\n" +
+                            "  • 混合：1-3,5",
+                            "頁碼格式錯誤", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return null;
+                    }
+
+                    if (rangeStart > rangeEnd)
+                    {
+                        MessageBox.Show(
+                            $"頁碼範圍錯誤：起始頁 {rangeStart} 大於結束頁 {rangeEnd}",
+                            "頁碼格式錯誤", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return null;
+                    }
+
+                    for (int p = rangeStart; p <= rangeEnd; p++)
+                    {
+                        pages.Add(p);
+                    }
+                }
+                else
+                {
+                    // 單頁格式，例如 "2"
+                    if (!int.TryParse(segment, out int page))
+                    {
+                        MessageBox.Show(
+                            $"頁碼格式錯誤：「{segment}」\n\n" +
+                            "支援的格式：\n" +
+                            "  • 單頁：2\n" +
+                            "  • 多頁：1,3,5\n" +
+                            "  • 範圍：2-4（第2頁到第4頁）\n" +
+                            "  • 混合：1-3,5",
+                            "頁碼格式錯誤", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return null;
+                    }
+                    pages.Add(page);
+                }
+            }
+
+            // 驗證頁碼是否在有效範圍內
+            var outOfRange = pages.Where(p => p < 1 || p > totalPages).ToList();
+            if (outOfRange.Count > 0)
+            {
+                MessageBox.Show(
+                    $"以下頁碼超出有效範圍（1 ~ {totalPages}）：{string.Join(", ", outOfRange)}",
+                    "頁碼範圍錯誤", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return null;
+            }
+
+            return pages;
         }
 
         /// <summary>
@@ -384,7 +603,7 @@ namespace invoicing.Service
                             row.RelativeItem().Text($"備註：{request.Remark}");
                             if (!string.IsNullOrEmpty(request.TotalAmount) && request.TotalAmount != "0")
                             {
-                                row.ConstantItem(150).AlignRight().Text($"總計：{request.TotalAmount}").Bold();
+                                row.ConstantItem(150).PaddingRight(50).AlignRight().Text($"總計：{request.TotalAmount}").Bold();
                             }
                         });
                     });
@@ -400,7 +619,7 @@ namespace invoicing.Service
                             row.RelativeItem().Text($"備註：{request.Remark}");
                             if (!string.IsNullOrEmpty(request.TotalAmount) && request.TotalAmount != "0")
                             {
-                                row.ConstantItem(150).AlignRight().Text($"總計：{request.TotalAmount}").Bold();
+                                row.ConstantItem(150).PaddingRight(50).AlignRight().Text($"總計：{request.TotalAmount}").Bold();
                             }
                         });
                     });
