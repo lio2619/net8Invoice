@@ -16,8 +16,6 @@ namespace invoicing.Service
 
         // 每頁最大筆數
         private const int MaxRowsPerPage = 40;
-        // 小於等於此筆數時，表尾位置調整至頁面中間
-        private const int SmallPageThreshold = 16;
 
         static PrintService()
         {
@@ -52,10 +50,8 @@ namespace invoicing.Service
                     // 計算這一頁實際有多少筆資料
                     int itemsOnThisPage = Math.Min(MaxRowsPerPage, totalItems - startIndex);
 
-                    // 【修改重點 1】判斷這一頁是否使用中間表尾
-                    // 邏輯改為：只要這一頁筆數少於等於 16 筆，就使用中間表尾 (不管是不是最後一頁)
-                    // 由於 MaxRowsPerPage = 40，所以前幾頁通常筆數都是 40 (>16)，會自動跑到頁尾
-                    bool useMiddleFooter = itemsOnThisPage < SmallPageThreshold && itemsOnThisPage > 0;
+                    // 筆數 < 16：表尾嵌入 Content 中間；筆數 >= 16：表尾推到 Content 底部
+                    bool useMiddleFooter = itemsOnThisPage < 16;
 
                     container.Page(page =>
                     {
@@ -65,23 +61,7 @@ namespace invoicing.Service
 
                         page.Header().Element(c => ComposeHeaderWithPageNumber(c, request, currentPage, totalPages));
 
-                        // 傳入 useMiddleFooter，如果是 True，ComposeContentPaged 內部會畫出中間表尾
                         page.Content().Element(c => ComposeContentPaged(c, request, startIndex, itemsOnThisPage, useMiddleFooter));
-
-                        // 【修改重點 2 & 3】每一頁都執行 Footer 設定
-                        page.Footer().Element(c =>
-                        {
-                            // 如果這頁使用的是中間表尾 (useMiddleFooter == true)，這裡就留空，避免重複顯示
-                            if (useMiddleFooter)
-                            {
-                                // 空的 Element，因為表尾已經畫在 Content 裡了
-                            }
-                            else
-                            {
-                                // 如果資料多，表尾就畫在頁面最底部
-                                ComposeFooter(c, request);
-                            }
-                        });
                     });
 
                     itemIndex += itemsOnThisPage;
@@ -115,7 +95,7 @@ namespace invoicing.Service
                 Document = pdfDocument
             };
 
-            // 控制面板 (包含列印按鈕與份數選擇)
+            // 控制面板 (包含印表機選擇、列印份數與列印按鈕)
             var controlPanel = new Panel
             {
                 Dock = DockStyle.Bottom,
@@ -123,12 +103,48 @@ namespace invoicing.Service
                 Padding = new Padding(10)
             };
 
+            // 印表機標籤
+            var printerLabel = new Label
+            {
+                Text = "印表機:",
+                AutoSize = true,
+                Location = new Point(20, 18),
+                Font = new Font("Microsoft JhengHei UI", 12F)
+            };
+
+            // 印表機選擇下拉選單
+            var printerCombo = new ComboBox
+            {
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                Location = new Point(110, 15),
+                Width = 250,
+                Font = new Font("Microsoft JhengHei UI", 10F)
+            };
+
+            // 列舉系統中所有已安裝的印表機
+            foreach (string printerName in System.Drawing.Printing.PrinterSettings.InstalledPrinters)
+            {
+                printerCombo.Items.Add(printerName);
+            }
+
+            // 預設選取系統預設印表機
+            var defaultPrinter = new System.Drawing.Printing.PrinterSettings().PrinterName;
+            int defaultIndex = printerCombo.Items.IndexOf(defaultPrinter);
+            if (defaultIndex >= 0)
+            {
+                printerCombo.SelectedIndex = defaultIndex;
+            }
+            else if (printerCombo.Items.Count > 0)
+            {
+                printerCombo.SelectedIndex = 0;
+            }
+
             // 份數標籤
             var copiesLabel = new Label
             {
-                Text = "列印份數:",
+                Text = "份數:",
                 AutoSize = true,
-                Location = new Point(20, 18),
+                Location = new Point(380, 18),
                 Font = new Font("Microsoft JhengHei UI", 12F)
             };
 
@@ -138,8 +154,8 @@ namespace invoicing.Service
                 Minimum = 1,
                 Maximum = 100,
                 Value = copies,
-                Location = new Point(120, 15),
-                Width = 80,
+                Location = new Point(440, 15),
+                Width = 60,
                 Font = new Font("Microsoft JhengHei UI", 12F)
             };
 
@@ -147,7 +163,7 @@ namespace invoicing.Service
             var printButton = new Button
             {
                 Text = "列印",
-                Location = new Point(220, 10),
+                Location = new Point(520, 10),
                 Width = 100,
                 Height = 35,
                 Font = new Font("Microsoft JhengHei UI", 12F)
@@ -157,20 +173,14 @@ namespace invoicing.Service
             {
                 using var printDoc = pdfDocument.CreatePrintDocument();
                 printDoc.PrinterSettings.Copies = (short)copiesInput.Value;
-
-                var printDialog = new PrintDialog
-                {
-                    Document = printDoc,
-                    UseEXDialog = true
-                };
-
-                if (printDialog.ShowDialog() == DialogResult.OK)
-                {
-                    printDoc.PrinterSettings.Copies = (short)copiesInput.Value; // 確保列印對話框確認後再次設定份數
-                    printDoc.Print();
-                }
+                printDoc.PrinterSettings.PrinterName = printerCombo.SelectedItem?.ToString()
+                    ?? printDoc.PrinterSettings.PrinterName;
+                printDoc.Print();
+                previewForm.Close();
             };
 
+            controlPanel.Controls.Add(printerLabel);
+            controlPanel.Controls.Add(printerCombo);
             controlPanel.Controls.Add(copiesLabel);
             controlPanel.Controls.Add(copiesInput);
             controlPanel.Controls.Add(printButton);
@@ -236,7 +246,7 @@ namespace invoicing.Service
         {
             var isPurchaseOrder = request.OrderType == "採購單";
             int columnCount = isPurchaseOrder ? 5 : 7;
-            // 設定固定顯示位置的門檻值
+            // 設定固定顯示位置的門檻值（少於此筆數時填充空白行）
             const int FixedRowThreshold = 16;
 
             container.Column(column =>
@@ -363,10 +373,10 @@ namespace invoicing.Service
                     }
                 });
 
-                // 加入一些垂直間距，讓表尾顯示在表格下方（中間位置）
+                // 筆數 < 16 時，表尾嵌入 Content 中間（緊接資料 + 空白行之後）
                 if (includeFooterInMiddle)
                 {
-                    column.Item().PaddingTop(0).Column(footerColumn =>
+                    column.Item().TranslateY(-10).PaddingTop(0).Column(footerColumn =>
                     {
                         footerColumn.Item().LineHorizontal(1);
                         footerColumn.Item().PaddingTop(0).Row(row =>
@@ -379,26 +389,22 @@ namespace invoicing.Service
                         });
                     });
                 }
-            });
-        }
-
-        /// <summary>
-        /// 繪製表尾（固定在頁面底部）
-        /// </summary>
-        private void ComposeFooter(IContainer container, PrintInvoiceRequest request)
-        {
-            container.Column(column =>
-            {
-                column.Item().PaddingTop(-12).LineHorizontal(1);
-
-                column.Item().PaddingTop(-10).Row(row =>
+                else
                 {
-                    row.RelativeItem().Text($"備註：{request.Remark}");
-                    if (!string.IsNullOrEmpty(request.TotalAmount) && request.TotalAmount != "0")
+                    // 筆數 >= 16 時，使用 ExtendVertical + AlignBottom 將表尾推到 Content 區域底部
+                    column.Item().ExtendVertical().AlignBottom().PaddingBottom(20).Column(footerColumn =>
                     {
-                        row.ConstantItem(150).AlignRight().Text($"總計：{request.TotalAmount}").Bold();
-                    }
-                });
+                        footerColumn.Item().LineHorizontal(1);
+                        footerColumn.Item().PaddingTop(2).Row(row =>
+                        {
+                            row.RelativeItem().Text($"備註：{request.Remark}");
+                            if (!string.IsNullOrEmpty(request.TotalAmount) && request.TotalAmount != "0")
+                            {
+                                row.ConstantItem(150).AlignRight().Text($"總計：{request.TotalAmount}").Bold();
+                            }
+                        });
+                    });
+                }
             });
         }
 

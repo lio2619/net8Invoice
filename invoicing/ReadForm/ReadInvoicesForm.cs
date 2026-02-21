@@ -29,6 +29,11 @@ namespace invoicing.ReadForm
         /// </summary>
         private List<InvoicingDTO> _invoicingData = new();
 
+        /// <summary>
+        /// 記錄上一次勾選的行索引（-1 表示尚未選取）
+        /// </summary>
+        private int _lastSelectedRowIndex = -1;
+
         public ReadInvoicesForm()
         {
             InitializeComponent();
@@ -83,6 +88,7 @@ namespace invoicing.ReadForm
         {
             btnSearch.Click += BtnSearch_Click;
             btnOK.Click += BtnOK_Click;
+            dgvReadInvoicing.CellClick += DgvReadInvoicing_CellClick;
         }
 
         /// <summary>
@@ -170,6 +176,27 @@ namespace invoicing.ReadForm
                     col.ReadOnly = true;
                 }
             }
+
+            // 重置上次選取的行索引
+            _lastSelectedRowIndex = -1;
+        }
+
+        /// <summary>
+        /// 點擊任意欄位時，僅勾選該行（單選模式，O(1) 操作）
+        /// </summary>
+        private void DgvReadInvoicing_CellClick(object? sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return;
+
+            // 取消上一次勾選的行
+            if (_lastSelectedRowIndex >= 0 && _lastSelectedRowIndex < dgvReadInvoicing.Rows.Count)
+            {
+                dgvReadInvoicing.Rows[_lastSelectedRowIndex].Cells["Select"].Value = false;
+            }
+
+            // 勾選當前點擊的行
+            dgvReadInvoicing.Rows[e.RowIndex].Cells["Select"].Value = true;
+            _lastSelectedRowIndex = e.RowIndex;
         }
 
         /// <summary>

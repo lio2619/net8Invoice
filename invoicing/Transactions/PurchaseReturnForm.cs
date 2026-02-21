@@ -510,19 +510,18 @@ namespace invoicing.Transactions
             if (_invoicingData.Count > 0)
             {
                 var result = MessageBox.Show(
-                    "是否要清空現有資料並載入選擇的單子？\n選擇「否」將追加到現有資料後面。",
+                    "是否要清空現有資料並載入選擇的單子？",
                     "載入確認",
-                    MessageBoxButtons.YesNoCancel,
+                    MessageBoxButtons.YesNo,
                     MessageBoxIcon.Question);
-
-                if (result == DialogResult.Cancel)
-                {
-                    return;
-                }
 
                 if (result == DialogResult.Yes)
                 {
                     _invoicingData.Clear();
+                }
+                else
+                {
+                    return;
                 }
             }
 
