@@ -65,6 +65,12 @@ namespace invoicing.ReadForm
             dtpStart.Value = DateTime.Today;
             dtpEnd.Value = DateTime.Today;
 
+            // 初始化九乘九篩選控制項
+            rdbOther.Checked = true;
+            cboNine.Items.AddRange(new object[] { "全部", "7503", "7235", "5231", "5331" });
+            cboNine.SelectedIndex = 0;
+            cboNine.Enabled = false;
+
             // 初始化 DataGridView
             InitializeDataGridView();
         }
@@ -89,6 +95,19 @@ namespace invoicing.ReadForm
             btnSearch.Click += BtnSearch_Click;
             btnOK.Click += BtnOK_Click;
             dgvReadInvoicing.CellClick += DgvReadInvoicing_CellClick;
+            rdbNine.CheckedChanged += RdbNine_CheckedChanged;
+        }
+
+        /// <summary>
+        /// 九乘九 RadioButton 切換事件，控制 cboNine 啟用狀態
+        /// </summary>
+        private void RdbNine_CheckedChanged(object? sender, EventArgs e)
+        {
+            cboNine.Enabled = rdbNine.Checked;
+            if (!rdbNine.Checked)
+            {
+                cboNine.SelectedIndex = 0;
+            }
         }
 
         /// <summary>
@@ -112,6 +131,25 @@ namespace invoicing.ReadForm
                 if (!string.IsNullOrEmpty(CallerOrderName))
                 {
                     query = query.Where(x => x.OrderName == CallerOrderName);
+                }
+
+                // 九乘九客戶篩選
+                if (rdbNine.Checked)
+                {
+                    // 僅顯示九乘九相關客戶
+                    query = query.Where(x => x.Customer != null && x.Customer.Contains("九乘九"));
+
+                    // 若選擇特定店號（非「全部」），進一步篩選
+                    string selectedStore = cboNine.SelectedItem?.ToString() ?? "";
+                    if (selectedStore != "全部" && !string.IsNullOrEmpty(selectedStore))
+                    {
+                        query = query.Where(x => x.Customer != null && x.Customer.Contains(selectedStore));
+                    }
+                }
+                else
+                {
+                    // 排除九乘九相關客戶
+                    query = query.Where(x => x.Customer == null || !x.Customer.Contains("九乘九"));
                 }
 
                 // 轉換為 DTO
