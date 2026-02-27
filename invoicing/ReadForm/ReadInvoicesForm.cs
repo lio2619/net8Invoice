@@ -66,10 +66,10 @@ namespace invoicing.ReadForm
             dtpEnd.Value = DateTime.Today;
 
             // 初始化九乘九篩選控制項
-            rdbOther.Checked = true;
+            rdbNine.Checked = true;
             cboNine.Items.AddRange(new object[] { "全部", "7503", "7235", "5231", "5331" });
             cboNine.SelectedIndex = 0;
-            cboNine.Enabled = false;
+            cboNine.Enabled = true;
 
             // 初始化 DataGridView
             InitializeDataGridView();

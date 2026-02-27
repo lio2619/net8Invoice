@@ -438,8 +438,16 @@ namespace invoicing.Transactions
                 }
             }
 
+            //20260227 如果沒有貨品編號才用品名作排序
+            var sortedDetails = e.SelectedDetails
+                .Select((detail, index) => new { detail, index })
+                .OrderBy(x => string.IsNullOrEmpty(x.detail.ProductCode)
+                    ? x.detail.ProductName ?? string.Empty
+                    : x.index.ToString("D10"))
+                .Select(x => x.detail);
+
             // 載入選中的明細資料
-            foreach (var detail in e.SelectedDetails)
+            foreach (var detail in sortedDetails)
             {
                 _invoicingData.Add(new InvoicingDetailDTO
                 {

@@ -277,7 +277,7 @@
             label4.Name = "label4";
             label4.Size = new Size(105, 24);
             label4.TabIndex = 3;
-            label4.Text = "現行成本：";
+            label4.Text = "標準成本：";
             // 
             // label9
             // 
@@ -289,7 +289,7 @@
             label9.Name = "label9";
             label9.Size = new Size(105, 24);
             label9.TabIndex = 8;
-            label9.Text = "標準成本：";
+            label9.Text = "現行成本：";
             // 
             // txtProductName
             // 
