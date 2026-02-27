@@ -623,13 +623,40 @@ namespace invoicing.Service
                     }
                 }
 
-                // 設定下拉選單位置（在 TextBox 下方）
+                // 設定下拉選單位置（優先在 TextBox 下方，空間不足時改為上方）
                 var textBoxScreenLocation = textBox.PointToScreen(Point.Empty);
                 var parentForm = _suggestionListBox.FindForm();
                 if (parentForm != null)
                 {
                     var locationOnForm = parentForm.PointToClient(textBoxScreenLocation);
-                    _suggestionListBox.Location = new Point(locationOnForm.X, locationOnForm.Y + textBox.Height);
+                    int listBoxHeight = _suggestionListBox.Height;
+
+                    // 計算下方顯示位置的底部邊界
+                    int belowY = locationOnForm.Y + textBox.Height;
+                    int belowBottom = belowY + listBoxHeight;
+
+                    // 取得表單客戶區域的高度
+                    int formClientHeight = parentForm.ClientSize.Height;
+
+                    if (belowBottom <= formClientHeight)
+                    {
+                        // 下方空間足夠，正常顯示在 TextBox 下方
+                        _suggestionListBox.Location = new Point(locationOnForm.X, belowY);
+                    }
+                    else
+                    {
+                        // 下方空間不足，嘗試在 TextBox 上方顯示
+                        int aboveY = locationOnForm.Y - listBoxHeight;
+                        if (aboveY >= 0)
+                        {
+                            _suggestionListBox.Location = new Point(locationOnForm.X, aboveY);
+                        }
+                        else
+                        {
+                            // 上方也不夠，固定在表單底部對齊
+                            _suggestionListBox.Location = new Point(locationOnForm.X, formClientHeight - listBoxHeight);
+                        }
+                    }
                 }
 
                 // 設定下拉選單大小
