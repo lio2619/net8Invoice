@@ -30,7 +30,7 @@ namespace invoicing.Service
             {
                 (43, 125, 0),  // 國碼
                 (331, 345, 1), // 數量
-                (407, 436, 2)  // 單價
+                (400, 436, 2)  // 單價
             };
             double minY = 232;
             double maxY = 693;
@@ -44,7 +44,7 @@ namespace invoicing.Service
                 foreach (var page in document.GetPages())
                 {
                     var words = page.GetWords().ToList();
-                    
+
                     if (words.Count < 21) continue;
 
                     var storeName = words[10].Text;
@@ -56,7 +56,7 @@ namespace invoicing.Service
                             xRanges.Any(range =>
                                 word.BoundingBox.Left >= range.MinX && word.BoundingBox.Right <= range.MaxX &&
                                 word.BoundingBox.Top >= minY && word.BoundingBox.Bottom <= maxY &&
-                                (range.CheckPattern > 0 || regex.IsMatch(word.Text)) && 
+                                (range.CheckPattern > 0 || regex.IsMatch(word.Text)) &&
                                 (range.CheckPattern < 2 || regexNumber.IsMatch(word.Text))))
                         .Select(word => word.Text);
 
@@ -65,14 +65,14 @@ namespace invoicing.Service
                         ans.AddRange(filteredWords);
                         var customerName = await GetCustomerNameAsync(storeName, number);
                         var orderNumber = await SavePdfDataAsync(ans, customerName, remarks);
-                        
+
                         results.Add(new PdfImportResult
                         {
                             CustomerName = customerName,
                             PoNumber = remarks,
                             NewOrderNumber = orderNumber
                         });
-                        
+
                         ans.Clear();
                     }
                     else
