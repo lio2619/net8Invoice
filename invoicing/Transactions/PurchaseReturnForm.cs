@@ -2,9 +2,7 @@
 
 using invoicing.Event;
 using invoicing.Models.DTO;
-using invoicing.Repository;
 using invoicing.Repository.Interface;
-using invoicing.Service;
 using invoicing.Service.Interface;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel;
@@ -161,16 +159,16 @@ namespace invoicing.Transactions
                     {
                         // 結束當前的編輯模式以確保資料可以正確顯示
                         dgvInvoicing.EndEdit();
-                        
+
                         // 強制刷新該行
                         dgvInvoicing.InvalidateRow(e.RowIndex);
-                        
+
                         // 刷新編輯控制項
                         dgvInvoicing.RefreshEdit();
-                        
+
                         // 強制更新顯示
                         dgvInvoicing.Update();
-                        
+
                         // 通知管理貨品表單（如果有開啟）
                         _eventBus.Publish(new MasterSelectEvent(productCode));
                     }
@@ -208,7 +206,7 @@ namespace invoicing.Transactions
                     row.Cells["Unit"].Value = product.Unit;
 
                     // 取得現行成本作為單價
-                    double unitPrice = (double)(product.CurrentCost ?? 0);
+                    double unitPrice = (double)(product.StandardCost ?? 0);
 
                     // 如果是「唐詣」廠商，單價除以1.05
                     if (cboCustomer.Text == SpecialSupplierName && unitPrice > 0)

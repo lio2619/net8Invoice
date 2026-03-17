@@ -42,10 +42,10 @@ namespace invoicing.Models.Entity
         [Comment("標準售價")]
         public decimal? StandardPrice { get; set; }
 
-        [Comment("標準成本")]
+        [Comment("現行成本")]
         public decimal? StandardCost { get; set; }
 
-        [Comment("現行成本")]
+        [Comment("標準成本")]
         public decimal? CurrentCost { get; set; }
 
         [Comment("箱購成本")]
