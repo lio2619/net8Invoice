@@ -182,9 +182,10 @@ namespace invoicing.Financials
                 {
                     // 取單子編號的後4位數字
                     int orderNo = 0;
-                    if (int.TryParse(d.OrderUid, out int fullOrderNo))
+                    if (!string.IsNullOrEmpty(d.OrderUid) && d.OrderUid.Length >= 4 &&
+                            int.TryParse(d.OrderUid.AsSpan(d.OrderUid.Length - 4), out int result))
                     {
-                        orderNo = fullOrderNo % 10000;
+                        orderNo = result;
                     }
                     // 組合成 日期 + 4位編號 格式
                     string transactionNumber = d.Date + orderNo.ToString("D4");
