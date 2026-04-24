@@ -110,12 +110,52 @@ namespace invoicing.Service
             string newOrderNumberStr = await GenerateNewOrderNumberAsync(dateStr, orderType);
 
             // 分組：每 3 個元素為一組（國碼、數量、單價）
-            var grouped = list
-                .Select((value, index) => new { value, index })
-                .GroupBy(x => x.index / 3)
-                .Select(g => g.Select(x => x.value).ToList())
-                .Where(g => g.Count == 3)
-                .ToList();
+            //var grouped = list
+            //    .Select((value, index) => new { value, index })
+            //    .GroupBy(x => x.index / 3)
+            //    .Select(g => g.Select(x => x.value).ToList())
+            //    .Where(g => g.Count == 3)
+            //    .ToList();
+
+            var grouped = new List<List<string>>();
+            int i = 0;
+
+            while (i < list.Count)
+            {
+                // 1. 取出數量與單價 (基本組成)
+                string qty = list[i];
+                string price = (i + 1 < list.Count) ? list[i + 1] : "0";
+
+                // 2. 檢查是否有第三個元素，且是否符合條碼規則
+                bool hasValidBarcode = false;
+                string barcode = $"空白{i}"; // 預設為空白
+
+                if (i + 2 < list.Count)
+                {
+                    string potentialBarcode = list[i + 2];
+                    // 判斷：4 開頭 且 長度為 13
+                    if (potentialBarcode.StartsWith("4") && potentialBarcode.Length == 13)
+                    {
+                        barcode = potentialBarcode;
+                        hasValidBarcode = true;
+                    }
+                }
+
+                // 3. 加入群組
+                grouped.Add(new List<string> { qty, price, barcode });
+
+                // 4. 關鍵：決定指標移動幾格
+                if (hasValidBarcode)
+                {
+                    i += 3; // 正常的組，跳過 數量、單價、條碼
+                }
+                else
+                {
+                    i += 2; // 缺條碼的組，只跳過 數量、單價，原本的 i+2 會變成下一組的 i
+                }
+            }
+
+            // 現在 finalGroups 就是對齊好的資料了
 
             decimal totalCost = 0m;
 
