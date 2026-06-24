@@ -19,8 +19,17 @@ namespace invoicing.Repository
         /// <returns></returns>
         public async Task<int> GetMaxCompanyCode()
         {
-            return await _context.Customers.Where(x => !x.IsDeleted).Select(y => Convert.ToInt32(y.CompanyCode))
-                                            .DefaultIfEmpty(0).MaxAsync();
+            // 先把需要的欄位撈回記憶體 (Client-side)
+            var companyCodes = await _context.Customers
+                .Where(x => !x.IsDeleted)
+                .Select(x => x.CompanyCode)
+                .ToListAsync(); // 這一步會真正執行 SQL 查詢
+
+            // 接下來在記憶體中做轉型與轉換，就不會觸發 LINQ 翻譯錯誤了
+            return companyCodes
+                .Select(y => int.TryParse(y, out int num) ? num : 0)
+                .DefaultIfEmpty(0)
+                .Max();
         }
     }
 }

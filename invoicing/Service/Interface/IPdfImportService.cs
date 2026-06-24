@@ -1,6 +1,3 @@
-using invoicing.Models.DTO;
-using System.Data;
-
 namespace invoicing.Service.Interface
 {
     /// <summary>
@@ -14,6 +11,13 @@ namespace invoicing.Service.Interface
         /// <param name="filePath">檔案路徑</param>
         /// <returns>匯入的訂單資料清單</returns>
         Task<List<PdfImportResult>> ImportFromPdfAsync(string filePath);
+
+        /// <summary>
+        /// 從 PDF 檔案匯入資料(新)
+        /// </summary>
+        /// <param name="filePath">檔案路徑</param>
+        /// <returns>匯入的訂單資料清單</returns>
+        Task<List<PdfImportResult>> ImportFromPdfNewAsync(string filePath);
     }
 
     /// <summary>

@@ -52,6 +52,7 @@
             JinDaMenu = new ToolStripMenuItem();
             JinDaNewMenu = new ToolStripMenuItem();
             GuanmaoMenu = new ToolStripMenuItem();
+            GuanmaoNewMenu = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             SuspendLayout();
             // 
@@ -193,7 +194,7 @@
             // 
             // 外掛ToolStripMenuItem
             // 
-            外掛ToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { TangYiMenu, JinDaMenu, JinDaNewMenu, GuanmaoMenu });
+            外掛ToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { TangYiMenu, JinDaMenu, JinDaNewMenu, GuanmaoMenu, GuanmaoNewMenu });
             外掛ToolStripMenuItem.Name = "外掛ToolStripMenuItem";
             外掛ToolStripMenuItem.Size = new Size(53, 24);
             外掛ToolStripMenuItem.Text = "外掛";
@@ -225,6 +226,13 @@
             GuanmaoMenu.Size = new Size(224, 26);
             GuanmaoMenu.Text = "關貿";
             GuanmaoMenu.Click += GuanmaoMenu_Click;
+            // 
+            // GuanmaoNewMenu
+            // 
+            GuanmaoNewMenu.Name = "GuanmaoNewMenu";
+            GuanmaoNewMenu.Size = new Size(224, 26);
+            GuanmaoNewMenu.Text = "關貿(新)";
+            GuanmaoNewMenu.Click += GuanmaoNewMenu_Click;
             // 
             // HomeScreenForm
             // 
@@ -269,5 +277,6 @@
         private ToolStripMenuItem JinDaMenu;
         private ToolStripMenuItem JinDaNewMenu;
         private ToolStripMenuItem GuanmaoMenu;
+        private ToolStripMenuItem GuanmaoNewMenu;
     }
 }

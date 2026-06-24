@@ -18,6 +18,7 @@ namespace invoicing.Service
             _dbContext = dbContext;
         }
 
+        #region 關貿
         /// <summary>
         /// 從 PDF 檔案匯入資料
         /// </summary>
@@ -47,9 +48,9 @@ namespace invoicing.Service
 
                     if (words.Count < 21) continue;
 
-                    var storeName = words[10].Text;
-                    var number = words[18].Text;
-                    var remarks = words[20].Text;
+                    var storeName = words[10].Text; //客戶名稱
+                    var number = words[18].Text;    //廠編
+                    var remarks = words[20].Text;   //單子代號
 
                     var filteredWords = words
                         .Where(word =>
@@ -60,7 +61,7 @@ namespace invoicing.Service
                                 (range.CheckPattern < 2 || regexNumber.IsMatch(word.Text))))
                         .Select(word => word.Text);
 
-                    if (words[4].Text == words[6].Text)
+                    if (words[4].Text == words[6].Text) // 這兩個是判斷目前的頁數是否是最後一頁
                     {
                         ans.AddRange(filteredWords);
                         var customerName = await GetCustomerNameAsync(storeName, number);
@@ -84,6 +85,84 @@ namespace invoicing.Service
 
             return results;
         }
+        #endregion
+
+
+        #region 關貿(新)
+        /// <summary>
+        /// 從 PDF 檔案匯入資料 (新)
+        /// </summary>
+        public async Task<List<PdfImportResult>> ImportFromPdfNewAsync(string filePath)
+        {
+            var results = new List<PdfImportResult>();
+
+            // PDF 座標範圍設定
+            var xRanges = new List<(double MinX, double MaxX, int CheckPattern)>
+            {
+                (43, 125, 0),  // 國碼
+                (331, 345, 1), // 數量
+                (400, 436, 2)  // 單價
+            };
+            double minY = 232;
+            double maxY = 693;
+
+            var regex = new Regex(@"^\d{13}$");
+            var regexNumber = new Regex(@"^\d+(\.\d+)?$");
+            var ans = new List<string>();
+
+            using (var document = PdfDocument.Open(filePath))
+            {
+                foreach (var page in document.GetPages())
+                {
+                    var words = page.GetWords().ToList();
+
+                    if (words.Count < 21) continue;
+
+                    var storeName = words[9].Text;  //客戶名稱
+                    var number = words[17].Text;    //廠編
+                    var remarks = words[19].Text;   //單子代號
+
+                    var filteredWords = words
+                        .Where(word =>
+                            xRanges.Any(range =>
+                                word.BoundingBox.Left >= range.MinX && word.BoundingBox.Right <= range.MaxX &&
+                                word.BoundingBox.Top >= minY && word.BoundingBox.Bottom <= maxY &&
+                                (range.CheckPattern > 0 || regex.IsMatch(word.Text)) &&
+                                (range.CheckPattern < 2 || regexNumber.IsMatch(word.Text))))
+                        .Select(word => word.Text);
+
+                    var temp = words[5].Text.LastOrDefault();
+                    string totalPageNumber = string.Empty;
+                    if (temp != '\0')
+                    {
+                        totalPageNumber = temp.ToString();
+                    }
+
+                    if (words[4].Text == totalPageNumber) // 這兩個是判斷目前的頁數是否是最後一頁
+                    {
+                        ans.AddRange(filteredWords);
+                        var customerName = await GetCustomerNameAsync(storeName, number);
+                        var orderNumber = await SavePdfDataAsync(ans, customerName, remarks);
+
+                        results.Add(new PdfImportResult
+                        {
+                            CustomerName = customerName,
+                            PoNumber = remarks,
+                            NewOrderNumber = orderNumber
+                        });
+
+                        ans.Clear();
+                    }
+                    else
+                    {
+                        ans.AddRange(filteredWords);
+                    }
+                }
+            }
+
+            return results;
+        }
+        #endregion
 
         /// <summary>
         /// 取得客戶名稱
