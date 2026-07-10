@@ -113,6 +113,11 @@ namespace invoicing
             OpenForm<GuanmaoNewForm>();
         }
 
+        private void ComparePriceMenu_Click(object sender, EventArgs e)
+        {
+            OpenForm<ComparePriceForm>();
+        }
+
         /// <summary>
         /// 判斷該視窗是否已經顯示在畫面上了，若沒有就呼叫該視窗，若有就不用管該請求
         /// </summary>

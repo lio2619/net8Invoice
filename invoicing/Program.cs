@@ -89,6 +89,7 @@ namespace invoicing
             services.AddTransient<JinDaNewForm>();
             services.AddTransient<GuanmaoForm>();
             services.AddTransient<GuanmaoNewForm>();
+            services.AddTransient<ComparePriceForm>();
 
             //事件註冊
             services.AddSingleton<EventBus>();

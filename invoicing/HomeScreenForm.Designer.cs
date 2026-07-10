@@ -53,16 +53,18 @@
             JinDaNewMenu = new ToolStripMenuItem();
             GuanmaoMenu = new ToolStripMenuItem();
             GuanmaoNewMenu = new ToolStripMenuItem();
+            ComparePriceMenu = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // menuStrip1
             // 
             menuStrip1.ImageScalingSize = new Size(20, 20);
-            menuStrip1.Items.AddRange(new ToolStripItem[] { 客戶資料ToolStripMenuItem, 商品資料ToolStripMenuItem, 廠商資料ToolStripMenuItem, SalesDeliveryMenu, PurchaseReceiptMenu, PurchaseOrderMenu, SalesOrderMenu, SalesReturnMenu, PurchaseReturnMenu, TotalPurchasesMenu, TotalSalesMenu, AccountsReceivableMenu, 外掛ToolStripMenuItem });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { 客戶資料ToolStripMenuItem, 商品資料ToolStripMenuItem, 廠商資料ToolStripMenuItem, SalesDeliveryMenu, PurchaseReceiptMenu, PurchaseOrderMenu, SalesOrderMenu, SalesReturnMenu, PurchaseReturnMenu, TotalPurchasesMenu, TotalSalesMenu, AccountsReceivableMenu, 外掛ToolStripMenuItem, ComparePriceMenu });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(1207, 28);
+            menuStrip1.Padding = new Padding(5, 2, 0, 2);
+            menuStrip1.Size = new Size(1050, 24);
             menuStrip1.TabIndex = 1;
             menuStrip1.Text = "menuStrip1";
             // 
@@ -70,20 +72,20 @@
             // 
             客戶資料ToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { CustomerMangeMenu, CustomerMenu });
             客戶資料ToolStripMenuItem.Name = "客戶資料ToolStripMenuItem";
-            客戶資料ToolStripMenuItem.Size = new Size(83, 24);
+            客戶資料ToolStripMenuItem.Size = new Size(67, 20);
             客戶資料ToolStripMenuItem.Text = "客戶資料";
             // 
             // CustomerMangeMenu
             // 
             CustomerMangeMenu.Name = "CustomerMangeMenu";
-            CustomerMangeMenu.Size = new Size(152, 26);
+            CustomerMangeMenu.Size = new Size(122, 22);
             CustomerMangeMenu.Text = "個別資料";
             CustomerMangeMenu.Click += CustomerMangeMenu_Click;
             // 
             // CustomerMenu
             // 
             CustomerMenu.Name = "CustomerMenu";
-            CustomerMenu.Size = new Size(152, 26);
+            CustomerMenu.Size = new Size(122, 22);
             CustomerMenu.Text = "全部資料";
             CustomerMenu.Click += CustomerMenu_Click;
             // 
@@ -91,20 +93,20 @@
             // 
             商品資料ToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { ProductMangeMenu, ProductMenu });
             商品資料ToolStripMenuItem.Name = "商品資料ToolStripMenuItem";
-            商品資料ToolStripMenuItem.Size = new Size(83, 24);
+            商品資料ToolStripMenuItem.Size = new Size(67, 20);
             商品資料ToolStripMenuItem.Text = "商品資料";
             // 
             // ProductMangeMenu
             // 
             ProductMangeMenu.Name = "ProductMangeMenu";
-            ProductMangeMenu.Size = new Size(152, 26);
+            ProductMangeMenu.Size = new Size(122, 22);
             ProductMangeMenu.Text = "貨品資料";
             ProductMangeMenu.Click += ProductMangeMenu_Click;
             // 
             // ProductMenu
             // 
             ProductMenu.Name = "ProductMenu";
-            ProductMenu.Size = new Size(152, 26);
+            ProductMenu.Size = new Size(122, 22);
             ProductMenu.Text = "查詢貨品";
             ProductMenu.Click += ProductMenu_Click;
             // 
@@ -112,83 +114,83 @@
             // 
             廠商資料ToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { SupplierMangeMenu, SupplierMenu });
             廠商資料ToolStripMenuItem.Name = "廠商資料ToolStripMenuItem";
-            廠商資料ToolStripMenuItem.Size = new Size(83, 24);
+            廠商資料ToolStripMenuItem.Size = new Size(67, 20);
             廠商資料ToolStripMenuItem.Text = "廠商資料";
             // 
             // SupplierMangeMenu
             // 
             SupplierMangeMenu.Name = "SupplierMangeMenu";
-            SupplierMangeMenu.Size = new Size(152, 26);
+            SupplierMangeMenu.Size = new Size(122, 22);
             SupplierMangeMenu.Text = "個別資料";
             SupplierMangeMenu.Click += SupplierMangeMenu_Click;
             // 
             // SupplierMenu
             // 
             SupplierMenu.Name = "SupplierMenu";
-            SupplierMenu.Size = new Size(152, 26);
+            SupplierMenu.Size = new Size(122, 22);
             SupplierMenu.Text = "全部資料";
             SupplierMenu.Click += SupplierMenu_Click;
             // 
             // SalesDeliveryMenu
             // 
             SalesDeliveryMenu.Name = "SalesDeliveryMenu";
-            SalesDeliveryMenu.Size = new Size(68, 24);
+            SalesDeliveryMenu.Size = new Size(55, 20);
             SalesDeliveryMenu.Text = "出貨單";
             SalesDeliveryMenu.Click += SalesDeliveryMenu_Click;
             // 
             // PurchaseReceiptMenu
             // 
             PurchaseReceiptMenu.Name = "PurchaseReceiptMenu";
-            PurchaseReceiptMenu.Size = new Size(68, 24);
+            PurchaseReceiptMenu.Size = new Size(55, 20);
             PurchaseReceiptMenu.Text = "進貨單";
             PurchaseReceiptMenu.Click += PurchaseReceiptMenu_Click;
             // 
             // PurchaseOrderMenu
             // 
             PurchaseOrderMenu.Name = "PurchaseOrderMenu";
-            PurchaseOrderMenu.Size = new Size(68, 24);
+            PurchaseOrderMenu.Size = new Size(55, 20);
             PurchaseOrderMenu.Text = "採購單";
             PurchaseOrderMenu.Click += PurchaseOrderMenu_Click;
             // 
             // SalesOrderMenu
             // 
             SalesOrderMenu.Name = "SalesOrderMenu";
-            SalesOrderMenu.Size = new Size(68, 24);
+            SalesOrderMenu.Size = new Size(55, 20);
             SalesOrderMenu.Text = "訂貨單";
             SalesOrderMenu.Click += SalesOrderMenu_Click;
             // 
             // SalesReturnMenu
             // 
             SalesReturnMenu.Name = "SalesReturnMenu";
-            SalesReturnMenu.Size = new Size(98, 24);
+            SalesReturnMenu.Size = new Size(79, 20);
             SalesReturnMenu.Text = "出貨退回單";
             SalesReturnMenu.Click += SalesReturnMenu_Click;
             // 
             // PurchaseReturnMenu
             // 
             PurchaseReturnMenu.Name = "PurchaseReturnMenu";
-            PurchaseReturnMenu.Size = new Size(98, 24);
+            PurchaseReturnMenu.Size = new Size(79, 20);
             PurchaseReturnMenu.Text = "進貨退出單";
             PurchaseReturnMenu.Click += PurchaseReturnMenu_Click;
             // 
             // TotalPurchasesMenu
             // 
             TotalPurchasesMenu.Name = "TotalPurchasesMenu";
-            TotalPurchasesMenu.Size = new Size(83, 24);
+            TotalPurchasesMenu.Size = new Size(67, 20);
             TotalPurchasesMenu.Text = "總進貨額";
             TotalPurchasesMenu.Click += TotalPurchasesMenu_Click;
             // 
             // TotalSalesMenu
             // 
             TotalSalesMenu.Name = "TotalSalesMenu";
-            TotalSalesMenu.Size = new Size(83, 24);
+            TotalSalesMenu.Size = new Size(67, 20);
             TotalSalesMenu.Text = "總銷貨額";
             TotalSalesMenu.Click += TotalSalesMenu_Click;
             // 
             // AccountsReceivableMenu
             // 
             AccountsReceivableMenu.Name = "AccountsReceivableMenu";
-            AccountsReceivableMenu.Size = new Size(83, 24);
+            AccountsReceivableMenu.Size = new Size(67, 20);
             AccountsReceivableMenu.Text = "應收帳款";
             AccountsReceivableMenu.Click += AccountsReceivableMenu_Click;
             // 
@@ -196,52 +198,60 @@
             // 
             外掛ToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { TangYiMenu, JinDaMenu, JinDaNewMenu, GuanmaoMenu, GuanmaoNewMenu });
             外掛ToolStripMenuItem.Name = "外掛ToolStripMenuItem";
-            外掛ToolStripMenuItem.Size = new Size(53, 24);
+            外掛ToolStripMenuItem.Size = new Size(43, 20);
             外掛ToolStripMenuItem.Text = "外掛";
             // 
             // TangYiMenu
             // 
             TangYiMenu.Name = "TangYiMenu";
-            TangYiMenu.Size = new Size(224, 26);
+            TangYiMenu.Size = new Size(118, 22);
             TangYiMenu.Text = "唐詣";
             TangYiMenu.Click += TangYiMenu_Click;
             // 
             // JinDaMenu
             // 
             JinDaMenu.Name = "JinDaMenu";
-            JinDaMenu.Size = new Size(224, 26);
+            JinDaMenu.Size = new Size(118, 22);
             JinDaMenu.Text = "金大";
             JinDaMenu.Click += JinDaMenu_Click;
             // 
             // JinDaNewMenu
             // 
             JinDaNewMenu.Name = "JinDaNewMenu";
-            JinDaNewMenu.Size = new Size(224, 26);
+            JinDaNewMenu.Size = new Size(118, 22);
             JinDaNewMenu.Text = "金大(新)";
             JinDaNewMenu.Click += JinDaNewMenu_Click;
             // 
             // GuanmaoMenu
             // 
             GuanmaoMenu.Name = "GuanmaoMenu";
-            GuanmaoMenu.Size = new Size(224, 26);
+            GuanmaoMenu.Size = new Size(118, 22);
             GuanmaoMenu.Text = "關貿";
             GuanmaoMenu.Click += GuanmaoMenu_Click;
             // 
             // GuanmaoNewMenu
             // 
             GuanmaoNewMenu.Name = "GuanmaoNewMenu";
-            GuanmaoNewMenu.Size = new Size(224, 26);
+            GuanmaoNewMenu.Size = new Size(118, 22);
             GuanmaoNewMenu.Text = "關貿(新)";
             GuanmaoNewMenu.Click += GuanmaoNewMenu_Click;
             // 
+            // ComparePriceMenu
+            // 
+            ComparePriceMenu.Name = "ComparePriceMenu";
+            ComparePriceMenu.Size = new Size(43, 20);
+            ComparePriceMenu.Text = "比價";
+            ComparePriceMenu.Click += ComparePriceMenu_Click;
+            // 
             // HomeScreenForm
             // 
-            AutoScaleDimensions = new SizeF(9F, 19F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1207, 450);
+            ClientSize = new Size(1050, 355);
             Controls.Add(menuStrip1);
             IsMdiContainer = true;
             MainMenuStrip = menuStrip1;
+            Margin = new Padding(2);
             Name = "HomeScreenForm";
             Text = "進銷存";
             WindowState = FormWindowState.Maximized;
@@ -278,5 +288,6 @@
         private ToolStripMenuItem JinDaNewMenu;
         private ToolStripMenuItem GuanmaoMenu;
         private ToolStripMenuItem GuanmaoNewMenu;
+        private ToolStripMenuItem ComparePriceMenu;
     }
 }
