@@ -1,4 +1,4 @@
-﻿//所有廠商資料
+//所有廠商資料
 
 using invoicing.Event;
 using invoicing.Models.DTO;
@@ -36,8 +36,37 @@ namespace invoicing.MasterData
             dgvSupplierAll.DataSource = supplierData;
             dgvSupplierAll.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             dgvSupplierAll.DefaultCellStyle.Font = new Font("Microsoft JhengHei", 12);
+
+            // 訂閱廠商選取事件，支援廠商管理資料切換時之雙向定位
+            _eventBus.Subscribe<SupplierSelectEvent>(OnSupplierSelectedFromOtherForm);
         }
 
+        /// <summary>
+        /// 當廠商管理資料切換或搜尋廠商時，同步定位廠商清單表格
+        /// </summary>
+        private void OnSupplierSelectedFromOtherForm(SupplierSelectEvent evt)
+        {
+            if (evt.Sender == this || string.IsNullOrWhiteSpace(evt.FullyName)) return;
+
+            var row = dgvSupplierAll.Rows.Cast<DataGridViewRow>()
+                        .Where(r => !r.IsNewRow)
+                        .FirstOrDefault(r =>
+                            r.Cells[nameof(SupplierDTO.CompanyFullName)].Value != null &&
+                            string.Equals(r.Cells[nameof(SupplierDTO.CompanyFullName)].Value.ToString(), evt.FullyName, StringComparison.OrdinalIgnoreCase));
+
+            if (row != null)
+            {
+                dgvSupplierAll.CurrentCell = row.Cells[0];
+                dgvSupplierAll.FirstDisplayedScrollingRowIndex = row.Index;
+            }
+        }
+
+        protected override void OnFormClosed(FormClosedEventArgs e)
+        {
+            // 退訂事件以防止記憶體洩漏
+            _eventBus.Unsubscribe<SupplierSelectEvent>(OnSupplierSelectedFromOtherForm);
+            base.OnFormClosed(e);
+        }
 
         private void txtInput_TextChanged(object sender, EventArgs e)
         {
@@ -71,8 +100,8 @@ namespace invoicing.MasterData
             if (string.IsNullOrEmpty(companyName))
                 return;
 
-            // 觸發事件
-            _eventBus.Publish(new MasterSelectEvent(companyName));
+            // 發布強型別廠商選取事件（標記自身為 Sender 避免遞迴）
+            _eventBus.Publish(new SupplierSelectEvent(companyName, this));
         }
     }
 }

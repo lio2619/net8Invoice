@@ -1,4 +1,4 @@
-﻿//金大新
+//金大新
 
 using invoicing.Event;
 using invoicing.Models.DTO;
@@ -105,6 +105,39 @@ namespace invoicing.PlugIn
 
                 _sourceTable = importedData.SourceTable;
                 lblAmount.Text = importedData.TotalAmount.ToString();
+
+                // 【比價檢查機制】：若有虧損商品或成本未設定商品，在表格標註並自動跳出詳細清單視窗
+                if (importedData.CompareDisplayRows != null && importedData.CompareDisplayRows.Count > 0)
+                {
+                    var abnormalDict = importedData.CompareDisplayRows
+                        .GroupBy(r => r.Barcode)
+                        .ToDictionary(g => g.Key, g => g.First());
+
+                    for (int i = 0; i < dgvInvoicing.Rows.Count; i++)
+                    {
+                        var row = dgvInvoicing.Rows[i];
+                        if (row.IsNewRow) continue;
+                        string code = row.Cells[0].Value?.ToString() ?? "";
+                        if (abnormalDict.TryGetValue(code, out var compareRow))
+                        {
+                            if (compareRow.IsBelowCost)
+                            {
+                                // 虧本商品標記為淡紅色背景與紅字
+                                row.DefaultCellStyle.BackColor = Color.MistyRose;
+                                row.DefaultCellStyle.ForeColor = Color.DarkRed;
+                            }
+                            else if (compareRow.IsCostNotSet)
+                            {
+                                // 成本未設定商品標記為淡黃色背景
+                                row.DefaultCellStyle.BackColor = Color.LightYellow;
+                            }
+                        }
+                    }
+
+                    // 自動彈出比價詳細清單視窗
+                    using var compareForm = new ComparePriceForm(importedData.CompareDisplayRows, "金大(新) Excel 成本比價結果");
+                    compareForm.ShowDialog(this);
+                }
             }
             catch (Exception ex)
             {
@@ -415,8 +448,8 @@ namespace invoicing.PlugIn
             if (string.IsNullOrEmpty(productCode))
                 return;
 
-            // 觸發事件
-            _eventBus.Publish(new MasterSelectEvent(productCode));
+            // 發布產品專屬事件，通知產品管理表單
+            _eventBus.Publish(new ProductSelectEvent(productCode, this));
         }
 
         #endregion

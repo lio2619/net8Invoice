@@ -1,4 +1,4 @@
-﻿//管理廠商資料
+//管理廠商資料
 
 using invoicing.Event;
 using invoicing.Models.Entity;
@@ -31,52 +31,73 @@ namespace invoicing.MasterData
             _formUIService.AddTextBoxUnderline(txtSupplierTel);
             _formUIService.AddTextBoxUnderline(txtSupplierFax);
 
-            //訂閱事件
-            _eventBus.Subscribe<MasterSelectEvent>(OnSupplierSelected);
+            // 訂閱廠商專屬事件，避免接收到其他領域事件干擾
+            _eventBus.Subscribe<SupplierSelectEvent>(OnSupplierSelected);
         }
 
-        private void OnSupplierSelected(MasterSelectEvent masterSelectEvent)
+        private async void OnSupplierSelected(SupplierSelectEvent evt)
         {
-            SearchAsync(masterSelectEvent.FullyName);
+            if (evt.Sender == this || string.IsNullOrWhiteSpace(evt.FullyName)) return;
+
+            // 僅同步連動更新表單資料，不呼叫 BringToFront() 與 Activate() 移動至最上層或搶奪焦點，
+            // 避免干擾使用者在其他作業表單（如進貨單、採購單等）上的操作流程
+            await SearchAsync(evt.FullyName, notifyOtherForms: false);
         }
 
         protected override void OnFormClosed(FormClosedEventArgs e)
         {
             // 記得退訂，避免記憶體洩漏
-            _eventBus.Unsubscribe<MasterSelectEvent>(OnSupplierSelected);
+            _eventBus.Unsubscribe<SupplierSelectEvent>(OnSupplierSelected);
             base.OnFormClosed(e);
         }
 
-        private async Task SearchAsync(string companyName)
+        private async Task<bool> SearchAsync(string companyName, bool notifyOtherForms = true)
         {
             if (string.IsNullOrWhiteSpace(companyName))
             {
                 MessageBox.Show("請輸入廠商名稱", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
+                return false;
             }
 
-            var supplier = await _supplierRepository.Get(x => x.CompanyFullName == companyName)
-                                                    .Select(
-                                                        y => new
-                                                        {
-                                                            y.CompanyCode,
-                                                            y.CompanyFullName,
-                                                            y.DeliveryAddress,
-                                                            y.Phone1,
-                                                            y.FaxNumber
-                                                        })
-                                                    .FirstOrDefaultAsync();
-            if (supplier is not null)
+            try
             {
-                lblSupplierIdValue.Text = supplier.CompanyCode;
-                txtSupplierName.Text = supplier.CompanyFullName;
-                txtSupplierAddress.Text = supplier.DeliveryAddress;
-                txtSupplierTel.Text = supplier.Phone1;
-                txtSupplierFax.Text = supplier.FaxNumber;
+                var supplier = await _supplierRepository.Get(x => x.CompanyFullName == companyName)
+                                                        .Select(
+                                                            y => new
+                                                            {
+                                                                y.CompanyCode,
+                                                                y.CompanyFullName,
+                                                                y.DeliveryAddress,
+                                                                y.Phone1,
+                                                                y.FaxNumber
+                                                            })
+                                                        .FirstOrDefaultAsync();
+                if (supplier is not null)
+                {
+                    lblSupplierIdValue.Text = supplier.CompanyCode;
+                    txtSupplierName.Text = supplier.CompanyFullName;
+                    txtSupplierAddress.Text = supplier.DeliveryAddress;
+                    txtSupplierTel.Text = supplier.Phone1;
+                    txtSupplierFax.Text = supplier.FaxNumber;
+
+                    // 若是由管理表單主動搜尋，雙向通知廠商清單表單同步定位
+                    if (notifyOtherForms && !string.IsNullOrEmpty(supplier.CompanyFullName))
+                    {
+                        _eventBus.Publish(new SupplierSelectEvent(supplier.CompanyFullName, this));
+                    }
+
+                    return true;
+                }
+                else
+                {
+                    MessageBox.Show("找不到此廠商", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show("找不到此廠商", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"查詢廠商發生錯誤：{ex.Message}", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
             }
         }
 

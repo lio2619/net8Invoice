@@ -1,4 +1,4 @@
-﻿using invoicing.Financials;
+using invoicing.Financials;
 using invoicing.MasterData;
 using invoicing.PlugIn;
 using invoicing.Transactions;
@@ -120,8 +120,11 @@ namespace invoicing
 
         /// <summary>
         /// 判斷該視窗是否已經顯示在畫面上了，若沒有就呼叫該視窗，若有就不用管該請求
+        /// 【修改原因】：原本直接從根容器解析 Scoped 服務，導致所有表單共用同一個 InvoicIngDbContext 實例。
+        /// 當連續開啟不同表單時，非同步查詢會在同一個 DbContext 上同時執行，造成 InvalidOperationException。
+        /// 改為替每個開啟的表單建立獨立的 IServiceScope，並在表單關閉時自動 Dispose 釋放資源，確保每個表單擁有獨立的 DbContext 與服務實例。
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T">表單型別</typeparam>
         private void OpenForm<T>() where T : Form
         {
             var existingForm = MdiChildren.FirstOrDefault(f => f.GetType() == typeof(T));
@@ -132,10 +135,28 @@ namespace invoicing
             }
             else
             {
-                // 使用 DI 容器來建立表單實例
-                var newForm = Program.ServiceProvider.GetRequiredService<T>();
-                newForm.MdiParent = this;
-                newForm.Show();
+                // 為每個表單建立專屬的服務生命週期範圍 (IServiceScope)
+                var scope = Program.ServiceProvider.CreateScope();
+                try
+                {
+                    // 從獨立的 Scope 中解析表單實例，確保其注入的 DbContext 彼此隔離
+                    var newForm = scope.ServiceProvider.GetRequiredService<T>();
+                    newForm.MdiParent = this;
+
+                    // 當表單關閉時，釋放該 Scope 及其包含的 DbContext 與相關 Scoped 資源
+                    newForm.FormClosed += (sender, e) =>
+                    {
+                        scope.Dispose();
+                    };
+
+                    newForm.Show();
+                }
+                catch
+                {
+                    // 若建立或顯示表單失敗，立即釋放該 Scope 避免記憶體洩漏
+                    scope.Dispose();
+                    throw;
+                }
             }
         }
     }

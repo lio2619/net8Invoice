@@ -41,6 +41,12 @@ namespace invoicing.Models.DTO
         public string SelectColumns { get; set; } = "F1, F3, F6, F7, F8";
 
         /// <summary>
+        /// 比價單價倍率（唐詣為 1.05，金大與金大新為 1.0）
+        /// 【修改原因】：支援外掛 Excel 比價時，唐詣單價需先乘上 1.05 再比對現行成本
+        /// </summary>
+        public decimal PriceMultiplier { get; set; } = 1.0m;
+
+        /// <summary>
         /// 建立金大設定
         /// </summary>
         public static ExcelImportConfig JinDaConfig => new()
@@ -51,7 +57,8 @@ namespace invoicing.Models.DTO
             UnitColumn = "F7",
             UnitPriceColumn = "F8",
             SheetRange = "A16:K",
-            SelectColumns = "F1, F3, F6, F7, F8"
+            SelectColumns = "F1, F3, F6, F7, F8",
+            PriceMultiplier = 1.0m
         };
 
         /// <summary>
@@ -65,7 +72,8 @@ namespace invoicing.Models.DTO
             UnitColumn = "F4",
             UnitPriceColumn = "F5",
             SheetRange = "A16:H",
-            SelectColumns = "F1, F2, F3, F4, F5"
+            SelectColumns = "F1, F2, F3, F4, F5",
+            PriceMultiplier = 1.0m
         };
 
         /// <summary>
@@ -79,7 +87,8 @@ namespace invoicing.Models.DTO
             UnitColumn = "F9",
             UnitPriceColumn = "F10",
             SheetRange = "A12:L",
-            SelectColumns = "F1, F4, F8, F9, F10"
+            SelectColumns = "F1, F4, F8, F9, F10",
+            PriceMultiplier = 1.05m
         };
     }
 }

@@ -12,19 +12,17 @@ using invoicing.DB.DBContext;
 using Microsoft.EntityFrameworkCore;
 using UglyToad.PdfPig;
 
+using invoicing.Models.DTO;
+
 namespace invoicing.PlugIn
 {
     public partial class ComparePriceForm : Form
     {
-        private readonly InvoicIngDbContext _dbContext;
+        private readonly InvoicIngDbContext? _dbContext;
 
-        private class CompareDisplayRow
+        public ComparePriceForm()
         {
-            public string Barcode { get; set; }
-            public string ProductName { get; set; }
-            public string InvoicePrice { get; set; }
-            public string PriceA { get; set; }
-            public Color DisplayColor { get; set; }
+            InitializeComponent();
         }
 
         public ComparePriceForm(InvoicIngDbContext dbContext)
@@ -36,8 +34,26 @@ namespace invoicing.PlugIn
             btnRead.Click += btnRead_Click;
         }
 
+        /// <summary>
+        /// 提供給外掛 (金大/唐詣/金大新) Excel 成本比價彈出視窗使用的建構函式
+        /// </summary>
+        /// <param name="rows">比價異常資料列（虧損或成本未設定）</param>
+        /// <param name="title">視窗標題</param>
+        public ComparePriceForm(List<CompareDisplayRow> rows, string title = "外掛 Excel 成本比價結果")
+        {
+            InitializeComponent();
+            this.Text = title;
+            btnRead.Text = "確定 / 關閉";
+            btnRead.Click += (s, e) => this.Close();
+
+            // 顯示比對資料 (欄位：貨品編號、品名、單價(折算後)、現行成本)
+            DisplayRows(rows, "貨品編號", "品名", "單價(折算)", "現行成本");
+        }
+
         private async void btnRead_Click(object sender, EventArgs e)
         {
+            if (_dbContext == null) return;
+
             using var dialog = new OpenFileDialog
             {
                 Filter = "PDF 檔案 (*.pdf)|*.pdf"
@@ -145,59 +161,7 @@ namespace invoicing.PlugIn
                 }
 
                 // 5. 輸出顯示結果
-                rtbErrorShow.Clear();
-                if (displayRows.Count == 0)
-                {
-                    AppendColorText("此次沒有會虧錢的商品", Color.Green, true);
-                    return;
-                }
-
-                int tab1 = 0;
-                int tab2 = 0;
-                int tab3 = 0;
-                int padding = 35; // 欄位間距
-                float maxNameWidth = 0f;
-
-                using (Graphics g = rtbErrorShow.CreateGraphics())
-                {
-                    Font font = rtbErrorShow.Font;
-
-                    float maxCol0Width = g.MeasureString("國碼", font).Width;
-                    float maxCol1Width = g.MeasureString("品名", font).Width;
-                    float maxCol2Width = g.MeasureString("單子售價", font).Width;
-
-                    foreach (var row in displayRows)
-                    {
-                        maxCol0Width = Math.Max(maxCol0Width, g.MeasureString(row.Barcode, font).Width);
-                        maxCol1Width = Math.Max(maxCol1Width, g.MeasureString(row.ProductName, font).Width);
-                        maxCol2Width = Math.Max(maxCol2Width, g.MeasureString(row.InvoicePrice, font).Width);
-                    }
-
-                    tab1 = (int)(maxCol0Width + padding);
-                    tab2 = tab1 + 380; // 品名欄位固定為 354 像素寬度
-                    maxNameWidth = 380f; // 限制品名最大寬度為 354 像素
-                    tab3 = tab2 + (int)(maxCol2Width + padding);
-
-                    rtbErrorShow.SelectionTabs = new int[] { tab1, tab2, tab3 };
-                }
-
-                // 印出表頭 (深灰色、粗體)
-                Color headerColor = Color.FromArgb(64, 64, 64);
-                AppendColorText("國碼\t品名\t單子售價\t售價A\r\n", headerColor, true);
-                AppendColorText("--------------------------------------------------------------------------------------------------------\r\n", headerColor);
-
-                using (Graphics g = rtbErrorShow.CreateGraphics())
-                {
-                    Font font = rtbErrorShow.Font;
-
-                    // 逐行印出資料
-                    foreach (var row in displayRows)
-                    {
-                        string truncatedName = TruncateProductName(row.ProductName, font, maxNameWidth, g);
-                        string lineText = $"{row.Barcode}\t{truncatedName}\t{row.InvoicePrice}\t{row.PriceA}\r\n";
-                        AppendColorText(lineText, row.DisplayColor);
-                    }
-                }
+                DisplayRows(displayRows, "國碼", "品名", "單子售價", "售價A");
             }
             catch (Exception ex)
             {
@@ -355,6 +319,71 @@ namespace invoicing.PlugIn
             }
             rtbErrorShow.AppendText(text);
             rtbErrorShow.SelectionColor = rtbErrorShow.ForeColor; // 還原
+        }
+
+        /// <summary>
+        /// 格式化並於 RichTextBox 中顯示比價清單
+        /// 【修改原因】：抽離統一的比價清單格式化輸出邏輯，支援 PDF 比價及外掛 Excel 成本比價視窗共同使用
+        /// </summary>
+        public void DisplayRows(List<CompareDisplayRow> displayRows, string col0Header = "國碼", string col1Header = "品名", string col2Header = "單子售價", string col3Header = "售價A")
+        {
+            rtbErrorShow.Clear();
+            if (displayRows == null || displayRows.Count == 0)
+            {
+                AppendColorText("此次沒有會虧錢或異常的商品", Color.Green, true);
+                return;
+            }
+
+            int tab1 = 0;
+            int tab2 = 0;
+            int tab3 = 0;
+            int padding = 35; // 欄位間距
+            float maxNameWidth = 380f;
+
+            using (Graphics g = rtbErrorShow.CreateGraphics())
+            {
+                Font font = rtbErrorShow.Font;
+
+                float maxCol0Width = g.MeasureString(col0Header, font).Width;
+                float maxCol1Width = g.MeasureString(col1Header, font).Width;
+                float maxCol2Width = g.MeasureString(col2Header, font).Width;
+
+                foreach (var row in displayRows)
+                {
+                    maxCol0Width = Math.Max(maxCol0Width, g.MeasureString(row.Barcode ?? "", font).Width);
+                    maxCol1Width = Math.Max(maxCol1Width, g.MeasureString(row.ProductName ?? "", font).Width);
+                    maxCol2Width = Math.Max(maxCol2Width, g.MeasureString(row.InvoicePrice ?? "", font).Width);
+                }
+
+                tab1 = (int)(maxCol0Width + padding);
+                tab2 = tab1 + 380; // 品名欄位固定為 380 像素寬度
+                tab3 = tab2 + (int)(maxCol2Width + padding);
+
+                rtbErrorShow.SelectionTabs = new int[] { tab1, tab2, tab3 };
+            }
+
+            // 印出表頭 (深灰色、粗體)
+            Color headerColor = Color.FromArgb(64, 64, 64);
+            AppendColorText($"{col0Header}\t{col1Header}\t{col2Header}\t{col3Header}\r\n", headerColor, true);
+            AppendColorText("--------------------------------------------------------------------------------------------------------\r\n", headerColor);
+
+            using (Graphics g = rtbErrorShow.CreateGraphics())
+            {
+                Font font = rtbErrorShow.Font;
+
+                // 逐行印出資料
+                foreach (var row in displayRows)
+                {
+                    string truncatedName = TruncateProductName(row.ProductName ?? "", font, maxNameWidth, g);
+                    string col3Value = !string.IsNullOrEmpty(row.StandardCost) ? row.StandardCost : (row.PriceA ?? "");
+                    if (!string.IsNullOrEmpty(row.Remark))
+                    {
+                        col3Value += $" [{row.Remark}]";
+                    }
+                    string lineText = $"{row.Barcode}\t{truncatedName}\t{row.InvoicePrice}\t{col3Value}\r\n";
+                    AppendColorText(lineText, row.DisplayColor);
+                }
+            }
         }
 
         /// <summary>

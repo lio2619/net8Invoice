@@ -26,6 +26,11 @@ namespace invoicing.Models.DTO
         /// 明細列表
         /// </summary>
         public List<ImportedOrderDetail> Details { get; set; } = new();
+
+        /// <summary>
+        /// 比價結果清單（用於比對 Excel 單價與現行成本）
+        /// </summary>
+        public List<CompareDisplayRow> CompareDisplayRows { get; set; } = new();
     }
 
     /// <summary>

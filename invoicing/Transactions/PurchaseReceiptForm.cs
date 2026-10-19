@@ -1,4 +1,4 @@
-﻿// 進貨單
+// 進貨單
 
 using invoicing.Event;
 using invoicing.Models.DTO;
@@ -115,7 +115,7 @@ namespace invoicing.Transactions
                     quantityColumnHeaderText: "數量",
                     priceColumnHeaderText: "單價",
                     onTotalAmountChanged: UpdateTotalAmountLabel,
-                    onProductCodeSelected: code => _eventBus.Publish(new MasterSelectEvent(code)),
+                    onProductCodeSelected: code => _eventBus.Publish(new ProductSelectEvent(code, this)),
                     _cancellationTokenSource.Token);
             };
 
@@ -545,8 +545,8 @@ namespace invoicing.Transactions
             if (string.IsNullOrEmpty(productCode))
                 return;
 
-            // 觸發事件
-            _eventBus.Publish(new MasterSelectEvent(productCode));
+            // 觸發產品專屬事件
+            _eventBus.Publish(new ProductSelectEvent(productCode, this));
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)

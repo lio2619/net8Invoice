@@ -77,7 +77,16 @@ namespace invoicing.Service
                 var quantity = rowData.GetValueOrDefault(config.QuantityColumn, "0");
                 var unit = rowData.GetValueOrDefault(config.UnitColumn, "");
 
-                // 查詢貨品資訊
+                // 讀取 Excel 檔案中的原始單價
+                var unitPriceValue = !string.IsNullOrEmpty(config.UnitPriceColumn) 
+                    ? rowData.GetValueOrDefault(config.UnitPriceColumn, "0") 
+                    : "0";
+                decimal.TryParse(unitPriceValue, out decimal excelPrice);
+
+                // 計算折算後單價（依設定之倍率：唐詣乘上 1.05，金大與金大新為 1.0）
+                decimal adjustedPrice = Math.Round(excelPrice * config.PriceMultiplier, 2, MidpointRounding.AwayFromZero);
+
+                // 查詢貨品主檔資訊
                 var productInfo = await pluginFormService.GetProductInfoAsync(productCode);
 
                 var detail = new ImportedOrderDetail
@@ -95,10 +104,23 @@ namespace invoicing.Service
 
                     // 新增貨品至資料庫
                     await pluginFormService.InsertProductAsync(productCode, productName, unit);
+
+                    // 資料庫查無此商品，標記為成本未設定商品
+                    result.CompareDisplayRows.Add(new CompareDisplayRow
+                    {
+                        Barcode = productCode,
+                        ProductName = productName,
+                        InvoicePrice = adjustedPrice.ToString("F2"),
+                        OriginalPrice = excelPrice.ToString("F2"),
+                        StandardCost = "0.00 (未設定)",
+                        DisplayColor = System.Drawing.Color.DarkOrange,
+                        Remark = "成本未設定/新商品",
+                        IsCostNotSet = true
+                    });
                 }
                 else
                 {
-                    // 貨品存在，使用資料庫中的資料
+                    // 貨品存在，維持原本邏輯使用資料庫中的 StandardPrice 計算單價與金額
                     if (!double.TryParse(productInfo.StandardPrice, out var standardPrice)) standardPrice = 0;
                     if (!double.TryParse(quantity, out var qty)) qty = 0;
                     var amount = standardPrice * qty;
@@ -113,6 +135,42 @@ namespace invoicing.Service
                     detail.Remark = suggestedPrice ?? "";
 
                     totalAmount += amount;
+
+                    // 【現行成本比價邏輯】
+                    // 解析資料庫中的現行成本 StandardCost
+                    decimal standardCost = 0m;
+                    bool hasValidCost = decimal.TryParse(productInfo.StandardCost, out standardCost) && standardCost > 0m;
+
+                    if (!hasValidCost)
+                    {
+                        // 成本未設定或為 0
+                        result.CompareDisplayRows.Add(new CompareDisplayRow
+                        {
+                            Barcode = productCode,
+                            ProductName = productInfo.ProductName,
+                            InvoicePrice = adjustedPrice.ToString("F2"),
+                            OriginalPrice = excelPrice.ToString("F2"),
+                            StandardCost = "0.00 (未設定)",
+                            DisplayColor = System.Drawing.Color.DarkGoldenrod,
+                            Remark = "成本未設定/0",
+                            IsCostNotSet = true
+                        });
+                    }
+                    else if (adjustedPrice < standardCost)
+                    {
+                        // 虧損判定：折算單價 < 現行成本
+                        result.CompareDisplayRows.Add(new CompareDisplayRow
+                        {
+                            Barcode = productCode,
+                            ProductName = productInfo.ProductName,
+                            InvoicePrice = adjustedPrice.ToString("F2"),
+                            OriginalPrice = excelPrice.ToString("F2"),
+                            StandardCost = standardCost.ToString("F2"),
+                            DisplayColor = System.Drawing.Color.Red,
+                            Remark = $"虧損 {(standardCost - adjustedPrice):F2}",
+                            IsBelowCost = true
+                        });
+                    }
                 }
 
                 result.Details.Add(detail);

@@ -1,4 +1,4 @@
-﻿// 採購單
+// 採購單
 
 using invoicing.Event;
 using invoicing.Models.DTO;
@@ -197,7 +197,7 @@ namespace invoicing.Transactions
                     dgvInvoicing.Update();
                     
                     // 通知管理貨品表單（如果有開啟）
-                    _eventBus.Publish(new MasterSelectEvent(productCode));
+                    _eventBus.Publish(new ProductSelectEvent(productCode, this));
                 }
                 
                 // 由於採購單沒有單價欄位，不需要清除可能設定的單價
@@ -552,8 +552,8 @@ namespace invoicing.Transactions
             if (string.IsNullOrEmpty(productCode))
                 return;
 
-            // 觸發事件
-            _eventBus.Publish(new MasterSelectEvent(productCode));
+            // 觸發產品專屬事件
+            _eventBus.Publish(new ProductSelectEvent(productCode, this));
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)

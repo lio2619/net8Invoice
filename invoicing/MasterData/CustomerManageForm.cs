@@ -1,4 +1,4 @@
-﻿//管理客戶資料
+//管理客戶資料
 
 using invoicing.Event;
 using invoicing.Models.Entity;
@@ -31,52 +31,74 @@ namespace invoicing.MasterData
             _formUIService.AddTextBoxUnderline(txtCustomerTel);
             _formUIService.AddTextBoxUnderline(txtCustomerFax);
 
-            //訂閱事件
-            _eventBus.Subscribe<MasterSelectEvent>(OnCustomerSelected);
+            // 訂閱客戶選取專屬事件，避免接收到出貨單等其他表單的產品編號
+            _eventBus.Subscribe<CustomerSelectEvent>(OnCustomerSelected);
         }
 
-        private void OnCustomerSelected(MasterSelectEvent masterSelectEvent)
+        private async void OnCustomerSelected(CustomerSelectEvent evt)
         {
-            SearchAsync(masterSelectEvent.FullyName);
+            // 若為自身發布則略過，避免重複處理
+            if (evt.Sender == this || string.IsNullOrWhiteSpace(evt.FullyName)) return;
+
+            // 僅同步連動更新表單資料，不呼叫 BringToFront() 與 Activate() 移動至最上層或搶奪焦點，
+            // 避免干擾使用者在其他作業表單（如出貨單、銷貨單等）上的操作流程
+            await SearchAsync(evt.FullyName, notifyOtherForms: false);
         }
 
         protected override void OnFormClosed(FormClosedEventArgs e)
         {
             // 記得退訂，避免記憶體洩漏
-            _eventBus.Unsubscribe<MasterSelectEvent>(OnCustomerSelected);
+            _eventBus.Unsubscribe<CustomerSelectEvent>(OnCustomerSelected);
             base.OnFormClosed(e);
         }
 
-        private async Task SearchAsync(string companyName)
+        private async Task<bool> SearchAsync(string companyName, bool notifyOtherForms = true)
         {
             if (string.IsNullOrWhiteSpace(companyName))
             {
                 MessageBox.Show("請輸入客戶名稱", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
+                return false;
             }
 
-            var customer = await _customerRepository.Get(x => x.CompanyFullName == companyName)
-                                                    .Select(
-                                                        y => new
-                                                        {
-                                                            y.CompanyCode,
-                                                            y.CompanyFullName,
-                                                            y.DeliveryAddress,
-                                                            y.Phone1,
-                                                            y.FaxNumber
-                                                        })
-                                                    .FirstOrDefaultAsync();
-            if (customer is not null)
+            try
             {
-                lblCustomerIdValue.Text = customer.CompanyCode;
-                txtCustomerName.Text = customer.CompanyFullName;
-                txtCustomerAddress.Text = customer.DeliveryAddress;
-                txtCustomerTel.Text = customer.Phone1;
-                txtCustomerFax.Text = customer.FaxNumber;
+                var customer = await _customerRepository.Get(x => x.CompanyFullName == companyName)
+                                                        .Select(
+                                                            y => new
+                                                            {
+                                                                y.CompanyCode,
+                                                                y.CompanyFullName,
+                                                                y.DeliveryAddress,
+                                                                y.Phone1,
+                                                                y.FaxNumber
+                                                            })
+                                                        .FirstOrDefaultAsync();
+                if (customer is not null)
+                {
+                    lblCustomerIdValue.Text = customer.CompanyCode;
+                    txtCustomerName.Text = customer.CompanyFullName;
+                    txtCustomerAddress.Text = customer.DeliveryAddress;
+                    txtCustomerTel.Text = customer.Phone1;
+                    txtCustomerFax.Text = customer.FaxNumber;
+
+                    // 若是由管理表單主動搜尋，則雙向通知客戶資料清單表單同步定位該客戶
+                    if (notifyOtherForms && !string.IsNullOrEmpty(customer.CompanyFullName))
+                    {
+                        _eventBus.Publish(new CustomerSelectEvent(customer.CompanyFullName, this));
+                    }
+
+                    return true;
+                }
+                else
+                {
+                    MessageBox.Show("找不到此客戶", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show("找不到此客戶", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"查詢客戶發生錯誤：{ex.Message}", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
             }
         }
 

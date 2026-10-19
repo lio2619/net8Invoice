@@ -1,4 +1,4 @@
-﻿//管理產品資料
+//管理產品資料
 
 using invoicing.Event;
 using invoicing.Models.Entity;
@@ -38,60 +38,80 @@ namespace invoicing.MasterData
             // 初始化清空
             btnFormClear_Click(null, null);
 
-            //訂閱事件
-            //TODO 這邊有一個bug，如果先開了產品的form並且沒有關閉此form，接下來開啟其他的form也會訂閱這個東西
-            _eventBus.Subscribe<MasterSelectEvent>(OnProductSelected);
+            // 訂閱產品專屬事件（解決舊有事件混淆 bug，不再被客戶或廠商事件干擾）
+            _eventBus.Subscribe<ProductSelectEvent>(OnProductSelected);
         }
 
-        private void OnProductSelected(MasterSelectEvent masterSelectEvent)
+        private async void OnProductSelected(ProductSelectEvent evt)
         {
-            SearchAsync(masterSelectEvent.FullyName);
+            if (evt.Sender == this || string.IsNullOrWhiteSpace(evt.ProductCode)) return;
+
+            // 僅同步連動更新表單資料，不呼叫 BringToFront() 與 Activate() 移動至最上層或搶奪焦點，
+            // 避免干擾使用者在出貨單等作業表單上的連續輸入操作
+            await SearchAsync(evt.ProductCode, notifyOtherForms: false);
         }
 
         protected override void OnFormClosed(FormClosedEventArgs e)
         {
-            // 記得退訂，避免記憶體洩漏
-            _eventBus.Unsubscribe<MasterSelectEvent>(OnProductSelected);
+            // 退訂事件以防止記憶體洩漏
+            _eventBus.Unsubscribe<ProductSelectEvent>(OnProductSelected);
             base.OnFormClosed(e);
         }
 
-        private async Task SearchAsync(string productCode)
+        private async Task<bool> SearchAsync(string productCode, bool notifyOtherForms = true)
         {
             if (string.IsNullOrWhiteSpace(productCode))
             {
                 MessageBox.Show("請輸入產品編號", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
+                return false;
             }
 
-            var product = await _productRepository.Get(x => x.ProductCode == productCode)
-                                                    .Select(
-                                                        y => new
-                                                        {
-                                                            y.ProductName,
-                                                            y.Unit,
-                                                            y.StandardPrice,
-                                                            y.PriceA,
-                                                            y.PriceB,
-                                                            y.BoxCost,
-                                                            y.StandardCost,
-                                                            y.CurrentCost,
-                                                        })
-                                                    .FirstOrDefaultAsync();
-            if (product is not null)
+            try
             {
-                txtProductId.Text = productCode;
-                txtProductName.Text = product.ProductName;
-                txtProductUnit.Text = product.Unit;
-                txtProductStandardPrice.Text = product.StandardPrice.ToString();
-                txtProductPriceA.Text = product.PriceA.ToString();
-                txtProductPriceB.Text = product.PriceB.ToString();
-                txtProductBoxCost.Text = product.BoxCost.ToString();
-                txtProductStandardCost.Text = product.StandardCost.ToString();
-                txtProductCurrentCost.Text = product.CurrentCost.ToString();
+                var product = await _productRepository.Get(x => x.ProductCode == productCode)
+                                                        .Select(
+                                                            y => new
+                                                            {
+                                                                y.ProductName,
+                                                                y.Unit,
+                                                                y.StandardPrice,
+                                                                y.PriceA,
+                                                                y.PriceB,
+                                                                y.BoxCost,
+                                                                y.StandardCost,
+                                                                y.CurrentCost,
+                                                            })
+                                                        .FirstOrDefaultAsync();
+                if (product is not null)
+                {
+                    txtProductId.Text = productCode;
+                    txtProductName.Text = product.ProductName;
+                    txtProductUnit.Text = product.Unit;
+                    txtProductStandardPrice.Text = product.StandardPrice.ToString();
+                    txtProductPriceA.Text = product.PriceA.ToString();
+                    txtProductPriceB.Text = product.PriceB.ToString();
+                    txtProductBoxCost.Text = product.BoxCost.ToString();
+                    txtProductStandardCost.Text = product.StandardCost.ToString();
+                    txtProductCurrentCost.Text = product.CurrentCost.ToString();
+
+                    // 若是由管理表單主動搜尋，雙向通知產品清單表單同步定位
+                    if (notifyOtherForms && !string.IsNullOrEmpty(productCode))
+                    {
+                        _eventBus.Publish(new ProductSelectEvent(productCode, this));
+                    }
+
+                    return true;
+                }
+                else
+                {
+                    MessageBox.Show("找不到此產品編號", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show("找不到此產品編號", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"查詢產品發生錯誤：{ex.Message}", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
             }
         }
 

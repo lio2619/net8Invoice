@@ -1,4 +1,4 @@
-﻿// 進貨退出單
+// 進貨退出單
 
 using invoicing.Event;
 using invoicing.Models.DTO;
@@ -170,7 +170,7 @@ namespace invoicing.Transactions
                         dgvInvoicing.Update();
 
                         // 通知管理貨品表單（如果有開啟）
-                        _eventBus.Publish(new MasterSelectEvent(productCode));
+                        _eventBus.Publish(new ProductSelectEvent(productCode, this));
                     }
                     else
                     {
@@ -622,8 +622,8 @@ namespace invoicing.Transactions
             if (string.IsNullOrEmpty(productCode))
                 return;
 
-            // 觸發事件
-            _eventBus.Publish(new MasterSelectEvent(productCode));
+            // 觸發產品專屬事件
+            _eventBus.Publish(new ProductSelectEvent(productCode, this));
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)

@@ -1,4 +1,4 @@
-﻿//所有產品資料
+//所有產品資料
 
 using invoicing.Event;
 using invoicing.Models.DTO;
@@ -40,6 +40,36 @@ namespace invoicing.MasterData
             dgvProductAll.DataSource = productData;
             dgvProductAll.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             dgvProductAll.DefaultCellStyle.Font = new Font("Microsoft JhengHei", 12);
+
+            // 訂閱產品選取事件，支援產品管理資料或其他單據切換時之雙向定位
+            _eventBus.Subscribe<ProductSelectEvent>(OnProductSelectedFromOtherForm);
+        }
+
+        /// <summary>
+        /// 當其他表單（如產品管理資料或單據）切換貨品時，同步定位產品清單表格
+        /// </summary>
+        private void OnProductSelectedFromOtherForm(ProductSelectEvent evt)
+        {
+            if (evt.Sender == this || string.IsNullOrWhiteSpace(evt.ProductCode)) return;
+
+            var row = dgvProductAll.Rows.Cast<DataGridViewRow>()
+                        .Where(r => !r.IsNewRow)
+                        .FirstOrDefault(r =>
+                            r.Cells[nameof(ProductDTO.ProductCode)].Value != null &&
+                            string.Equals(r.Cells[nameof(ProductDTO.ProductCode)].Value.ToString(), evt.ProductCode, StringComparison.OrdinalIgnoreCase));
+
+            if (row != null)
+            {
+                dgvProductAll.CurrentCell = row.Cells[0];
+                dgvProductAll.FirstDisplayedScrollingRowIndex = row.Index;
+            }
+        }
+
+        protected override void OnFormClosed(FormClosedEventArgs e)
+        {
+            // 退訂事件以防止記憶體洩漏
+            _eventBus.Unsubscribe<ProductSelectEvent>(OnProductSelectedFromOtherForm);
+            base.OnFormClosed(e);
         }
 
         private void txtInput_TextChanged(object sender, EventArgs e)
@@ -89,8 +119,8 @@ namespace invoicing.MasterData
             if (string.IsNullOrEmpty(productCode))
                 return;
 
-            // 觸發事件
-            _eventBus.Publish(new MasterSelectEvent(productCode));
+            // 發布強型別產品選取事件（標記自身為 Sender 避免遞迴）
+            _eventBus.Publish(new ProductSelectEvent(productCode, this));
         }
     }
 }

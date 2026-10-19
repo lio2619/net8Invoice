@@ -1,4 +1,4 @@
-﻿//所有客戶資料
+//所有客戶資料
 
 using invoicing.Event;
 using invoicing.Models.DTO;
@@ -37,6 +37,36 @@ namespace invoicing.MasterData
             dgvCustomerAll.DataSource = customerData;
             dgvCustomerAll.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             dgvCustomerAll.DefaultCellStyle.Font = new Font("Microsoft JhengHei", 12);
+            // 訂閱客戶選取事件，以支援自客戶管理資料切換時之雙向同步選取定位
+            _eventBus.Subscribe<CustomerSelectEvent>(OnCustomerSelectedFromOtherForm);
+        }
+
+        /// <summary>
+        /// 當其他表單（如客戶管理資料）切換或搜尋客戶時，同步定位客戶清單表格
+        /// </summary>
+        private void OnCustomerSelectedFromOtherForm(CustomerSelectEvent evt)
+        {
+            if (evt.Sender == this || string.IsNullOrWhiteSpace(evt.FullyName)) return;
+
+            // 尋找表格中相符的客戶名稱列
+            var row = dgvCustomerAll.Rows.Cast<DataGridViewRow>()
+                        .Where(r => !r.IsNewRow)
+                        .FirstOrDefault(r =>
+                            r.Cells[nameof(CustomerDto.CompanyFullName)].Value != null &&
+                            string.Equals(r.Cells[nameof(CustomerDto.CompanyFullName)].Value.ToString(), evt.FullyName, StringComparison.OrdinalIgnoreCase));
+
+            if (row != null)
+            {
+                dgvCustomerAll.CurrentCell = row.Cells[0];
+                dgvCustomerAll.FirstDisplayedScrollingRowIndex = row.Index;
+            }
+        }
+
+        protected override void OnFormClosed(FormClosedEventArgs e)
+        {
+            // 退訂事件以防止記憶體洩漏
+            _eventBus.Unsubscribe<CustomerSelectEvent>(OnCustomerSelectedFromOtherForm);
+            base.OnFormClosed(e);
         }
 
         private void txtInput_TextChanged(object sender, EventArgs e)
@@ -71,8 +101,8 @@ namespace invoicing.MasterData
             if (string.IsNullOrEmpty(companyName))
                 return;
 
-            // 觸發事件
-            _eventBus.Publish(new MasterSelectEvent(companyName));
+            // 發布強型別客戶選取事件（標記自身為 Sender 避免遞迴），通知客戶管理資料切換
+            _eventBus.Publish(new CustomerSelectEvent(companyName, this));
         }
     }
 }
