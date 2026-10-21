@@ -17,7 +17,10 @@ namespace invoicing.PlugIn
         private bool _isSaved = false;
         private DataTable _sourceTable = new DataTable();
         private string _currentOrderNumber = string.Empty;
-        private ComparePriceForm? _comparePriceForm;
+        /// <summary>
+        /// 外掛專屬之 Excel 成本比價 MDI 子視窗實例（型別隔離避免與主選單 ComparePriceForm 衝突）
+        /// </summary>
+        private PluginComparePriceForm? _comparePriceForm;
 
         public JinDaForm(
             IPluginFormService pluginFormService, 
@@ -512,6 +515,7 @@ namespace invoicing.PlugIn
         /// 1. 原本使用 ShowDialog(this) 強制回應視窗會鎖死主視窗，使用者無法操作其他選單。
         /// 2. 若僅使用獨立浮動視窗 (無 MdiParent)，點擊主畫面選單（如「產品資料管理」）時會導致比價視窗被整個主視窗覆蓋沉入背景。
         /// 3. 改將比價視窗設為 MDI 子視窗 (MdiParent = this.MdiParent)，與「產品資料管理」等功能頁面同存於主工作區內，不會被覆蓋消失，方便多筆資料逐項對照修改。
+        /// 4. 採用專屬衍生類別 PluginComparePriceForm 進行型別隔離，避免主選單 OpenForm&lt;ComparePriceForm&gt;() 誤判已開啟而只執行 Focus() 導致點選主選單「比價」毫無反應的問題。
         /// </summary>
         /// <param name="rows">比價異常資料列</param>
         /// <param name="title">視窗標題</param>
@@ -522,7 +526,7 @@ namespace invoicing.PlugIn
             // 若主視窗內已存在舊有的比價視窗（無論由何表單開啟），先行關閉釋放以避免堆疊
             if (this.MdiParent != null)
             {
-                var existingMdiCompare = this.MdiParent.MdiChildren.OfType<ComparePriceForm>().ToList();
+                var existingMdiCompare = this.MdiParent.MdiChildren.OfType<PluginComparePriceForm>().ToList();
                 foreach (var form in existingMdiCompare)
                 {
                     form.Close();
@@ -530,7 +534,7 @@ namespace invoicing.PlugIn
                 }
             }
 
-            _comparePriceForm = new ComparePriceForm(rows, title);
+            _comparePriceForm = new PluginComparePriceForm(rows, title);
             if (this.MdiParent != null)
             {
                 _comparePriceForm.MdiParent = this.MdiParent;

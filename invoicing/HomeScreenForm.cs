@@ -119,10 +119,13 @@ namespace invoicing
         }
 
         /// <summary>
-        /// 判斷該視窗是否已經顯示在畫面上了，若沒有就呼叫該視窗，若有就不用管該請求
-        /// 【修改原因】：原本直接從根容器解析 Scoped 服務，導致所有表單共用同一個 InvoicIngDbContext 實例。
-        /// 當連續開啟不同表單時，非同步查詢會在同一個 DbContext 上同時執行，造成 InvalidOperationException。
-        /// 改為替每個開啟的表單建立獨立的 IServiceScope，並在表單關閉時自動 Dispose 釋放資源，確保每個表單擁有獨立的 DbContext 與服務實例。
+        /// 判斷該視窗是否已經顯示在畫面上了，若沒有就呼叫該視窗，若有就喚醒並置頂該視窗
+        /// 【修改原因】：
+        /// 1. 原本直接從根容器解析 Scoped 服務，導致所有表單共用同一個 InvoicIngDbContext 實例。
+        ///    當連續開啟不同表單時，非同步查詢會在同一個 DbContext 上同時執行，造成 InvalidOperationException。
+        ///    改為替每個開啟的表單建立獨立的 IServiceScope，並在表單關閉時自動 Dispose 釋放資源，確保每個表單擁有獨立的 DbContext 與服務實例。
+        /// 2. 原本當表單已存在時僅執行 Focus()，若該表單處於最小化或被其他 MDI 視窗遮蔽時，使用者點選主選單會看似無反應。
+        ///    加入判斷：若表單已最小化則自動還原為 Normal，並依序執行 BringToFront()、Activate() 與 Focus()，確保畫面能確實浮上最頂層並獲取焦點。
         /// </summary>
         /// <typeparam name="T">表單型別</typeparam>
         private void OpenForm<T>() where T : Form
@@ -131,6 +134,13 @@ namespace invoicing
 
             if (existingForm != null)
             {
+                // 若表單已縮小則還原，並移至最上層以利使用者操作
+                if (existingForm.WindowState == FormWindowState.Minimized)
+                {
+                    existingForm.WindowState = FormWindowState.Normal;
+                }
+                existingForm.BringToFront();
+                existingForm.Activate();
                 existingForm.Focus();
             }
             else
